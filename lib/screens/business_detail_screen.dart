@@ -1,0 +1,555 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../services/api_service.dart';
+import '../utils/business_category.dart';
+import '../utils/map_config.dart';
+import '../utils/maps_launcher.dart';
+import '../widgets/report_dialog.dart';
+import 'business_form_screen.dart';
+import 'premium_screen.dart';
+import 'user_profile_screen.dart';
+import '../theme/app_colors.dart';
+import '../widgets/app_loader.dart';
+import '../utils/sound_player.dart';
+
+class BusinessDetailScreen extends StatefulWidget {
+  final String businessId;
+
+  const BusinessDetailScreen({Key? key, required this.businessId}) : super(key: key);
+
+  @override
+  State<BusinessDetailScreen> createState() => _BusinessDetailScreenState();
+}
+
+class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
+  Map<String, dynamic>? _business;
+  List<dynamic> _reviews = [];
+  bool _isLoadingDetail = true;
+  bool _isActionLoading = false;
+
+  bool _showReviewForm = false;
+  int _myStars = 0;
+  final _reviewController = TextEditingController();
+
+  String? get _myId => Provider.of<AuthProvider>(context, listen: false).user?['id'];
+  bool get _isOwner => _business != null && _business!['owner_id'] != null && _business!['owner_id'] == _myId;
+  bool get _isFavorite => _business?['is_favorite'] == true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAll();
+  }
+
+  @override
+  void dispose() {
+    _reviewController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadAll() async {
+    await _loadBusiness();
+    await _loadReviews();
+  }
+
+  Future<void> _loadBusiness() async {
+    setState(() => _isLoadingDetail = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final response = await ApiService.get(
+        '/api/businesses/${widget.businessId}',
+        token: authProvider.accessToken,
+      );
+      setState(() {
+        _business = response;
+        _myStars = (response['my_rating'] as int?) ?? 0;
+      });
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoadingDetail = false);
+    }
+  }
+
+  Future<void> _loadReviews() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final response = await ApiService.get(
+        '/api/businesses/${widget.businessId}/reviews?limit=50',
+        token: authProvider.accessToken,
+      );
+      setState(() => _reviews = response['items'] ?? []);
+    } catch (e) {
+      print('Ошибка: $e');
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    if (_business == null) return;
+    setState(() => _isActionLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      if (_isFavorite) {
+        await ApiService.delete('/api/businesses/${widget.businessId}/favorite', token: authProvider.accessToken);
+      } else {
+        await ApiService.post('/api/businesses/${widget.businessId}/favorite', {}, token: authProvider.accessToken);
+      }
+      if (mounted) setState(() => _business!['is_favorite'] = !_isFavorite);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _isActionLoading = false);
+    }
+  }
+
+  Future<void> _submitReview() async {
+    if (_myStars == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Поставь оценку от 1 до 5 звёзд')));
+      return;
+    }
+    setState(() => _isActionLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await ApiService.post(
+        '/api/businesses/${widget.businessId}/reviews',
+        {
+          'rating': _myStars,
+          'text': _reviewController.text.trim().isEmpty ? null : _reviewController.text.trim(),
+        },
+        token: authProvider.accessToken,
+      );
+      _reviewController.clear();
+      setState(() => _showReviewForm = false);
+      await _loadAll();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Отзыв отправлен')));
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _isActionLoading = false);
+    }
+  }
+
+  bool _isBoosted() {
+    final until = _business?['boosted_until'];
+    if (until == null) return false;
+    try {
+      return DateTime.parse(until.toString()).isAfter(DateTime.now());
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _boost() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final isPremium = authProvider.user?['is_premium'] == true;
+    if (!isPremium) {
+      final goPremium = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Только для Premium'),
+          content: const Text('Поднимать заведение в топ каталога могут только подписчики CarSpot Premium.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Узнать больше')),
+          ],
+        ),
+      );
+      if (goPremium == true && mounted) {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumScreen()));
+      }
+      return;
+    }
+    try {
+      final response = await ApiService.post(
+        '/api/businesses/${widget.businessId}/boost',
+        {},
+        token: authProvider.accessToken,
+      );
+      setState(() => _business = response);
+      SoundPlayer.play(context, AppSound.success);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Заведение поднято в топ каталога на 24 часа 🚀')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+    }
+  }
+
+  Future<void> _openEdit() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => BusinessFormScreen(business: _business)),
+    );
+    if (result == true) _loadAll();
+  }
+
+  Future<void> _delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Удалить заведение?'),
+        content: const Text('Вместе с ним удалятся все отзывы. Это нельзя отменить.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _isActionLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await ApiService.delete('/api/businesses/${widget.businessId}', token: authProvider.accessToken);
+      if (mounted) {
+        Navigator.pop(context, true);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Заведение удалено')));
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _isActionLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoadingDetail && _business == null) {
+      return Scaffold(body: Center(child: AppLoader()));
+    }
+    if (_business == null) {
+      return const Scaffold(body: Center(child: Text('Заведение не найдено')));
+    }
+
+    final b = _business!;
+    final rating = ((b['average_rating'] ?? 0) as num).toDouble();
+    final reviewsCount = b['reviews_count'] ?? 0;
+    final coverUrl = b['cover_url'] as String?;
+    final logoUrl = b['logo_url'] as String?;
+    final services = (b['services'] as String? ?? '')
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(b['name'] ?? ''),
+        actions: [
+          IconButton(
+            icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border, color: _isFavorite ? AppColors.red : null),
+            tooltip: 'В избранное',
+            onPressed: _isActionLoading ? null : _toggleFavorite,
+          ),
+          if (_isOwner) ...[
+            IconButton(
+              icon: Icon(Icons.rocket_launch, color: _isBoosted() ? Colors.amber : null),
+              tooltip: _isBoosted() ? 'Заведение в топе' : 'Поднять в топ каталога (Premium)',
+              onPressed: _isBoosted() ? null : _boost,
+            ),
+            IconButton(icon: const Icon(Icons.edit), tooltip: 'Изменить', onPressed: _openEdit),
+            IconButton(icon: const Icon(Icons.delete_outline), tooltip: 'Удалить', onPressed: _delete),
+          ],
+          if (!_isOwner)
+            IconButton(
+              icon: const Icon(Icons.flag_outlined),
+              tooltip: 'Пожаловаться',
+              onPressed: () => showReportDialog(context, targetType: 'business', targetId: widget.businessId),
+            ),
+        ],
+      ),
+      body: RefreshIndicator(
+        color: AppColors.red,
+        backgroundColor: AppColors.surfaceDark,
+        onRefresh: _loadAll,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            if (coverUrl != null && coverUrl.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(coverUrl, height: 160, width: double.infinity, fit: BoxFit.cover),
+              ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                (logoUrl != null && logoUrl.isNotEmpty)
+                    ? CircleAvatar(radius: 28, backgroundImage: NetworkImage(logoUrl))
+                    : CircleAvatar(
+                        radius: 28,
+                        backgroundColor: AppColors.blue.withOpacity(0.15),
+                        child: Icon(businessCategoryIcon(b['category']), color: AppColors.blue),
+                      ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              b['name'] ?? '',
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (b['is_verified'] == true) ...[
+                            const SizedBox(width: 6),
+                            const Icon(Icons.verified, color: AppColors.blue, size: 18),
+                          ],
+                        ],
+                      ),
+                      Text(businessCategoryLabel(b['category']), style: const TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                ...List.generate(5, (i) {
+                  return Icon(
+                    i < rating.round() ? Icons.star : Icons.star_border,
+                    color: Colors.orange,
+                    size: 20,
+                  );
+                }),
+                const SizedBox(width: 8),
+                Text('${rating.toStringAsFixed(1)} ($reviewsCount отзывов)'),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            if ((b['description'] ?? '').toString().isNotEmpty) ...[
+              Text(b['description'], style: const TextStyle(fontSize: 14)),
+              const SizedBox(height: 20),
+            ],
+
+            if (services.isNotEmpty) ...[
+              const Text('Услуги', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: services.map((s) => Chip(label: Text(s))).toList(),
+              ),
+              const SizedBox(height: 20),
+            ],
+
+            const Text('Контакты', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            if ((b['city'] ?? '').toString().isNotEmpty ||
+                (b['address'] ?? '').toString().isNotEmpty ||
+                (b['latitude'] != null && b['longitude'] != null))
+              _infoRow(
+                Icons.location_on,
+                () {
+                  final parts = [b['city'], b['address']]
+                      .where((s) => (s ?? '').toString().isNotEmpty)
+                      .join(', ');
+                  return parts.isNotEmpty ? parts : 'Место указано на карте';
+                }(),
+                trailing: (b['latitude'] != null && b['longitude'] != null)
+                    ? IconButton(
+                        icon: const Icon(Icons.directions, color: AppColors.blue, size: 20),
+                        tooltip: 'Маршрут в Google Maps',
+                        onPressed: () => openDirections(
+                          context,
+                          (b['latitude'] as num).toDouble(),
+                          (b['longitude'] as num).toDouble(),
+                        ),
+                      )
+                    : null,
+              ),
+            if (b['latitude'] != null && b['longitude'] != null) ...[
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: SizedBox(
+                  height: 160,
+                  child: FlutterMap(
+                    options: MapOptions(
+                      initialCenter: LatLng(
+                        (b['latitude'] as num).toDouble(),
+                        (b['longitude'] as num).toDouble(),
+                      ),
+                      initialZoom: defaultMapZoom,
+                    ),
+                    children: [
+                      TileLayer(urlTemplate: osmTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: LatLng(
+                              (b['latitude'] as num).toDouble(),
+                              (b['longitude'] as num).toDouble(),
+                            ),
+                            width: 40,
+                            height: 40,
+                            child: Icon(
+                              businessCategoryIcon(b['category']),
+                              color: AppColors.blue,
+                              size: 34,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            if ((b['phone'] ?? '').toString().isNotEmpty) _infoRow(Icons.phone, b['phone']),
+            if ((b['website'] ?? '').toString().isNotEmpty) _infoRow(Icons.language, b['website']),
+            if ((b['instagram'] ?? '').toString().isNotEmpty) _infoRow(Icons.camera_alt, b['instagram']),
+            if ((b['work_hours'] ?? '').toString().isNotEmpty) _infoRow(Icons.access_time, b['work_hours']),
+
+            const SizedBox(height: 30),
+
+            const Text('Отзывы', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            _reviews.isEmpty
+                ? const Text('Пока нет отзывов — стань первым')
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _reviews.length,
+                    itemBuilder: (context, index) {
+                      final review = _reviews[index] as Map<String, dynamic>;
+                      final user = review['user'] as Map<String, dynamic>?;
+                      final userId = user?['id'];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: userId == null
+                                        ? null
+                                        : () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (_) => UserProfileScreen(userId: userId)),
+                                            ),
+                                    child: Text(user?['username'] ?? 'Неизвестный'),
+                                  ),
+                                  Row(
+                                    children: List.generate(5, (i) {
+                                      return Icon(
+                                        i < (review['rating'] as num).toInt() ? Icons.star : Icons.star_border,
+                                        color: Colors.orange,
+                                        size: 16,
+                                      );
+                                    }),
+                                  ),
+                                ],
+                              ),
+                              if ((review['text'] ?? '').toString().isNotEmpty) ...[
+                                const SizedBox(height: 5),
+                                Text(review['text'], style: const TextStyle(fontSize: 12)),
+                              ],
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+            const SizedBox(height: 20),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () => setState(() => _showReviewForm = !_showReviewForm),
+                icon: const Icon(Icons.star),
+                label: Text(_showReviewForm
+                    ? 'Скрыть форму отзыва'
+                    : (_myStars > 0 ? 'Изменить свой отзыв' : 'Оставить отзыв')),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+
+            if (_showReviewForm) ...[
+              const SizedBox(height: 20),
+              const Text('Твоя оценка', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return GestureDetector(
+                    onTap: () => setState(() => _myStars = index + 1),
+                    child: Icon(
+                      _myStars > index ? Icons.star : Icons.star_border,
+                      color: Colors.orange,
+                      size: 40,
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 15),
+              TextField(
+                controller: _reviewController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Твой отзыв (опционально)',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isActionLoading ? null : _submitReview,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('Отправить отзыв', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(IconData icon, String? value, {Widget? trailing}) {
+    if (value == null || value.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: Colors.grey),
+          const SizedBox(width: 8),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
+          if (trailing != null) trailing,
+        ],
+      ),
+    );
+  }
+}

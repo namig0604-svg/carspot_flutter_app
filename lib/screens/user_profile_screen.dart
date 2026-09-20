@@ -1,0 +1,732 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../services/api_service.dart';
+import '../utils/gamification.dart';
+import '../widgets/report_dialog.dart';
+import 'car_detail_screen.dart';
+import 'chat_room_screen.dart';
+import '../theme/app_colors.dart';
+import '../widgets/animated_counter.dart';
+import '../widgets/app_loader.dart';
+import '../utils/sound_player.dart';
+
+/// Публичный профиль пользователя (не свой): машины, клубы, статистика.
+class UserProfileScreen extends StatefulWidget {
+  final String userId;
+
+  const UserProfileScreen({Key? key, required this.userId}) : super(key: key);
+
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  Map<String, dynamic>? _user;
+  List<dynamic> _cars = [];
+  List<dynamic> _clubs = [];
+  bool _isLoading = true;
+
+  // Друзья: none | friends | pending_sent | pending_received
+  String _friendStatus = 'none';
+  String? _friendshipId;
+  bool _friendActionLoading = false;
+
+  String? get _myId => Provider.of<AuthProvider>(context, listen: false).user?['id'];
+  bool get _isMe => widget.userId == _myId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAll();
+  }
+
+  Future<void> _loadAll() async {
+    setState(() => _isLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final results = await Future.wait([
+        ApiService.get('/api/users/${widget.userId}', token: authProvider.accessToken),
+        ApiService.get('/api/users/${widget.userId}/cars', token: authProvider.accessToken),
+        ApiService.get('/api/users/${widget.userId}/clubs', token: authProvider.accessToken),
+      ]);
+      setState(() {
+        _user = results[0] as Map<String, dynamic>;
+        _cars = results[1] is List ? results[1] as List : [];
+        _clubs = results[2] is List ? results[2] as List : [];
+      });
+      if (!_isMe) {
+        try {
+          final fs = await ApiService.get('/api/friends/status/${widget.userId}', token: authProvider.accessToken);
+          if (mounted && fs is Map<String, dynamic>) {
+            setState(() {
+              _friendStatus = (fs['status'] as String?) ?? 'none';
+              _friendshipId = fs['friendship_id'] as String?;
+            });
+          }
+        } catch (_) {}
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _toggleProfileLike() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final result = await ApiService.post('/api/users/${widget.userId}/like', {}, token: authProvider.accessToken);
+      setState(() {
+        _user!['is_liked'] = result['liked'];
+        _user!['likes_count'] = result['likes_count'];
+      });
+      if (mounted) SoundPlayer.play(context, AppSound.click);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    }
+  }
+
+  Future<void> _openChat() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final room = await ApiService.post(
+        '/api/chats/direct',
+        {'user_id': widget.userId},
+        token: authProvider.accessToken,
+      );
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChatRoomScreen(roomId: room['id'], title: room['title'] ?? _user?['username'] ?? 'Чат'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    }
+  }
+
+  Future<void> _sendFriendRequest() async {
+    setState(() => _friendActionLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final result = await ApiService.post(
+        '/api/friends/request/${widget.userId}',
+        {},
+        token: authProvider.accessToken,
+      );
+      setState(() {
+        _friendStatus = (result['status'] as String?) ?? 'pending_sent';
+        _friendshipId = result['friendship_id'] as String?;
+      });
+      if (mounted) SoundPlayer.play(context, AppSound.click);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _friendActionLoading = false);
+    }
+  }
+
+  Future<void> _acceptFriendRequest() async {
+    if (_friendshipId == null) return;
+    setState(() => _friendActionLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final result = await ApiService.post(
+        '/api/friends/$_friendshipId/accept',
+        {},
+        token: authProvider.accessToken,
+      );
+      setState(() {
+        _friendStatus = (result['status'] as String?) ?? 'friends';
+      });
+      if (mounted) SoundPlayer.play(context, AppSound.click);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _friendActionLoading = false);
+    }
+  }
+
+  Future<void> _declineOrCancelFriendRequest() async {
+    if (_friendshipId == null) return;
+    final fid = _friendshipId!;
+    setState(() => _friendActionLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await ApiService.post('/api/friends/$fid/decline', {}, token: authProvider.accessToken);
+      setState(() {
+        _friendStatus = 'none';
+        _friendshipId = null;
+      });
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _friendActionLoading = false);
+    }
+  }
+
+  Future<void> _removeFriend() async {
+    if (_friendshipId == null) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Удалить из друзей?'),
+        content: Text('${_user?['username'] ?? 'Пользователь'} больше не будет в списке друзей.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || _friendshipId == null) return;
+    final fid = _friendshipId!;
+    setState(() => _friendActionLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await ApiService.delete('/api/friends/$fid', token: authProvider.accessToken);
+      setState(() {
+        _friendStatus = 'none';
+        _friendshipId = null;
+      });
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _friendActionLoading = false);
+    }
+  }
+
+  Widget _friendButton() {
+    if (_friendActionLoading) {
+      return const SizedBox(
+        height: 46,
+        child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+      );
+    }
+    switch (_friendStatus) {
+      case 'friends':
+        return SizedBox(
+          height: 46,
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _removeFriend,
+            icon: const Icon(Icons.how_to_reg, color: AppColors.blue),
+            label: const Text('Друзья ✓'),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.blue),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        );
+      case 'pending_sent':
+        return SizedBox(
+          height: 46,
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _declineOrCancelFriendRequest,
+            icon: const Icon(Icons.hourglass_top, color: Colors.grey),
+            label: const Text('Заявка отправлена · отменить'),
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        );
+      case 'pending_received':
+        return SizedBox(
+          height: 46,
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _acceptFriendRequest,
+                  icon: const Icon(Icons.check),
+                  label: const Text('Принять'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _declineOrCancelFriendRequest,
+                  icon: const Icon(Icons.close, color: AppColors.red),
+                  label: const Text('Отклонить'),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      default:
+        return SizedBox(
+          height: 46,
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _sendFriendRequest,
+            icon: const Icon(Icons.person_add_alt_1),
+            label: const Text('Добавить в друзья'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade600,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget _stat(num value, String label, {String Function(num)? formatter}) {
+    final fmt = formatter ?? (v) => v.round().toString();
+    return Column(
+      children: [
+        AnimatedCountText(
+          end: value,
+          formatter: fmt,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Text(label, style: const TextStyle(color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _carCard(Map<String, dynamic> car) {
+    final photoUrl = car['photo_url'] as String?;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => CarDetailScreen(carId: car['id'])),
+        ),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: (photoUrl != null && photoUrl.isNotEmpty)
+              ? Image.network(
+                  photoUrl,
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _carPlaceholder(),
+                )
+              : _carPlaceholder(),
+        ),
+        title: Text('${car['make'] ?? ''} ${car['model'] ?? ''}'.trim()),
+        subtitle: Text(
+          [car['year']?.toString(), car['color'], car['license_plate']]
+              .where((v) => v != null && v.toString().isNotEmpty)
+              .join(' · '),
+        ),
+        trailing: (car['is_primary'] ?? false) ? const Icon(Icons.star, color: Colors.orange, size: 18) : null,
+      ),
+    );
+  }
+
+  Widget _carPlaceholder() {
+    return Container(
+      width: 48,
+      height: 48,
+      color: Colors.grey.shade200,
+      child: const Icon(Icons.directions_car, color: Colors.grey),
+    );
+  }
+
+  Widget _achievementBadge(Achievement a) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final baseSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final textColor = isDark ? AppColors.textOnDark : AppColors.textOnLight;
+    return Tooltip(
+      message: '${a.title}\n${a.description}',
+      child: Opacity(
+        opacity: a.unlocked ? 1.0 : 0.45,
+        child: Container(
+          width: 78,
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+          decoration: BoxDecoration(
+            color: a.unlocked ? Color.alphaBlend(Colors.amber.withOpacity(0.22), baseSurface) : baseSurface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: a.unlocked ? Colors.amber : Colors.grey.shade300),
+          ),
+          child: Column(
+            children: [
+              Text(a.emoji, style: const TextStyle(fontSize: 26)),
+              const SizedBox(height: 4),
+              Text(
+                a.title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 10, color: textColor),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final cardText = isDark ? AppColors.textOnDark : AppColors.textOnLight;
+    GamificationStats? stats;
+    List<Achievement> achievements = const [];
+    if (_user != null) {
+      final isClubLeader = _clubs.any((c) => c['role'] == 'owner' || c['role'] == 'admin');
+      final isVerified = _user!['is_verified'] == true;
+      final isPremium = _user!['is_premium'] == true;
+      int accountAgeDays = 0;
+      try {
+        final createdAt = _user!['created_at'];
+        if (createdAt != null) {
+          accountAgeDays = DateTime.now().difference(DateTime.parse(createdAt.toString())).inDays;
+        }
+      } catch (_) {}
+      final xp = computeXp(
+        eventsAttended: (_user!['events_attended'] ?? 0) as int,
+        eventsCreated: (_user!['events_created'] ?? 0) as int,
+        carsCount: (_user!['cars_count'] ?? 0) as int,
+        ratingsCount: (_user!['ratings_count'] ?? 0) as int,
+        averageRating: ((_user!['average_rating'] ?? 0) as num).toDouble(),
+        clubsCount: _clubs.length,
+        referralsCount: 0,
+        likesCount: (_user!['likes_count'] ?? 0) as int,
+        isVerified: isVerified,
+        isPremium: isPremium,
+      );
+      stats = computeStats(xp);
+      achievements = buildAchievements(
+        eventsAttended: (_user!['events_attended'] ?? 0) as int,
+        eventsCreated: (_user!['events_created'] ?? 0) as int,
+        carsCount: (_user!['cars_count'] ?? 0) as int,
+        ratingsCount: (_user!['ratings_count'] ?? 0) as int,
+        averageRating: ((_user!['average_rating'] ?? 0) as num).toDouble(),
+        clubsCount: _clubs.length,
+        isClubLeader: isClubLeader,
+        referralsCount: 0,
+        likesCount: (_user!['likes_count'] ?? 0) as int,
+        isVerified: isVerified,
+        isPremium: isPremium,
+        accountAgeDays: accountAgeDays,
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_user != null ? '@${_user!['username']}' : 'Профиль'),
+        backgroundColor: AppColors.black,
+        elevation: 0,
+        actions: [
+          if (!_isMe)
+            IconButton(
+              icon: const Icon(Icons.flag_outlined),
+              tooltip: 'Пожаловаться',
+              onPressed: () => showReportDialog(context, targetType: 'user', targetId: widget.userId),
+            ),
+        ],
+      ),
+      body: _isLoading
+          ? Center(child: AppLoader())
+          : _user == null
+              ? const Center(child: Text('Пользователь не найден'))
+              : RefreshIndicator(
+                  color: AppColors.red,
+                  backgroundColor: AppColors.surfaceDark,
+                  onRefresh: _loadAll,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Column(
+                            children: [
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 45,
+                                    backgroundImage: (_user!['avatar_url'] != null &&
+                                            (_user!['avatar_url'] as String).isNotEmpty)
+                                        ? NetworkImage(_user!['avatar_url'])
+                                        : null,
+                                    child: (_user!['avatar_url'] == null ||
+                                            (_user!['avatar_url'] as String).isEmpty)
+                                        ? Text(
+                                            (_user!['username'] as String).isNotEmpty
+                                                ? _user!['username'][0].toUpperCase()
+                                                : 'U',
+                                            style: const TextStyle(fontSize: 32),
+                                          )
+                                        : null,
+                                  ),
+                                  if (_user!['is_online'] == true)
+                                    Positioned(
+                                      right: 0,
+                                      bottom: 0,
+                                      child: Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 3),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      _user!['full_name'] ?? _user!['username'],
+                                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (_user!['is_verified'] == true) ...[
+                                    const SizedBox(width: 6),
+                                    const Tooltip(message: 'Подтверждённый аккаунт', child: Icon(Icons.verified, color: AppColors.blue, size: 20)),
+                                  ],
+                                  if (_user!['is_admin'] == true) ...[
+                                    const SizedBox(width: 6),
+                                    const Tooltip(message: 'Администратор', child: Icon(Icons.shield, color: AppColors.red, size: 20)),
+                                  ],
+                                  if (_user!['is_premium'] == true) ...[
+                                    const SizedBox(width: 6),
+                                    const Tooltip(message: 'CarSpot Premium', child: Icon(Icons.workspace_premium, color: Colors.amber, size: 20)),
+                                  ],
+                                  if (_clubs.isNotEmpty) ...[
+                                    const SizedBox(width: 6),
+                                    Tooltip(
+                                      message: '${_clubs.first['name'] ?? 'Клуб'}',
+                                      child: CircleAvatar(
+                                        radius: 10,
+                                        backgroundColor: AppColors.blue.withOpacity(0.15),
+                                        backgroundImage: ((_clubs.first['logo_url'] as String?) ?? '').isNotEmpty
+                                            ? NetworkImage(_clubs.first['logo_url'])
+                                            : null,
+                                        child: ((_clubs.first['logo_url'] as String?) ?? '').isEmpty
+                                            ? const Icon(Icons.groups, size: 12, color: AppColors.blue)
+                                            : null,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              Text('@${_user!['username']}', style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                              const SizedBox(height: 4),
+                              if ((_user!['city'] ?? '').toString().isNotEmpty ||
+                                  (_user!['country'] ?? '').toString().isNotEmpty)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      [_user!['city'], _user!['country']]
+                                          .where((v) => v != null && v.toString().isNotEmpty)
+                                          .join(', '),
+                                      style: const TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        if (!_isMe)
+                          SizedBox(
+                            height: 46,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: _openChat,
+                                    icon: const Icon(Icons.chat_bubble_outline),
+                                    label: const Text('Написать'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.blue,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                OutlinedButton.icon(
+                                  onPressed: _toggleProfileLike,
+                                  icon: AnimatedScale(
+                                    scale: _user!['is_liked'] == true ? 1.2 : 1.0,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.elasticOut,
+                                    child: Icon(
+                                      _user!['is_liked'] == true ? Icons.favorite : Icons.favorite_border,
+                                      color: AppColors.red,
+                                    ),
+                                  ),
+                                  label: Text('${_user!['likes_count'] ?? 0}'),
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (!_isMe) ...[
+                          const SizedBox(height: 10),
+                          _friendButton(),
+                        ],
+                        const SizedBox(height: 20),
+
+                        if (stats != null)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Color.alphaBlend(AppColors.blue.withOpacity(0.25), cardSurface),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onLongPress: () {
+                                        HapticFeedback.mediumImpact();
+                                        final jokes = [
+                                          '🔧 Серьёзный соперник на трассе',
+                                          '🏁 Такой уровень просто так не даётся',
+                                          '⚡ Вот это гонщик!',
+                                        ];
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text(jokes[Random().nextInt(jokes.length)])),
+                                        );
+                                      },
+                                      child: Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: const BoxDecoration(color: AppColors.blue, shape: BoxShape.circle),
+                                        alignment: Alignment.center,
+                                        child: AnimatedCountText(
+                                          end: stats.level,
+                                          formatter: (v) => '${v.round()}',
+                                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Уровень ${stats.level} · ${stats.levelTitle}',
+                                            style: TextStyle(fontWeight: FontWeight.bold, color: cardText),
+                                          ),
+                                          AnimatedCountText(
+                                            end: stats.xp,
+                                            formatter: (v) => '${v.round()} XP всего',
+                                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: LinearProgressIndicator(
+                                    value: stats.progress,
+                                    minHeight: 8,
+                                    backgroundColor: AppColors.blue.withOpacity(0.15),
+                                    valueColor: const AlwaysStoppedAnimation(AppColors.blue),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(height: 20),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _stat((_user!['cars_count'] ?? 0) as num, 'Авто'),
+                            _stat((_user!['events_attended'] ?? 0) as num, 'Сходок'),
+                            _stat((_user!['average_rating'] ?? 0) as num, 'Рейтинг', formatter: (v) => '${v.toStringAsFixed(1)}⭐'),
+                          ],
+                        ),
+
+                        if ((_user!['bio'] ?? '').toString().isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('О себе', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                                const SizedBox(height: 8),
+                                Text(_user!['bio'], style: const TextStyle(color: Colors.black87)),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        if (_clubs.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          const Text('Клубы', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: _clubs.map<Widget>((c) {
+                              final role = c['role'] as String?;
+                              final roleLabel = role == 'owner' ? ' · владелец' : (role == 'admin' ? ' · админ' : '');
+                              return Chip(
+                                avatar: const Icon(Icons.groups, size: 16, color: AppColors.blue),
+                                label: Text('${c['name']}$roleLabel'),
+                                backgroundColor: AppColors.blue.withOpacity(0.08),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+
+                        if (_cars.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          const Text('Гараж', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          ..._cars.map((c) => _carCard(c as Map<String, dynamic>)),
+                        ],
+
+                        const SizedBox(height: 20),
+                        const Text('Достижения', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: achievements.map((a) => _achievementBadge(a)).toList(),
+                        ),
+
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+    );
+  }
+}

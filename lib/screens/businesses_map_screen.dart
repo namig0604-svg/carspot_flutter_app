@@ -1,0 +1,202 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../services/api_service.dart';
+import '../utils/business_category.dart';
+import '../utils/map_config.dart';
+import '../utils/maps_launcher.dart';
+import 'business_detail_screen.dart';
+import '../theme/app_colors.dart';
+import '../widgets/app_loader.dart';
+
+/// Карта автосервисов и тюнинг-ателье. Метки — из /api/businesses/map,
+/// с широкой рамкой на весь мир (геопозиции пользователя в приложении пока нет).
+/// При открытии карта сама подстраивается, чтобы все метки были видны сразу.
+class BusinessesMapScreen extends StatefulWidget {
+  const BusinessesMapScreen({Key? key}) : super(key: key);
+
+  @override
+  State<BusinessesMapScreen> createState() => _BusinessesMapScreenState();
+}
+
+class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
+  final MapController _mapController = MapController();
+  List<dynamic> _markers = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _isLoading = true);
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final response = await ApiService.get(
+        '/api/businesses/map?min_lat=-90&max_lat=90&min_lon=-180&max_lon=180&limit=500',
+        token: authProvider.accessToken,
+      );
+      setState(() => _markers = response is List ? response : []);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+      WidgetsBinding.instance.addPostFrameCallback((_) => _fitToMarkers());
+    }
+  }
+
+  void _fitToMarkers() {
+    final points = _markers
+        .where((m) => m['latitude'] != null && m['longitude'] != null)
+        .map<LatLng>((m) => LatLng((m['latitude'] as num).toDouble(), (m['longitude'] as num).toDouble()))
+        .toList();
+    if (points.isEmpty) return;
+    if (points.length == 1) {
+      _mapController.move(points.first, defaultMapZoom);
+      return;
+    }
+    try {
+      _mapController.fitCamera(
+        CameraFit.bounds(
+          bounds: LatLngBounds.fromPoints(points),
+          padding: const EdgeInsets.all(50),
+        ),
+      );
+    } catch (_) {
+      // Карта могла ещё не успеть построиться — не критично, просто оставляем текущий вид.
+    }
+  }
+
+  void _showMarkerSheet(Map<String, dynamic> marker) {
+    final lat = (marker['latitude'] as num?)?.toDouble();
+    final lon = (marker['longitude'] as num?)?.toDouble();
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(businessCategoryIcon(marker['category']), color: businessCategoryColor(marker['category'])),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(marker['name'] ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(businessCategoryLabel(marker['category']), style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.star, size: 16, color: Colors.orange),
+                const SizedBox(width: 4),
+                Text('${marker['average_rating'] ?? 0}'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                if (lat != null && lon != null)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => openDirections(context, lat, lon),
+                      icon: const Icon(Icons.directions),
+                      label: const Text('Маршрут'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(0, 44),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                if (lat != null && lon != null) const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => BusinessDetailScreen(businessId: marker['id'])),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.blue,
+                      minimumSize: const Size(0, 44),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text('Открыть заведение', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final markers = _markers
+        .where((m) => m['latitude'] != null && m['longitude'] != null)
+        .map<Marker>((m) {
+      return Marker(
+        point: LatLng((m['latitude'] as num).toDouble(), (m['longitude'] as num).toDouble()),
+        width: 40,
+        height: 40,
+        child: GestureDetector(
+          onTap: () => _showMarkerSheet(m as Map<String, dynamic>),
+          child: Icon(businessCategoryIcon(m['category']), color: businessCategoryColor(m['category']), size: 34),
+        ),
+      );
+    }).toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Карта заведений'),
+        backgroundColor: AppColors.black,
+        actions: [
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
+        ],
+      ),
+      body: Stack(
+        children: [
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: defaultMapCenter,
+              initialZoom: worldMapZoom,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: osmTileUrlTemplate,
+                userAgentPackageName: mapUserAgentPackageName,
+              ),
+              MarkerLayer(markers: markers),
+            ],
+          ),
+          if (_isLoading) Positioned(top: 12, left: 0, right: 0, child: Center(child: AppLoader())),
+          if (!_isLoading && markers.isEmpty)
+            Positioned(
+              top: 12,
+              left: 12,
+              right: 12,
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                child: const Text('Пока нет заведений с координатами', textAlign: TextAlign.center),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
