@@ -9,6 +9,7 @@ import '../services/api_service.dart';
 import 'people_list_screen.dart';
 import '../theme/app_colors.dart';
 import '../utils/sound_player.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Экран CarSpot Premium: статус подписки, пробный период, реферальная
 /// программа (10 друзей = месяц Premium) и список привилегий.
@@ -67,13 +68,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
       if (mounted) {
         SoundPlayer.play(context, AppSound.success);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Пробный Premium активирован на 14 дней 🎉')),
+          SnackBar(content: Text(context.t('premium.trial_activated_snackbar'))),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Не удалось активировать: $e')),
+          SnackBar(content: Text(context.tArgs('premium.trial_activate_failed', {'error': '$e'}))),
         );
       }
     } finally {
@@ -103,17 +104,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
       final payUrl = result['pay_url'] as String?;
       final paymentId = result['payment_id'] as String?;
       if (payUrl == null || paymentId == null) {
-        throw Exception('Не удалось создать счёт на оплату');
+        throw Exception(context.t('premium.checkout_no_invoice_error'));
       }
 
       final opened = await launchUrl(Uri.parse(payUrl), mode: LaunchMode.externalApplication);
       if (!mounted) return;
-      if (!opened) throw Exception('Не удалось открыть страницу оплаты');
+      if (!opened) throw Exception(context.t('premium.checkout_open_failed_error'));
 
       setState(() => _activePaymentId = paymentId);
       _startPolling(paymentId);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('premium.generic_error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isCheckingOut = false);
     }
@@ -146,7 +147,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           setState(() => _activePaymentId = null);
           SoundPlayer.play(context, AppSound.success);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Оплата подтверждена — Premium активирован! 🎉')),
+            SnackBar(content: Text(context.t('premium.payment_confirmed_snackbar'))),
           );
         }
       } else if (status == 'canceled' || status == 'failed') {
@@ -154,17 +155,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
         if (mounted) {
           setState(() => _activePaymentId = null);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Оплата не прошла — попробуй ещё раз')),
+            SnackBar(content: Text(context.t('premium.payment_failed_snackbar'))),
           );
         }
       } else if (!silent && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Пока не оплачено — оплати по открытой ссылке и попробуй снова')),
+          SnackBar(content: Text(context.t('premium.payment_pending_snackbar'))),
         );
       }
     } catch (e) {
       if (!silent && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('premium.generic_error', {'error': '$e'}))));
       }
     }
   }
@@ -188,7 +189,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     final isPremium = authProvider.user?['is_premium'] == true;
     if (!isPremium) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Список тех, кто лайкнул профиль, доступен с Premium')),
+        SnackBar(content: Text(context.t('premium.likers_locked_snackbar'))),
       );
       return;
     }
@@ -198,10 +199,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
       if (!mounted) return;
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => PeopleListScreen(title: 'Кто лайкнул профиль', people: people)),
+        MaterialPageRoute(builder: (_) => PeopleListScreen(title: context.t('premium.likers_screen_title'), people: people)),
       );
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('premium.generic_error', {'error': '$e'}))));
     }
   }
 
@@ -210,7 +211,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     final isPremium = authProvider.user?['is_premium'] == true;
     if (!isPremium) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Список просмотров профиля доступен с Premium')),
+        SnackBar(content: Text(context.t('premium.views_locked_snackbar'))),
       );
       return;
     }
@@ -219,16 +220,16 @@ class _PremiumScreenState extends State<PremiumScreen> {
       final rows = response is List ? response : [];
       final people = rows.map<Map<String, dynamic>>((row) {
         final user = Map<String, dynamic>.from(row['user'] as Map);
-        user['subtitle_override'] = 'Смотрел ${_formatDate(row['viewed_at'].toString())}';
+        user['subtitle_override'] = context.tArgs('premium.viewed_on', {'date': _formatDate(row['viewed_at'].toString())});
         return user;
       }).toList();
       if (!mounted) return;
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => PeopleListScreen(title: 'Кто смотрел профиль', people: people)),
+        MaterialPageRoute(builder: (_) => PeopleListScreen(title: context.t('premium.viewers_screen_title'), people: people)),
       );
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('premium.generic_error', {'error': '$e'}))));
     }
   }
 
@@ -295,7 +296,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       const Icon(Icons.workspace_premium, color: Colors.white, size: 32),
                       const SizedBox(width: 10),
                       Text(
-                        isPremium ? 'Premium активен' : 'Premium не активен',
+                        isPremium ? context.t('premium.status_active') : context.t('premium.status_inactive'),
                         style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -303,13 +304,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   const SizedBox(height: 8),
                   if (isPremium && premiumUntil != null)
                     Text(
-                      'Действует до ${_formatDate(premiumUntil)}',
+                      context.tArgs('premium.active_until', {'date': _formatDate(premiumUntil)}),
                       style: const TextStyle(color: Colors.white, fontSize: 13),
                     )
                   else
-                    const Text(
-                      'Открой автосервисы, больше машин в гараже и другие возможности',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
+                    Text(
+                      context.t('premium.hero_subtitle_inactive'),
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                 ],
               ),
@@ -326,7 +327,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ? const SizedBox(
                           width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                       : const Icon(Icons.card_giftcard),
-                  label: const Text('Попробовать 14 дней бесплатно'),
+                  label: Text(context.t('premium.trial_button')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber.shade800,
                     foregroundColor: Colors.white,
@@ -341,19 +342,19 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   color: Colors.grey.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
-                  'Пробный период уже использован. Получи Premium снова через реферальную программу ниже.',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                child: Text(
+                  context.t('premium.trial_used_notice'),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ),
 
             const SizedBox(height: 20),
 
-            Text(isPremium ? 'Продлить Premium' : 'Купить Premium', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(isPremium ? context.t('premium.renew_title') : context.t('premium.buy_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 4),
-            const Text(
-              'Оплата через Trybit — картой или криптовалютой, работает в любой стране СНГ',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            Text(
+              context.t('premium.payment_method_note'),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 10),
 
@@ -377,7 +378,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Text('Ждём подтверждения оплаты...', style: TextStyle(color: cardText)),
+                          child: Text(context.t('premium.awaiting_payment'), style: TextStyle(color: cardText)),
                         ),
                       ],
                     ),
@@ -387,13 +388,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () => _checkPaymentNow(_activePaymentId!),
-                            child: const Text('Проверить сейчас'),
+                            child: Text(context.t('premium.check_now_button')),
                           ),
                         ),
                         const SizedBox(width: 8),
                         TextButton(
                           onPressed: _cancelPolling,
-                          child: const Text('Отмена'),
+                          child: Text(context.t('common.cancel')),
                         ),
                       ],
                     ),
@@ -445,7 +446,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     children: [
                       const Icon(Icons.card_giftcard, color: Colors.green, size: 20),
                       const SizedBox(width: 8),
-                      Text('Реферальная программа', style: TextStyle(fontWeight: FontWeight.bold, color: cardText)),
+                      Text(context.t('premium.referral_title'), style: TextStyle(fontWeight: FontWeight.bold, color: cardText)),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -469,27 +470,27 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         const SizedBox(width: 8),
                         IconButton(
                           icon: const Icon(Icons.copy, color: Colors.green),
-                          tooltip: 'Скопировать код',
+                          tooltip: context.t('premium.copy_code_tooltip'),
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: '${_referral!['code']}'));
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Код скопирован')),
+                              SnackBar(content: Text(context.t('premium.code_copied_snackbar'))),
                             );
                           },
                         ),
                       ],
                     )
                   else if (_isLoadingReferral)
-                    const Row(
+                    Row(
                       children: [
-                        SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
-                        SizedBox(width: 8),
-                        Text('Загружаем код...', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                        const SizedBox(width: 8),
+                        Text(context.t('premium.loading_code'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                   const SizedBox(height: 12),
                   Text(
-                    'Приглашено друзей: $referralsCount · заработано месяцев Premium: $monthsEarned',
+                    context.tArgs('premium.referral_stats', {'count': '$referralsCount', 'months': '$monthsEarned'}),
                     style: TextStyle(color: cardText, fontSize: 13),
                   ),
                   const SizedBox(height: 8),
@@ -505,8 +506,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   const SizedBox(height: 4),
                   Text(
                     untilNext == perMonth
-                        ? 'Пригласи $perMonth друзей — получи месяц Premium'
-                        : 'Ещё $untilNext друзей до следующего месяца Premium',
+                        ? context.tArgs('premium.referral_invite_prompt', {'count': '$perMonth'})
+                        : context.tArgs('premium.referral_remaining', {'count': '$untilNext'}),
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
@@ -514,7 +515,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
             ),
 
             const SizedBox(height: 24),
-            const Text('Твоя популярность', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(context.t('premium.popularity_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 4),
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -525,8 +526,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       backgroundColor: AppColors.red,
                       child: Icon(Icons.favorite, color: Colors.white, size: 18),
                     ),
-                    title: Text('${user?['likes_count'] ?? 0} лайков профиля'),
-                    subtitle: Text(isPremium ? 'Смотри, кто лайкнул' : 'Оформи Premium, чтобы увидеть кто'),
+                    title: Text(context.tArgs('premium.likes_count_label', {'count': '${user?['likes_count'] ?? 0}'})),
+                    subtitle: Text(isPremium ? context.t('premium.see_who_liked') : context.t('premium.subscribe_to_see_who')),
                     trailing: Icon(isPremium ? Icons.chevron_right : Icons.lock_outline, color: Colors.grey),
                     onTap: _openLikers,
                   ),
@@ -536,8 +537,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       backgroundColor: AppColors.blue,
                       child: Icon(Icons.visibility, color: Colors.white, size: 18),
                     ),
-                    title: Text('${user?['profile_views_count'] ?? 0} просмотров профиля'),
-                    subtitle: Text(isPremium ? 'Смотри, кто заходил' : 'Оформи Premium, чтобы увидеть кто'),
+                    title: Text(context.tArgs('premium.views_count_label', {'count': '${user?['profile_views_count'] ?? 0}'})),
+                    subtitle: Text(isPremium ? context.t('premium.see_who_viewed') : context.t('premium.subscribe_to_see_who')),
                     trailing: Icon(isPremium ? Icons.chevron_right : Icons.lock_outline, color: Colors.grey),
                     onTap: _openProfileViews,
                   ),
@@ -545,32 +546,32 @@ class _PremiumScreenState extends State<PremiumScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Что даёт Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(context.t('premium.perks_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 4),
             Card(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Column(
                 children: [
-                  _perkTile(Icons.favorite, 'Кто лайкнул и кто смотрел',
-                      'Полные списки тех, кто лайкнул профиль/машину и кто заходил к тебе в профиль'),
+                  _perkTile(Icons.favorite, context.t('premium.perk_likers_title'),
+                      context.t('premium.perk_likers_subtitle')),
                   const Divider(height: 1),
-                  _perkTile(Icons.rocket_launch, 'Буст сходок и заведений',
-                      'Поднимай свою сходку или автосервис в топ ленты и каталога на 24 часа'),
+                  _perkTile(Icons.rocket_launch, context.t('premium.perk_boost_title'),
+                      context.t('premium.perk_boost_subtitle')),
                   const Divider(height: 1),
-                  _perkTile(Icons.storefront, 'Добавление автосервисов',
-                      'Только подписчики Premium могут размещать свои автосервисы и ателье в CarSpot'),
+                  _perkTile(Icons.storefront, context.t('premium.perk_services_title'),
+                      context.t('premium.perk_services_subtitle')),
                   const Divider(height: 1),
-                  _perkTile(Icons.directions_car, 'Больше машин в гараже',
-                      'До 25 машин вместо 10 на обычном аккаунте'),
+                  _perkTile(Icons.directions_car, context.t('premium.perk_garage_title'),
+                      context.t('premium.perk_garage_subtitle')),
                   const Divider(height: 1),
-                  _perkTile(Icons.push_pin, 'Закреплённые фото',
-                      'Закрепляй свои лучшие фото сверху галереи сходки или машины'),
+                  _perkTile(Icons.push_pin, context.t('premium.perk_pinned_photos_title'),
+                      context.t('premium.perk_pinned_photos_subtitle')),
                   const Divider(height: 1),
-                  _perkTile(Icons.workspace_premium, 'Premium-значок',
-                      'Золотая корона рядом с именем в профиле и на сходках'),
+                  _perkTile(Icons.workspace_premium, context.t('premium.perk_badge_title'),
+                      context.t('premium.perk_badge_subtitle')),
                   const Divider(height: 1),
-                  _perkTile(Icons.emoji_events, 'Эксклюзивное достижение',
-                      'Отдельное достижение «Premium» в списке наград профиля'),
+                  _perkTile(Icons.emoji_events, context.t('premium.perk_achievement_title'),
+                      context.t('premium.perk_achievement_subtitle')),
                 ],
               ),
             ),

@@ -10,6 +10,7 @@ import '../utils/maps_launcher.dart';
 import 'business_detail_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Карта автосервисов и тюнинг-ателье. Метки — из /api/businesses/map,
 /// с широкой рамкой на весь мир (геопозиции пользователя в приложении пока нет).
@@ -42,7 +43,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
       );
       setState(() => _markers = response is List ? response : []);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('businesses_map.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
       WidgetsBinding.instance.addPostFrameCallback((_) => _fitToMarkers());
@@ -110,7 +111,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => openDirections(context, lat, lon),
                       icon: const Icon(Icons.directions),
-                      label: const Text('Маршрут'),
+                      label: Text(context.t('businesses_map.directions_button')),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(0, 44),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -132,7 +133,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
                       minimumSize: const Size(0, 44),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: const Text('Открыть заведение', style: TextStyle(color: Colors.white)),
+                    child: Text(context.t('businesses_map.open_business_button'), style: const TextStyle(color: Colors.white)),
                   ),
                 ),
               ],
@@ -161,7 +162,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Карта заведений'),
+        title: Text(context.t('businesses_map.title')),
         backgroundColor: AppColors.black,
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
@@ -192,7 +193,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                child: const Text('Пока нет заведений с координатами', textAlign: TextAlign.center),
+                child: Text(context.t('businesses_map.no_businesses_with_coords'), textAlign: TextAlign.center),
               ),
             ),
         ],

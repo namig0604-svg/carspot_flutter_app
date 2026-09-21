@@ -12,6 +12,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../widgets/neon_chip.dart';
+import '../l10n/l10n_extensions.dart';
 
 class BusinessesListScreen extends StatefulWidget {
   const BusinessesListScreen({Key? key}) : super(key: key);
@@ -55,7 +56,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
         setState(() => _businesses = response['items'] ?? []);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('businesses_list.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -81,13 +82,13 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Автосервисы и ателье'),
+        title: Text(context.t('businesses_list.title')),
         elevation: 0,
         backgroundColor: AppColors.black,
         actions: [
           IconButton(
             icon: const Icon(Icons.map_outlined),
-            tooltip: 'Карта заведений',
+            tooltip: context.t('businesses_list.map_tooltip'),
             onPressed: () {
               Navigator.push(
                 context,
@@ -113,13 +114,13 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
             final goPremium = await showDialog<bool>(
               context: context,
               builder: (_) => AlertDialog(
-                title: const Text('Только для Premium'),
-                content: const Text(
-                  'Добавлять автосервисы и ателье могут только подписчики CarSpot Premium. Попробуй 14 дней бесплатно!',
+                title: Text(context.t('businesses_list.premium_only_title')),
+                content: Text(
+                  context.t('businesses_list.premium_required_desc'),
                 ),
                 actions: [
-                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
-                  ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Узнать больше')),
+                  TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
+                  ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(context.t('businesses_list.learn_more'))),
                 ],
               ),
             );
@@ -149,7 +150,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
             child: Row(
               children: [
                 NeonChip(
-                  label: 'Все',
+                  label: context.t('businesses_list.filter_all'),
                   icon: Icons.apps,
                   color: AppColors.red,
                   selected: !_showFavoritesOnly,
@@ -160,7 +161,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                 ),
                 const SizedBox(width: 8),
                 NeonChip(
-                  label: 'Избранное',
+                  label: context.t('businesses_list.filter_favorites'),
                   icon: Icons.favorite,
                   color: AppColors.red,
                   selected: _showFavoritesOnly,
@@ -179,7 +180,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                 controller: _searchController,
                 onSubmitted: (_) => _load(),
                 decoration: InputDecoration(
-                  hintText: 'Поиск по названию или услугам...',
+                  hintText: context.t('businesses_list.search_hint'),
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(icon: const Icon(Icons.arrow_forward), onPressed: _load),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -196,7 +197,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: NeonChip(
-                      label: 'Все категории',
+                      label: context.t('businesses_list.all_categories'),
                       icon: Icons.apps,
                       color: AppColors.blue,
                       selected: _selectedCategory == null,
@@ -239,7 +240,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                               const SizedBox(height: 16),
                               Center(
                                 child: Text(
-                                  _showFavoritesOnly ? 'Пока нет избранных заведений' : 'Ничего не найдено',
+                                  _showFavoritesOnly ? context.t('businesses_list.no_favorites_empty') : context.t('businesses_list.nothing_found'),
                                   style: const TextStyle(fontSize: 16, color: Colors.grey),
                                 ),
                               ),

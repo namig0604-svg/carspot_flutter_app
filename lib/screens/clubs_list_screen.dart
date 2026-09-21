@@ -8,6 +8,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
+import '../l10n/l10n_extensions.dart';
 
 class ClubsListScreen extends StatefulWidget {
   const ClubsListScreen({Key? key}) : super(key: key);
@@ -48,7 +49,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
         setState(() => _clubs = response['items'] ?? []);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('clubs_list.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -74,7 +75,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => club['is_favorite'] = isFav);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('clubs_list.error_message', {'error': '$e'}))));
       }
     }
   }
@@ -83,7 +84,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Клубы'),
+        title: Text(context.t('clubs_list.title')),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
@@ -117,7 +118,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
             child: Row(
               children: [
                 FilterChip(
-                  label: const Text('Все клубы'),
+                  label: Text(context.t('clubs_list.all_clubs')),
                   selected: !_showMyOnly,
                   onSelected: (_) {
                     setState(() => _showMyOnly = false);
@@ -126,7 +127,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
-                  label: const Text('Мои клубы'),
+                  label: Text(context.t('clubs_list.my_clubs')),
                   selected: _showMyOnly,
                   onSelected: (_) {
                     setState(() => _showMyOnly = true);
@@ -143,7 +144,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                 controller: _searchController,
                 onSubmitted: (_) => _load(),
                 decoration: InputDecoration(
-                  hintText: 'Поиск клубов...',
+                  hintText: context.t('clubs_list.search_hint'),
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(icon: const Icon(Icons.arrow_forward), onPressed: _load),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -166,7 +167,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                               const SizedBox(height: 16),
                               Center(
                                 child: Text(
-                                  _showMyOnly ? 'Ты пока не состоишь в клубах' : 'Клубов не найдено',
+                                  _showMyOnly ? context.t('clubs_list.no_my_clubs') : context.t('clubs_list.no_clubs_found'),
                                   style: const TextStyle(fontSize: 16, color: Colors.grey),
                                 ),
                               ),
@@ -196,7 +197,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                                   subtitle: Text(
                                     [
                                       if ((club['city'] ?? '').toString().isNotEmpty) club['city'],
-                                      '${club['members_count'] ?? 0} участников',
+                                      context.tArgs('clubs_list.members_count', {'count': '${club['members_count'] ?? 0}'}),
                                     ].join(' · '),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -209,7 +210,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                                           color: club['is_favorite'] == true ? AppColors.red : Colors.grey,
                                           size: 20,
                                         ),
-                                        tooltip: 'В избранное',
+                                        tooltip: context.t('clubs_list.favorite_tooltip'),
                                         onPressed: () => _toggleFavorite(club),
                                       ),
                                       const Icon(Icons.chevron_right, color: Colors.grey),

@@ -9,6 +9,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Единый экран "Избранное" — сохранённые сходки, клубы и автосервисы
 /// на трёх вкладках. Каждый тип избранного уже умеет тогглиться со своего
@@ -91,7 +92,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
       await ApiService.delete('/api/events/${event['id']}/favorite', token: authProvider.accessToken);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('favorites.error_with_message', {'error': '$e'}))));
         _loadEvents();
       }
     }
@@ -104,7 +105,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
       await ApiService.delete('/api/clubs/${club['id']}/favorite', token: authProvider.accessToken);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('favorites.error_with_message', {'error': '$e'}))));
         _loadClubs();
       }
     }
@@ -117,7 +118,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
       await ApiService.delete('/api/businesses/${business['id']}/favorite', token: authProvider.accessToken);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('favorites.error_with_message', {'error': '$e'}))));
         _loadBusinesses();
       }
     }
@@ -136,7 +137,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
 
   Widget _eventsTab() {
     if (_isLoadingEvents) return Center(child: AppLoader());
-    if (_events.isEmpty) return _emptyState('Пока нет избранных сходок', Icons.calendar_today_outlined);
+    if (_events.isEmpty) return _emptyState(context.t('favorites.no_events'), Icons.calendar_today_outlined);
     return RefreshIndicator(
       color: AppColors.red,
       backgroundColor: AppColors.surfaceDark,
@@ -150,11 +151,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
             margin: const EdgeInsets.only(bottom: 10),
             child: ListTile(
               leading: CircleAvatar(child: Text((event['event_type'] ?? '?')[0].toUpperCase())),
-              title: Text(event['title'] ?? 'Без названия', overflow: TextOverflow.ellipsis),
+              title: Text(event['title'] ?? context.t('favorites.untitled_event'), overflow: TextOverflow.ellipsis),
               subtitle: Text('${event['city'] ?? ''}, ${event['event_date'] ?? ''}', overflow: TextOverflow.ellipsis),
               trailing: IconButton(
                 icon: const Icon(Icons.favorite, color: AppColors.red),
-                tooltip: 'Убрать из избранного',
+                tooltip: context.t('favorites.remove_favorite_tooltip'),
                 onPressed: () => _removeEventFavorite(event),
               ),
               onTap: () {
@@ -172,7 +173,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
 
   Widget _clubsTab() {
     if (_isLoadingClubs) return Center(child: AppLoader());
-    if (_clubs.isEmpty) return _emptyState('Пока нет избранных клубов', Icons.groups_outlined);
+    if (_clubs.isEmpty) return _emptyState(context.t('favorites.no_clubs'), Icons.groups_outlined);
     return RefreshIndicator(
       color: AppColors.red,
       backgroundColor: AppColors.surfaceDark,
@@ -193,10 +194,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                       child: const Icon(Icons.groups, color: AppColors.blue),
                     ),
               title: Text(club['name'] ?? '', overflow: TextOverflow.ellipsis),
-              subtitle: Text('${club['members_count'] ?? 0} участников', overflow: TextOverflow.ellipsis),
+              subtitle: Text(context.tArgs('favorites.members_count', {'count': '${club['members_count'] ?? 0}'}), overflow: TextOverflow.ellipsis),
               trailing: IconButton(
                 icon: const Icon(Icons.favorite, color: AppColors.red),
-                tooltip: 'Убрать из избранного',
+                tooltip: context.t('favorites.remove_favorite_tooltip'),
                 onPressed: () => _removeClubFavorite(club),
               ),
               onTap: () {
@@ -214,7 +215,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
 
   Widget _businessesTab() {
     if (_isLoadingBusinesses) return Center(child: AppLoader());
-    if (_businesses.isEmpty) return _emptyState('Пока нет избранных автосервисов', Icons.car_repair);
+    if (_businesses.isEmpty) return _emptyState(context.t('favorites.no_businesses'), Icons.car_repair);
     return RefreshIndicator(
       color: AppColors.red,
       backgroundColor: AppColors.surfaceDark,
@@ -238,7 +239,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
               subtitle: Text('${business['city'] ?? ''}', overflow: TextOverflow.ellipsis),
               trailing: IconButton(
                 icon: const Icon(Icons.favorite, color: AppColors.red),
-                tooltip: 'Убрать из избранного',
+                tooltip: context.t('favorites.remove_favorite_tooltip'),
                 onPressed: () => _removeBusinessFavorite(business),
               ),
               onTap: () {
@@ -258,7 +259,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Избранное'),
+        title: Text(context.t('favorites.title')),
         elevation: 0,
         backgroundColor: AppColors.black,
         bottom: TabBar(
@@ -266,10 +267,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
           indicatorColor: AppColors.red,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white54,
-          tabs: const [
-            Tab(text: 'Сходки'),
-            Tab(text: 'Клубы'),
-            Tab(text: 'Сервисы'),
+          tabs: [
+            Tab(text: context.t('favorites.tab_events')),
+            Tab(text: context.t('favorites.tab_clubs')),
+            Tab(text: context.t('favorites.tab_businesses')),
           ],
         ),
       ),

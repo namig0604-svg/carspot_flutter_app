@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../screens/story_viewer_screen.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Лента историй сверху главного экрана: своя история/кнопка добавить + кольца
 /// друзей (градиент — есть непросмотренные, серая рамка — уже всё видел).
@@ -52,7 +53,7 @@ class _StoriesBarState extends State<StoriesBar> {
       picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Не удалось открыть галерею: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('stories_bar.gallery_open_failed', {'error': '$e'}))));
       }
       return;
     }
@@ -69,11 +70,11 @@ class _StoriesBarState extends State<StoriesBar> {
       );
       await _load();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('История опубликована')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('stories_bar.story_published'))));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Не удалось опубликовать: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('stories_bar.publish_failed', {'error': '$e'}))));
       }
     } finally {
       if (mounted) setState(() => _isUploading = false);
@@ -217,7 +218,7 @@ class _StoriesBarState extends State<StoriesBar> {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text('Вы', style: TextStyle(fontSize: 11)),
+                  Text(context.t('stories_bar.you_label'), style: const TextStyle(fontSize: 11)),
                 ],
               ),
             ),

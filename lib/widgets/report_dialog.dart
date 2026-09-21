@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Причины жалобы — ключ уходит на бэкенд, подпись показывается пользователю.
 const Map<String, String> reportReasonLabels = {
@@ -12,6 +13,9 @@ const Map<String, String> reportReasonLabels = {
   'scam': 'Мошенничество',
   'other': 'Другое',
 };
+
+/// Ключ перевода подписи причины жалобы по её коду (см. [reportReasonLabels]).
+String _reportReasonKey(String reason) => 'report_dialog.reason_$reason';
 
 /// Открывает форму жалобы на пользователя/сходку/клуб/сервис/сообщение/фото.
 /// targetType — один из: user, event, club, business, message, photo.
@@ -43,13 +47,13 @@ Future<void> showReportDialog(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Пожаловаться', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(context.t('report_dialog.title'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   ...reportReasonLabels.entries.map(
                     (e) => RadioListTile<String>(
                       contentPadding: EdgeInsets.zero,
                       dense: true,
-                      title: Text(e.value),
+                      title: Text(context.t(_reportReasonKey(e.key))),
                       value: e.key,
                       groupValue: selectedReason,
                       onChanged: (v) => setSheetState(() => selectedReason = v!),
@@ -60,9 +64,9 @@ Future<void> showReportDialog(
                     controller: descriptionController,
                     maxLength: 1000,
                     maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: 'Подробности (необязательно)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: context.t('report_dialog.details_label'),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -88,12 +92,12 @@ Future<void> showReportDialog(
                                 );
                                 Navigator.pop(sheetCtx);
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Жалоба отправлена, спасибо')),
+                                  SnackBar(content: Text(context.t('report_dialog.report_sent'))),
                                 );
                               } catch (e) {
                                 setSheetState(() => isSending = false);
                                 ScaffoldMessenger.of(sheetCtx).showSnackBar(
-                                  SnackBar(content: Text('Ошибка: $e')),
+                                  SnackBar(content: Text(context.tArgs('report_dialog.error_message', {'error': '$e'}))),
                                 );
                               }
                             },
@@ -103,7 +107,7 @@ Future<void> showReportDialog(
                               height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
-                          : const Text('Отправить жалобу'),
+                          : Text(context.t('report_dialog.submit_button')),
                     ),
                   ),
                 ],

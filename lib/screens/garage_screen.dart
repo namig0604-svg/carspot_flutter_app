@@ -8,6 +8,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
+import '../l10n/l10n_extensions.dart';
 
 class GarageScreen extends StatefulWidget {
   const GarageScreen({Key? key}) : super(key: key);
@@ -36,7 +37,7 @@ class _GarageScreenState extends State<GarageScreen> {
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('garage.error', {'error': '$e'}))));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -57,7 +58,7 @@ class _GarageScreenState extends State<GarageScreen> {
       await ApiService.post('/api/cars/${car['id']}/primary', {}, token: authProvider.accessToken);
       _loadGarage();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('garage.error', {'error': '$e'}))));
     }
   }
 
@@ -65,13 +66,13 @@ class _GarageScreenState extends State<GarageScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить машину?'),
-        content: Text('${car['make']} ${car['model']} будет удалена из гаража. Это нельзя отменить.'),
+        title: Text(context.t('garage.delete_car_title')),
+        content: Text(context.tArgs('garage.delete_car_content', {'car': '${car['make']} ${car['model']}'})),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -83,7 +84,7 @@ class _GarageScreenState extends State<GarageScreen> {
       await ApiService.delete('/api/cars/${car['id']}', token: authProvider.accessToken);
       _loadGarage();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('garage.error', {'error': '$e'}))));
     }
   }
 
@@ -100,7 +101,7 @@ class _GarageScreenState extends State<GarageScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.edit, color: AppColors.blue),
-              title: const Text('Редактировать'),
+              title: Text(context.t('common.edit')),
               onTap: () {
                 Navigator.pop(context);
                 _openForm(car: car);
@@ -109,7 +110,7 @@ class _GarageScreenState extends State<GarageScreen> {
             if (!(car['is_primary'] ?? false))
               ListTile(
                 leading: const Icon(Icons.star, color: Colors.orange),
-                title: const Text('Сделать основной'),
+                title: Text(context.t('garage.set_primary')),
                 onTap: () {
                   Navigator.pop(context);
                   _setPrimary(car);
@@ -117,7 +118,7 @@ class _GarageScreenState extends State<GarageScreen> {
               ),
             ListTile(
               leading: const Icon(Icons.delete, color: AppColors.red),
-              title: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+              title: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _deleteCar(car);
@@ -136,7 +137,7 @@ class _GarageScreenState extends State<GarageScreen> {
 
     final subtitleParts = <String>[];
     if (car['engine'] != null) subtitleParts.add(car['engine']);
-    if (car['power_hp'] != null) subtitleParts.add('${car['power_hp']} л.с.');
+    if (car['power_hp'] != null) subtitleParts.add(context.tArgs('garage.power_hp', {'power': '${car['power_hp']}'}));
     if (car['drivetrain'] != null) subtitleParts.add(car['drivetrain']);
     if ((car['license_plate'] ?? '').toString().isNotEmpty) subtitleParts.add(car['license_plate']);
 
@@ -198,8 +199,8 @@ class _GarageScreenState extends State<GarageScreen> {
                       Wrap(
                         spacing: 6,
                         children: [
-                          if (isPrimary) _badge('Основная', Colors.orange),
-                          if (isForSale) _badge('Продаётся', Colors.green),
+                          if (isPrimary) _badge(context.t('garage.primary_badge'), Colors.orange),
+                          if (isForSale) _badge(context.t('garage.for_sale_badge'), Colors.green),
                         ],
                       ),
                     ],
@@ -238,7 +239,7 @@ class _GarageScreenState extends State<GarageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Мой гараж'),
+        title: Text(context.t('garage.title')),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
@@ -273,13 +274,13 @@ class _GarageScreenState extends State<GarageScreen> {
                         const Icon(Icons.directions_car, size: 64, color: Colors.grey),
                         const SizedBox(height: 16),
                         const Center(
-                          child: Text('Гараж пуст', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                          child: Text(context.t('garage.empty_title'), style: const TextStyle(fontSize: 18, color: Colors.grey)),
                         ),
                         const SizedBox(height: 8),
                         const Center(
                           child: Text(
-                            'Добавь свою первую машину',
-                            style: TextStyle(color: Colors.grey),
+                            context.t('garage.empty_subtitle'),
+                            style: const TextStyle(color: Colors.grey),
                           ),
                         ),
                       ],

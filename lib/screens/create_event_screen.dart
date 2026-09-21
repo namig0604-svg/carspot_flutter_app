@@ -6,6 +6,7 @@ import '../utils/event_duration.dart';
 import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 class CreateEventScreen extends StatefulWidget {
   /// Если передан — сходка создаётся как событие клуба (только владелец/админ
@@ -99,7 +100,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.clubId != null ? 'Сходка клуба' : 'Создать сходку')),
+      appBar: AppBar(title: Text(widget.clubId != null ? context.t('create_event.title_club') : context.t('create_event.title'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -107,7 +108,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                labelText: 'Название сходки *',
+                labelText: context.t('create_event.title_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -117,7 +118,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               controller: _descriptionController,
               maxLines: 4,
               decoration: InputDecoration(
-                labelText: 'Описание',
+                labelText: context.t('create_event.description_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -126,7 +127,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             DropdownButtonFormField<String>(
               value: _selectedType,
               decoration: InputDecoration(
-                labelText: 'Тип сходки *',
+                labelText: context.t('create_event.type_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               items: _eventTypes.map((type) {
@@ -141,7 +142,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             TextField(
               controller: _countryController,
               decoration: InputDecoration(
-                labelText: 'Страна *',
+                labelText: context.t('create_event.country_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -150,7 +151,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             TextField(
               controller: _cityController,
               decoration: InputDecoration(
-                labelText: 'Город *',
+                labelText: context.t('create_event.city_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -159,7 +160,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             TextField(
               controller: _locationController,
               decoration: InputDecoration(
-                labelText: 'Место проведения *',
+                labelText: context.t('create_event.location_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -170,8 +171,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               icon: Icon(_latitude == null ? Icons.map_outlined : Icons.check_circle, color: _latitude == null ? null : Colors.green),
               label: Text(
                 _latitude == null
-                    ? 'Указать точку на карте *'
-                    : 'Точка выбрана: ${_latitude!.toStringAsFixed(4)}, ${_longitude!.toStringAsFixed(4)}',
+                    ? context.t('create_event.pick_location_button')
+                    : context.tArgs('create_event.location_point_selected', {
+                        'lat': _latitude!.toStringAsFixed(4),
+                        'lng': _longitude!.toStringAsFixed(4),
+                      }),
               ),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
@@ -186,7 +190,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 controller: _dateController,
                 enabled: false,
                 decoration: InputDecoration(
-                  labelText: 'Дата (YYYY-MM-DD) *',
+                  labelText: context.t('create_event.date_label'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   suffixIcon: const Icon(Icons.calendar_today),
                 ),
@@ -200,7 +204,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 controller: _timeController,
                 enabled: false,
                 decoration: InputDecoration(
-                  labelText: 'Время (HH:MM) *',
+                  labelText: context.t('create_event.time_label'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   suffixIcon: const Icon(Icons.access_time),
                 ),
@@ -211,8 +215,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             DropdownButtonFormField<int>(
               value: _durationMinutes,
               decoration: InputDecoration(
-                labelText: 'Продолжительность *',
-                helperText: 'Сходка автоматически закроется, когда это время истечёт',
+                labelText: context.t('create_event.duration_label'),
+                helperText: context.t('create_event.duration_helper'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               items: eventDurationOptions
@@ -228,8 +232,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 secondary: const Icon(Icons.lock_outline, color: Colors.blueGrey),
-                title: const Text('Закрытая сходка'),
-                subtitle: const Text('Видна и доступна только участникам клуба'),
+                title: Text(context.t('create_event.private_event_title')),
+                subtitle: Text(context.t('create_event.private_event_subtitle')),
                 value: _isPrivate,
                 onChanged: (v) => setState(() => _isPrivate = v),
               ),
@@ -260,7 +264,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 ),
                 child: _isLoading
                   ? AppLoader(size: 22, color: Colors.white)
-                  : const Text('Создать сходку', style: TextStyle(color: Colors.white, fontSize: 16)),
+                  : Text(context.t('create_event.title'), style: const TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ),
           ],
@@ -272,11 +276,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   void _createEvent() async {
     if (_titleController.text.isEmpty || _cityController.text.isEmpty ||
         _dateController.text.isEmpty || _timeController.text.isEmpty) {
-      setState(() => _errorMessage = 'Заполни все обязательные поля (*)');
+      setState(() => _errorMessage = context.t('create_event.fill_required_fields'));
       return;
     }
     if (_latitude == null || _longitude == null) {
-      setState(() => _errorMessage = 'Укажи точку проведения на карте');
+      setState(() => _errorMessage = context.t('create_event.pick_location_on_map'));
       return;
     }
 
@@ -313,10 +317,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
       Navigator.pop(context, true);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Сходка создана! 🎉')),
+        SnackBar(content: Text(context.t('create_event.event_created'))),
       );
     } catch (e) {
-      setState(() => _errorMessage = 'Ошибка: ${e.toString()}');
+      setState(() => _errorMessage = context.tArgs('create_event.error_prefix', {'error': e.toString()}));
     } finally {
       setState(() => _isLoading = false);
     }

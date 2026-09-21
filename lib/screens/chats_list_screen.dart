@@ -7,6 +7,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
+import '../l10n/l10n_extensions.dart';
 
 class ChatsListScreen extends StatefulWidget {
   const ChatsListScreen({Key? key}) : super(key: key);
@@ -33,7 +34,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
       setState(() => _rooms = response is List ? response : []);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('chats_list.error_message', {'error': '$e'}))));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -45,11 +46,11 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
     if (title != null && title.isNotEmpty) return title;
     switch (room['room_type']) {
       case 'event':
-        return 'Чат сходки';
+        return context.t('chats_list.event_chat');
       case 'club':
-        return 'Чат клуба';
+        return context.t('chats_list.club_chat');
       default:
-        return 'Личный чат';
+        return context.t('chats_list.direct_chat');
     }
   }
 
@@ -82,7 +83,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Чаты'),
+        title: Text(context.t('chats_list.title')),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
@@ -102,17 +103,17 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                         const Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
                         const SizedBox(height: 16),
-                        const Center(
-                          child: Text('Чатов пока нет', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                        Center(
+                          child: Text(context.t('chats_list.empty_title'), style: const TextStyle(fontSize: 18, color: Colors.grey)),
                         ),
                         const SizedBox(height: 8),
-                        const Center(
+                        Center(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 40),
+                            padding: const EdgeInsets.symmetric(horizontal: 40),
                             child: Text(
-                              'Напиши участнику сходки или открой чат сходки, к которой присоединился',
+                              context.t('chats_list.empty_subtitle'),
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey),
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ),
                         ),
@@ -155,7 +156,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                             style: TextStyle(fontWeight: hasUnread ? FontWeight.bold : FontWeight.normal),
                           ),
                           subtitle: Text(
-                            room['last_message_text'] ?? 'Нет сообщений',
+                            room['last_message_text'] ?? context.t('chats_list.no_messages'),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

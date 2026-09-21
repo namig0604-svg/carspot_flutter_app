@@ -14,6 +14,7 @@ import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
+import '../l10n/l10n_extensions.dart';
 
 class BusinessDetailScreen extends StatefulWidget {
   final String businessId;
@@ -68,7 +69,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
         _myStars = (response['my_rating'] as int?) ?? 0;
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('business_detail.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoadingDetail = false);
     }
@@ -99,7 +100,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       }
       if (mounted) setState(() => _business!['is_favorite'] = !_isFavorite);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('business_detail.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isActionLoading = false);
     }
@@ -107,7 +108,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
 
   Future<void> _submitReview() async {
     if (_myStars == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Поставь оценку от 1 до 5 звёзд')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('business_detail.rate_before_submit'))));
       return;
     }
     setState(() => _isActionLoading = true);
@@ -125,10 +126,10 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       setState(() => _showReviewForm = false);
       await _loadAll();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Отзыв отправлен')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('business_detail.review_submitted'))));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('business_detail.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isActionLoading = false);
     }
@@ -151,11 +152,11 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       final goPremium = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Только для Premium'),
-          content: const Text('Поднимать заведение в топ каталога могут только подписчики CarSpot Premium.'),
+          title: Text(context.t('business_detail.premium_only_title')),
+          content: Text(context.t('business_detail.boost_premium_only_desc')),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Узнать больше')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(context.t('business_detail.learn_more'))),
           ],
         ),
       );
@@ -173,7 +174,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       setState(() => _business = response);
       SoundPlayer.play(context, AppSound.success);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заведение поднято в топ каталога на 24 часа 🚀')),
+        SnackBar(content: Text(context.t('business_detail.boosted_success'))),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
@@ -192,13 +193,13 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить заведение?'),
-        content: const Text('Вместе с ним удалятся все отзывы. Это нельзя отменить.'),
+        title: Text(context.t('business_detail.delete_confirm_title')),
+        content: Text(context.t('business_detail.delete_confirm_desc')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -211,10 +212,10 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       await ApiService.delete('/api/businesses/${widget.businessId}', token: authProvider.accessToken);
       if (mounted) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Заведение удалено')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('business_detail.deleted_success'))));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('business_detail.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isActionLoading = false);
     }
@@ -226,7 +227,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
       return Scaffold(body: Center(child: AppLoader()));
     }
     if (_business == null) {
-      return const Scaffold(body: Center(child: Text('Заведение не найдено')));
+      return Scaffold(body: Center(child: Text(context.t('business_detail.not_found'))));
     }
 
     final b = _business!;
@@ -246,22 +247,22 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
         actions: [
           IconButton(
             icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border, color: _isFavorite ? AppColors.red : null),
-            tooltip: 'В избранное',
+            tooltip: context.t('business_detail.favorite_tooltip'),
             onPressed: _isActionLoading ? null : _toggleFavorite,
           ),
           if (_isOwner) ...[
             IconButton(
               icon: Icon(Icons.rocket_launch, color: _isBoosted() ? Colors.amber : null),
-              tooltip: _isBoosted() ? 'Заведение в топе' : 'Поднять в топ каталога (Premium)',
+              tooltip: _isBoosted() ? context.t('business_detail.boosted_tooltip') : context.t('business_detail.boost_tooltip'),
               onPressed: _isBoosted() ? null : _boost,
             ),
-            IconButton(icon: const Icon(Icons.edit), tooltip: 'Изменить', onPressed: _openEdit),
-            IconButton(icon: const Icon(Icons.delete_outline), tooltip: 'Удалить', onPressed: _delete),
+            IconButton(icon: const Icon(Icons.edit), tooltip: context.t('business_detail.edit_tooltip'), onPressed: _openEdit),
+            IconButton(icon: const Icon(Icons.delete_outline), tooltip: context.t('common.delete'), onPressed: _delete),
           ],
           if (!_isOwner)
             IconButton(
               icon: const Icon(Icons.flag_outlined),
-              tooltip: 'Пожаловаться',
+              tooltip: context.t('business_detail.report_tooltip'),
               onPressed: () => showReportDialog(context, targetType: 'business', targetId: widget.businessId),
             ),
         ],
@@ -327,7 +328,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                   );
                 }),
                 const SizedBox(width: 8),
-                Text('${rating.toStringAsFixed(1)} ($reviewsCount отзывов)'),
+                Text(context.tArgs('business_detail.rating_summary', {'rating': rating.toStringAsFixed(1), 'count': '$reviewsCount'})),
               ],
             ),
             const SizedBox(height: 20),
@@ -338,7 +339,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
             ],
 
             if (services.isNotEmpty) ...[
-              const Text('Услуги', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(context.t('business_detail.services_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
@@ -348,7 +349,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
               const SizedBox(height: 20),
             ],
 
-            const Text('Контакты', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(context.t('business_detail.contacts_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             if ((b['city'] ?? '').toString().isNotEmpty ||
                 (b['address'] ?? '').toString().isNotEmpty ||
@@ -359,12 +360,12 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                   final parts = [b['city'], b['address']]
                       .where((s) => (s ?? '').toString().isNotEmpty)
                       .join(', ');
-                  return parts.isNotEmpty ? parts : 'Место указано на карте';
+                  return parts.isNotEmpty ? parts : context.t('business_detail.location_on_map_only');
                 }(),
                 trailing: (b['latitude'] != null && b['longitude'] != null)
                     ? IconButton(
                         icon: const Icon(Icons.directions, color: AppColors.blue, size: 20),
-                        tooltip: 'Маршрут в Google Maps',
+                        tooltip: context.t('business_detail.directions_tooltip'),
                         onPressed: () => openDirections(
                           context,
                           (b['latitude'] as num).toDouble(),
@@ -419,10 +420,10 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
 
             const SizedBox(height: 30),
 
-            const Text('Отзывы', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(context.t('business_detail.reviews_title'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             _reviews.isEmpty
-                ? const Text('Пока нет отзывов — стань первым')
+                ? Text(context.t('business_detail.no_reviews_yet'))
                 : ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -448,7 +449,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                                               context,
                                               MaterialPageRoute(builder: (_) => UserProfileScreen(userId: userId)),
                                             ),
-                                    child: Text(user?['username'] ?? 'Неизвестный'),
+                                    child: Text(user?['username'] ?? context.t('business_detail.unknown_user')),
                                   ),
                                   Row(
                                     children: List.generate(5, (i) {
@@ -481,8 +482,8 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                 onPressed: () => setState(() => _showReviewForm = !_showReviewForm),
                 icon: const Icon(Icons.star),
                 label: Text(_showReviewForm
-                    ? 'Скрыть форму отзыва'
-                    : (_myStars > 0 ? 'Изменить свой отзыв' : 'Оставить отзыв')),
+                    ? context.t('business_detail.hide_review_form')
+                    : (_myStars > 0 ? context.t('business_detail.edit_my_review') : context.t('business_detail.leave_review'))),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -492,7 +493,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
 
             if (_showReviewForm) ...[
               const SizedBox(height: 20),
-              const Text('Твоя оценка', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(context.t('business_detail.your_rating_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -512,7 +513,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                 controller: _reviewController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: 'Твой отзыв (опционально)',
+                  hintText: context.t('business_detail.review_hint'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
@@ -526,7 +527,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                     backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Отправить отзыв', style: TextStyle(color: Colors.white)),
+                  child: Text(context.t('business_detail.submit_review_button'), style: const TextStyle(color: Colors.white)),
                 ),
               ),
             ],

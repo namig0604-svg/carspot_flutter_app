@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Редактирование своего профиля: юзернейм, имя, фото, описание.
 class EditProfileScreen extends StatefulWidget {
@@ -47,7 +48,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _submit() async {
     if (_usernameController.text.trim().length < 3) {
-      setState(() => _errorMessage = 'Юзернейм — минимум 3 символа');
+      setState(() => _errorMessage = context.t('edit_profile.username_min_length'));
       return;
     }
 
@@ -71,11 +72,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Профиль обновлён')),
+          SnackBar(content: Text(context.t('edit_profile.profile_updated'))),
         );
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Ошибка: $e');
+      setState(() => _errorMessage = context.tArgs('edit_profile.generic_error', {'error': '$e'}));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -107,7 +108,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final avatarUrl = _avatarUrlController.text.trim();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Редактировать профиль')),
+      appBar: AppBar(title: Text(context.t('edit_profile.title'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -122,16 +123,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 20),
 
-            _field(_usernameController, 'Юзернейм', required: true, prefixText: '@'),
-            _field(_fullNameController, 'Имя'),
-            _field(_bioController, 'О себе', maxLines: 4),
+            _field(_usernameController, context.t('edit_profile.field_username'), required: true, prefixText: '@'),
+            _field(_fullNameController, context.t('edit_profile.field_full_name')),
+            _field(_bioController, context.t('edit_profile.field_bio'), maxLines: 4),
             Padding(
               padding: const EdgeInsets.only(bottom: 15),
               child: TextField(
                 controller: _avatarUrlController,
                 onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
-                  labelText: 'Ссылка на фото профиля (URL)',
+                  labelText: context.t('edit_profile.field_avatar_url'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
@@ -161,7 +162,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 child: _isLoading
                     ? AppLoader(size: 22, color: Colors.white)
-                    : const Text('Сохранить', style: TextStyle(color: Colors.white, fontSize: 16)),
+                    : Text(context.t('common.save'), style: const TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ),
             const SizedBox(height: 20),

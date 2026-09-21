@@ -10,6 +10,7 @@ import '../utils/maps_launcher.dart';
 import 'event_details_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Карта всех предстоящих сходок. Метки берутся из лёгкого /api/events/map —
 /// той же ручки, что бэкенд отдаёт для карты, просто с широкой рамкой на весь мир,
@@ -44,7 +45,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
       );
       setState(() => _markers = response is List ? response : []);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('events_map.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
       WidgetsBinding.instance.addPostFrameCallback((_) => _fitToMarkers());
@@ -103,7 +104,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
               children: [
                 const Icon(Icons.people, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text('${marker['participants_count'] ?? 0} участников'),
+                Text(context.tArgs('events_map.participants_count', {'count': '${marker['participants_count'] ?? 0}'})),
                 const SizedBox(width: 16),
                 const Icon(Icons.star, size: 16, color: Colors.orange),
                 const SizedBox(width: 4),
@@ -118,7 +119,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => openDirections(context, lat, lon),
                       icon: const Icon(Icons.directions),
-                      label: const Text('Маршрут'),
+                      label: Text(context.t('events_map.directions')),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(0, 44),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -142,7 +143,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                       minimumSize: const Size(0, 44),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: const Text('Открыть сходку', style: TextStyle(color: Colors.white)),
+                    child: Text(context.t('events_map.open_event'), style: const TextStyle(color: Colors.white)),
                   ),
                 ),
               ],
@@ -172,7 +173,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Карта сходок'),
+        title: Text(context.t('events_map.title')),
         backgroundColor: AppColors.black,
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
@@ -203,7 +204,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                child: const Text('Пока нет сходок с координатами', textAlign: TextAlign.center),
+                child: Text(context.t('events_map.no_events'), textAlign: TextAlign.center),
               ),
             ),
         ],

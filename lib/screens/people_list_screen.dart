@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'user_profile_screen.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Общий список людей — используется для "кто лайкнул" и "кто смотрел профиль" (Premium).
 /// Каждый элемент people — карта пользователя, опционально с ключом 'subtitle_override'
@@ -7,13 +8,13 @@ import 'user_profile_screen.dart';
 class PeopleListScreen extends StatelessWidget {
   final String title;
   final List<dynamic> people;
-  final String emptyText;
+  final String? emptyText;
 
   const PeopleListScreen({
     Key? key,
     required this.title,
     required this.people,
-    this.emptyText = 'Пока никого',
+    this.emptyText,
   }) : super(key: key);
 
   @override
@@ -21,7 +22,7 @@ class PeopleListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(title), backgroundColor: Colors.amber.shade800),
       body: people.isEmpty
-          ? Center(child: Text(emptyText, style: const TextStyle(color: Colors.grey)))
+          ? Center(child: Text(emptyText ?? context.t('people_list.empty_default'), style: const TextStyle(color: Colors.grey)))
           : ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: people.length,

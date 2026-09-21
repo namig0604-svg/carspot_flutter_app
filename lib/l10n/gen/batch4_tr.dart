@@ -1,0 +1,140 @@
+/// Переводы для батча 4 (user_profile_screen, garage_screen,
+/// story_viewer_screen, car_form_screen, achievements_screen).
+///
+/// Подключается централизованно в lib/l10n/app_translations.dart — этот файл
+/// не редактировать вручную для wiring, только для добавления/правки строк.
+const Map<String, Map<String, String>> kBatch4Translations = {
+  // ─────────────────────────── user_profile_screen.dart ───────────────────────────
+  'user_profile.error': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'user_profile.chat_default_title': {'ru': 'Чат', 'en': 'Chat', 'ka': 'ჩატი'},
+  'user_profile.remove_friend_title': {'ru': 'Удалить из друзей?', 'en': 'Remove from friends?', 'ka': 'წაშალო მეგობრებიდან?'},
+  'user_profile.remove_friend_content': {
+    'ru': '{name} больше не будет в списке друзей.',
+    'en': '{name} will no longer be in your friends list.',
+    'ka': '{name} აღარ იქნება თქვენს მეგობრების სიაში.',
+  },
+  'user_profile.default_user': {'ru': 'Пользователь', 'en': 'User', 'ka': 'მომხმარებელი'},
+  'user_profile.friends_label': {'ru': 'Друзья ✓', 'en': 'Friends ✓', 'ka': 'მეგობრები ✓'},
+  'user_profile.pending_sent_label': {
+    'ru': 'Заявка отправлена · отменить',
+    'en': 'Request sent · cancel',
+    'ka': 'მოთხოვნა გაგზავნილია · გაუქმება',
+  },
+  'user_profile.accept_label': {'ru': 'Принять', 'en': 'Accept', 'ka': 'დათანხმება'},
+  'user_profile.decline_label': {'ru': 'Отклонить', 'en': 'Decline', 'ka': 'უარყოფა'},
+  'user_profile.add_friend_label': {'ru': 'Добавить в друзья', 'en': 'Add friend', 'ka': 'მეგობრად დამატება'},
+  'user_profile.title_fallback': {'ru': 'Профиль', 'en': 'Profile', 'ka': 'პროფილი'},
+  'user_profile.report_tooltip': {'ru': 'Пожаловаться', 'en': 'Report', 'ka': 'ჩივილის გაგზავნა'},
+  'user_profile.user_not_found': {'ru': 'Пользователь не найден', 'en': 'User not found', 'ka': 'მომხმარებელი ვერ მოიძებნა'},
+  'user_profile.verified_tooltip': {'ru': 'Подтверждённый аккаунт', 'en': 'Verified account', 'ka': 'დადასტურებული ანგარიში'},
+  'user_profile.admin_tooltip': {'ru': 'Администратор', 'en': 'Administrator', 'ka': 'ადმინისტრატორი'},
+  'user_profile.club_fallback': {'ru': 'Клуб', 'en': 'Club', 'ka': 'კლუბი'},
+  'user_profile.write_message_label': {'ru': 'Написать', 'en': 'Message', 'ka': 'შეტყობინება'},
+  'user_profile.joke_1': {
+    'ru': '🔧 Серьёзный соперник на трассе',
+    'en': '🔧 A serious rival on the track',
+    'ka': '🔧 სერიოზული მეტოქე ტრასაზე',
+  },
+  'user_profile.joke_2': {
+    'ru': '🏁 Такой уровень просто так не даётся',
+    'en': "🏁 That level isn't earned easily",
+    'ka': '🏁 ასეთი დონე ისე არავის ერგება',
+  },
+  'user_profile.joke_3': {'ru': '⚡ Вот это гонщик!', 'en': "⚡ Now that's a racer!", 'ka': '⚡ აი ეს არის მძღოლი!'},
+  'user_profile.level_title': {'ru': 'Уровень {level} · {title}', 'en': 'Level {level} · {title}', 'ka': 'დონე {level} · {title}'},
+  'user_profile.xp_total': {'ru': '{xp} XP всего', 'en': '{xp} XP total', 'ka': 'სულ {xp} XP'},
+  'user_profile.stat_cars': {'ru': 'Авто', 'en': 'Cars', 'ka': 'მანქანები'},
+  'user_profile.stat_meetups': {'ru': 'Сходок', 'en': 'Meetups', 'ka': 'შეხვედრები'},
+  'user_profile.stat_rating': {'ru': 'Рейтинг', 'en': 'Rating', 'ka': 'რეიტინგი'},
+  'user_profile.about_title': {'ru': 'О себе', 'en': 'About', 'ka': 'ჩემ შესახებ'},
+  'user_profile.clubs_title': {'ru': 'Клубы', 'en': 'Clubs', 'ka': 'კლუბები'},
+  'user_profile.role_owner': {'ru': 'владелец', 'en': 'owner', 'ka': 'მფლობელი'},
+  'user_profile.role_admin': {'ru': 'админ', 'en': 'admin', 'ka': 'ადმინი'},
+  'user_profile.garage_section_title': {'ru': 'Гараж', 'en': 'Garage', 'ka': 'გარაჟი'},
+  'user_profile.achievements_title': {'ru': 'Достижения', 'en': 'Achievements', 'ka': 'მიღწევები'},
+
+  // ─────────────────────────── garage_screen.dart ───────────────────────────
+  'garage.error': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'garage.delete_car_title': {'ru': 'Удалить машину?', 'en': 'Delete this car?', 'ka': 'წავშალო მანქანა?'},
+  'garage.delete_car_content': {
+    'ru': '{car} будет удалена из гаража. Это нельзя отменить.',
+    'en': '{car} will be removed from your garage. This cannot be undone.',
+    'ka': '{car} წაიშლება გარაჟიდან. ამის გაუქმება შეუძლებელია.',
+  },
+  'garage.set_primary': {'ru': 'Сделать основной', 'en': 'Set as primary', 'ka': 'ძირითადად დაყენება'},
+  'garage.power_hp': {'ru': '{power} л.с.', 'en': '{power} hp', 'ka': '{power} ცხ.ძ.'},
+  'garage.primary_badge': {'ru': 'Основная', 'en': 'Primary', 'ka': 'ძირითადი'},
+  'garage.for_sale_badge': {'ru': 'Продаётся', 'en': 'For sale', 'ka': 'იყიდება'},
+  'garage.title': {'ru': 'Мой гараж', 'en': 'My garage', 'ka': 'ჩემი გარაჟი'},
+  'garage.empty_title': {'ru': 'Гараж пуст', 'en': 'Garage is empty', 'ka': 'გარაჟი ცარიელია'},
+  'garage.empty_subtitle': {'ru': 'Добавь свою первую машину', 'en': 'Add your first car', 'ka': 'დაამატე შენი პირველი მანქანა'},
+
+  // ─────────────────────────── story_viewer_screen.dart ───────────────────────────
+  'story_viewer.delete_title': {'ru': 'Удалить историю?', 'en': 'Delete this story?', 'ka': 'წავშალო ისტორია?'},
+  'story_viewer.delete_failed': {
+    'ru': 'Не удалось удалить: {error}',
+    'en': "Couldn't delete: {error}",
+    'ka': 'წაშლა ვერ მოხერხდა: {error}',
+  },
+
+  // ─────────────────────────── car_form_screen.dart ───────────────────────────
+  'car_form.error_required_fields': {'ru': 'Укажи марку и модель', 'en': 'Enter make and model', 'ka': 'მიუთითე მარკა და მოდელი'},
+  'car_form.updated_message': {'ru': 'Машина обновлена', 'en': 'Car updated', 'ka': 'მანქანა განახლდა'},
+  'car_form.added_message': {'ru': 'Машина добавлена в гараж 🚗', 'en': 'Car added to garage 🚗', 'ka': 'მანქანა დაემატა გარაჟს 🚗'},
+  'car_form.error': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'car_form.title_edit': {'ru': 'Изменить машину', 'en': 'Edit car', 'ka': 'მანქანის რედაქტირება'},
+  'car_form.title_add': {'ru': 'Добавить машину', 'en': 'Add car', 'ka': 'მანქანის დამატება'},
+  'car_form.section_basic': {'ru': 'Основное', 'en': 'Basics', 'ka': 'ძირითადი'},
+  'car_form.section_specs': {'ru': 'Характеристики', 'en': 'Specs', 'ka': 'მახასიათებლები'},
+  'car_form.section_appearance': {'ru': 'Внешний вид', 'en': 'Appearance', 'ka': 'გარეგნობა'},
+  'car_form.field_make': {'ru': 'Марка', 'en': 'Make', 'ka': 'მარკა'},
+  'car_form.field_model': {'ru': 'Модель', 'en': 'Model', 'ka': 'მოდელი'},
+  'car_form.field_year': {'ru': 'Год выпуска', 'en': 'Year', 'ka': 'გამოშვების წელი'},
+  'car_form.field_generation': {'ru': 'Поколение (например S15)', 'en': 'Generation (e.g. S15)', 'ka': 'თაობა (მაგ. S15)'},
+  'car_form.field_body_type': {
+    'ru': 'Тип кузова (coupe / sedan / suv...)',
+    'en': 'Body type (coupe / sedan / suv...)',
+    'ka': 'ძარის ტიპი (coupe / sedan / suv...)',
+  },
+  'car_form.field_engine': {'ru': 'Двигатель (например SR20DET)', 'en': 'Engine (e.g. SR20DET)', 'ka': 'ძრავი (მაგ. SR20DET)'},
+  'car_form.field_engine_volume': {'ru': 'Объём (л)', 'en': 'Displacement (L)', 'ka': 'მოცულობა (ლ)'},
+  'car_form.field_power': {'ru': 'Мощность (л.с.)', 'en': 'Power (hp)', 'ka': 'სიმძლავრე (ცხ.ძ.)'},
+  'car_form.field_torque': {'ru': 'Крутящий момент (Нм)', 'en': 'Torque (Nm)', 'ka': 'ბრუნვის მომენტი (ნმ)'},
+  'car_form.field_drivetrain': {
+    'ru': 'Привод (RWD / FWD / AWD)',
+    'en': 'Drivetrain (RWD / FWD / AWD)',
+    'ka': 'წამყვანი (RWD / FWD / AWD)',
+  },
+  'car_form.field_transmission': {
+    'ru': 'Трансмиссия (manual / automatic)',
+    'en': 'Transmission (manual / automatic)',
+    'ka': 'ტრანსმისია (manual / automatic)',
+  },
+  'car_form.field_fuel_type': {
+    'ru': 'Тип топлива (petrol / diesel / electric)',
+    'en': 'Fuel type (petrol / diesel / electric)',
+    'ka': 'საწვავის ტიპი (petrol / diesel / electric)',
+  },
+  'car_form.field_weight': {'ru': 'Вес (кг)', 'en': 'Weight (kg)', 'ka': 'წონა (კგ)'},
+  'car_form.field_zero_to_hundred': {
+    'ru': 'Разгон 0-100 (сек)',
+    'en': '0-100 acceleration (sec)',
+    'ka': 'აჩქარება 0-100 (წმ)',
+  },
+  'car_form.field_color': {'ru': 'Цвет', 'en': 'Color', 'ka': 'ფერი'},
+  'car_form.field_plate': {'ru': 'Гос. номер', 'en': 'License plate', 'ka': 'სახელმწიფო ნომერი'},
+  'car_form.field_photo_url': {'ru': 'Ссылка на фото (URL)', 'en': 'Photo link (URL)', 'ka': 'ფოტოს ბმული (URL)'},
+  'car_form.field_mods': {'ru': 'Доработки (тюнинг)', 'en': 'Mods (tuning)', 'ka': 'დამუშავება (ტიუნინგი)'},
+  'car_form.field_description': {'ru': 'Описание', 'en': 'Description', 'ka': 'აღწერა'},
+  'car_form.for_sale_label': {'ru': 'Продаётся', 'en': 'For sale', 'ka': 'იყიდება'},
+  'car_form.submit_add': {'ru': 'Добавить в гараж', 'en': 'Add to garage', 'ka': 'გარაჟში დამატება'},
+
+  // ─────────────────────────── achievements_screen.dart ───────────────────────────
+  'achievements.title': {'ru': 'Достижения', 'en': 'Achievements', 'ka': 'მიღწევები'},
+  'achievements.unlocked_count': {
+    'ru': 'Открыто {unlocked} из {total}',
+    'en': '{unlocked} of {total} unlocked',
+    'ka': 'გახსნილია {unlocked} სულ {total}-დან',
+  },
+  'achievements.level_title': {'ru': 'Уровень {level} · {title}', 'en': 'Level {level} · {title}', 'ka': 'დონე {level} · {title}'},
+};

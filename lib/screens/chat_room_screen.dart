@@ -8,6 +8,7 @@ import '../widgets/report_dialog.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Экран одного чата (личный / чат сходки / чат клуба).
 /// Обновляется по таймеру каждые несколько секунд — без WebSocket,
@@ -69,7 +70,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       if (grew) _scrollToBottom();
     } catch (e) {
       if (!silent && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('chat_room.error_prefix', {'error': '$e'}))));
       }
     } finally {
       if (!silent && mounted) setState(() => _isLoading = false);
@@ -117,7 +118,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       _scrollToBottom();
     } catch (e) {
       _textController.text = text;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('chat_room.error_prefix', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isSending = false);
     }
@@ -129,7 +130,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     try {
       picked = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 82);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Не удалось открыть галерею: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('chat_room.gallery_open_error', {'error': '$e'}))));
       return;
     }
     if (picked == null) return;
@@ -145,7 +146,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         token: authProvider.accessToken,
       );
       final imageUrl = uploadResult['image_url'] as String?;
-      if (imageUrl == null) throw Exception('Сервер не вернул ссылку на фото');
+      if (imageUrl == null) throw Exception(context.t('chat_room.no_image_url_error'));
 
       final message = await ApiService.post(
         '/api/chats/${widget.roomId}/messages',
@@ -155,7 +156,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       setState(() => _messages = [..._messages, message]);
       _scrollToBottom();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка отправки фото: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('chat_room.image_send_error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isUploadingImage = false);
     }
@@ -165,12 +166,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить сообщение?'),
+        title: Text(context.t('chat_room.delete_message_title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -185,7 +186,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       );
       setState(() => _messages = _messages.where((m) => m['id'] != msg['id']).toList());
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('chat_room.error_prefix', {'error': '$e'}))));
     }
   }
 
@@ -241,7 +242,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           ),
           const SizedBox(width: 6),
           Text(
-            isOnline ? 'онлайн' : 'не в сети',
+            isOnline ? context.t('chat_room.online') : context.t('chat_room.offline'),
             style: const TextStyle(fontSize: 12, color: Colors.white70),
           ),
         ],
@@ -253,7 +254,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     final othersTotal = membersCount > 0 ? membersCount - 1 : 0;
     if (othersTotal <= 0) return null;
     return Text(
-      '$onlineCount из $othersTotal онлайн',
+      context.tArgs('chat_room.online_count', {'online': '$onlineCount', 'total': '$othersTotal'}),
       style: const TextStyle(fontSize: 12, color: Colors.white70),
     );
   }
@@ -261,7 +262,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget _buildMessage(Map<String, dynamic> msg) {
     final isMe = msg['user_id'] == _myId;
     final user = msg['user'] as Map<String, dynamic>?;
-    final username = user?['username'] as String? ?? 'Пользователь';
+    final username = user?['username'] as String? ?? context.t('chat_room.default_username');
     final avatarUrl = user?['avatar_url'] as String?;
     final text = msg['text'] as String? ?? '';
     final imageUrl = msg['image_url'] as String?;
@@ -382,8 +383,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             child: _isLoading
                 ? Center(child: AppLoader())
                 : _messages.isEmpty
-                    ? const Center(
-                        child: Text('Нет сообщений. Напиши первым! 👋', style: TextStyle(color: Colors.grey)),
+                    ? Center(
+                        child: Text(context.t('chat_room.no_messages_yet'), style: const TextStyle(color: Colors.grey)),
                       )
                     : ListView.builder(
                         controller: _scrollController,
@@ -409,7 +410,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         )
                       : IconButton(
                           icon: const Icon(Icons.image_outlined, color: AppColors.blue),
-                          tooltip: 'Отправить фото',
+                          tooltip: context.t('chat_room.send_photo_tooltip'),
                           onPressed: _pickAndSendImage,
                         ),
                   Expanded(
@@ -420,7 +421,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _send(),
                       decoration: InputDecoration(
-                        hintText: 'Написать сообщение...',
+                        hintText: context.t('chat_room.message_hint'),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
                       ),

@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import 'user_profile_screen.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Друзья: список друзей + входящие/исходящие заявки в друзья.
 class FriendsListScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
         _sent = results[2] is List ? results[2] as List : [];
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('friends_list.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -64,7 +65,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
       await ApiService.post('/api/friends/$friendshipId/accept', {}, token: authProvider.accessToken);
       await _loadAll();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('friends_list.error', {'error': '$e'}))));
     }
   }
 
@@ -74,7 +75,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
       await ApiService.post('/api/friends/$friendshipId/decline', {}, token: authProvider.accessToken);
       await _loadAll();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('friends_list.error', {'error': '$e'}))));
     }
   }
 
@@ -84,7 +85,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
       await ApiService.delete('/api/friends/$friendshipId', token: authProvider.accessToken);
       await _loadAll();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('friends_list.error', {'error': '$e'}))));
     }
   }
 
@@ -129,8 +130,8 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
     if (_friends.isEmpty) {
       return _emptyState(
         Icons.people_outline,
-        'Друзей пока нет',
-        'Добавляй в друзья участников сходок и клубов — их профиль будет тут',
+        context.t('friends_list.no_friends_title'),
+        context.t('friends_list.no_friends_subtitle'),
       );
     }
     return ListView.builder(
@@ -155,16 +156,16 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
     if (_incoming.isEmpty && _sent.isEmpty) {
       return _emptyState(
         Icons.person_add_alt_1,
-        'Заявок пока нет',
-        'Заявки в друзья, которые ты отправил или получил, появятся здесь',
+        context.t('friends_list.no_requests_title'),
+        context.t('friends_list.no_requests_subtitle'),
       );
     }
     return ListView(
       children: [
         if (_incoming.isNotEmpty) ...[
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Входящие', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text(context.t('friends_list.incoming'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
           ..._incoming.map((r) {
             final req = r as Map<String, dynamic>;
@@ -180,12 +181,12 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
                 children: [
                   IconButton(
                     icon: const Icon(Icons.check_circle, color: Colors.green),
-                    tooltip: 'Принять',
+                    tooltip: context.t('friends_list.accept'),
                     onPressed: () => _accept(fid),
                   ),
                   IconButton(
                     icon: const Icon(Icons.cancel, color: AppColors.red),
-                    tooltip: 'Отклонить',
+                    tooltip: context.t('friends_list.decline'),
                     onPressed: () => _decline(fid),
                   ),
                 ],
@@ -194,9 +195,9 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
           }),
         ],
         if (_sent.isNotEmpty) ...[
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Отправленные', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+            child: Text(context.t('friends_list.sent'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
           ..._sent.map((r) {
             final req = r as Map<String, dynamic>;
@@ -205,11 +206,11 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
             return ListTile(
               leading: _userAvatar(user),
               title: Text(user['full_name'] ?? user['username'] ?? ''),
-              subtitle: const Text('Заявка отправлена · ожидает ответа', style: TextStyle(color: Colors.grey)),
+              subtitle: Text(context.t('friends_list.request_sent_pending'), style: const TextStyle(color: Colors.grey)),
               onTap: () => _openProfile(user['id'] as String),
               trailing: TextButton(
                 onPressed: () => _decline(fid),
-                child: const Text('Отменить'),
+                child: Text(context.t('friends_list.cancel_request')),
               ),
             );
           }),
@@ -222,14 +223,18 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Друзья'),
+        title: Text(context.t('friends_list.title')),
         backgroundColor: AppColors.black,
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            const Tab(text: 'Друзья'),
-            Tab(text: _incoming.isEmpty ? 'Заявки' : 'Заявки (${_incoming.length})'),
+            Tab(text: context.t('friends_list.tab_friends')),
+            Tab(
+              text: _incoming.isEmpty
+                  ? context.t('friends_list.tab_requests')
+                  : context.tArgs('friends_list.tab_requests_count', {'count': '${_incoming.length}'}),
+            ),
           ],
         ),
       ),

@@ -6,6 +6,7 @@ import '../utils/business_category.dart';
 import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Форма заведения: добавление нового (business == null) или редактирование (владелец).
 class BusinessFormScreen extends StatefulWidget {
@@ -104,7 +105,7 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
 
   Future<void> _submit() async {
     if (_nameController.text.trim().length < 2) {
-      setState(() => _errorMessage = 'Название — минимум 2 символа');
+      setState(() => _errorMessage = context.t('business_form.name_too_short'));
       return;
     }
 
@@ -146,11 +147,11 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_isEditing ? 'Заведение обновлено' : 'Заведение добавлено 🔧')),
+          SnackBar(content: Text(_isEditing ? context.t('business_form.updated_success') : context.t('business_form.created_success'))),
         );
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Ошибка: $e');
+      setState(() => _errorMessage = context.tArgs('business_form.error_message', {'error': '$e'}));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -180,18 +181,18 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Изменить заведение' : 'Добавить заведение')),
+      appBar: AppBar(title: Text(_isEditing ? context.t('business_form.edit_business_title') : context.t('business_form.add_business'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _field(_nameController, 'Название', required: true),
+            _field(_nameController, context.t('business_form.label_name'), required: true),
 
             DropdownButtonFormField<String>(
               value: _category,
               decoration: InputDecoration(
-                labelText: 'Категория *',
+                labelText: context.t('business_form.label_category'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               items: businessCategories
@@ -203,18 +204,18 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
             ),
             const SizedBox(height: 15),
 
-            _field(_descriptionController, 'Описание', maxLines: 3),
-            _field(_servicesController, 'Услуги через запятую (Развал-схождение, Чип-тюнинг)'),
-            _field(_logoUrlController, 'Ссылка на логотип (URL)'),
-            _field(_coverUrlController, 'Ссылка на обложку (URL)'),
-            _field(_countryController, 'Страна'),
-            _field(_cityController, 'Город'),
-            _field(_addressController, 'Адрес'),
+            _field(_descriptionController, context.t('business_form.label_description'), maxLines: 3),
+            _field(_servicesController, context.t('business_form.label_services')),
+            _field(_logoUrlController, context.t('business_form.label_logo_url')),
+            _field(_coverUrlController, context.t('business_form.label_cover_url')),
+            _field(_countryController, context.t('business_form.label_country')),
+            _field(_cityController, context.t('business_form.label_city')),
+            _field(_addressController, context.t('business_form.label_address')),
 
             OutlinedButton.icon(
               onPressed: _pickLocation,
               icon: const Icon(Icons.map_outlined),
-              label: const Text('Указать точку на карте'),
+              label: Text(context.t('business_form.pick_location_button')),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -227,7 +228,7 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
                 Expanded(
                   child: _field(
                     _latController,
-                    'Широта (latitude)',
+                    context.t('business_form.label_latitude'),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                   ),
                 ),
@@ -235,17 +236,17 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
                 Expanded(
                   child: _field(
                     _lonController,
-                    'Долгота (longitude)',
+                    context.t('business_form.label_longitude'),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
                   ),
                 ),
               ],
             ),
 
-            _field(_phoneController, 'Телефон', keyboardType: TextInputType.phone),
-            _field(_websiteController, 'Сайт'),
+            _field(_phoneController, context.t('business_form.label_phone'), keyboardType: TextInputType.phone),
+            _field(_websiteController, context.t('business_form.label_website')),
             _field(_instagramController, 'Instagram'),
-            _field(_workHoursController, 'Режим работы (Пн-Сб 09:00-19:00)'),
+            _field(_workHoursController, context.t('business_form.label_work_hours')),
 
             const SizedBox(height: 10),
 
@@ -272,7 +273,7 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
                 child: _isLoading
                     ? AppLoader(size: 22, color: Colors.white)
                     : Text(
-                        _isEditing ? 'Сохранить' : 'Добавить заведение',
+                        _isEditing ? context.t('common.save') : context.t('business_form.add_business'),
                         style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
               ),

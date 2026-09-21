@@ -1,0 +1,103 @@
+/// Переводы для шестого набора экранов/виджетов (batch 5):
+/// business_detail_screen, businesses_list_screen, businesses_map_screen,
+/// business_form_screen, report_dialog, stories_bar.
+///
+/// Подключается централизованно в lib/l10n/app_translations.dart —
+/// этот файл только определяет ключи, ничего не импортирует и не
+/// вызывается напрямую из виджетов.
+const Map<String, Map<String, String>> kBatch5Translations = {
+  // ─────────────────────── business_detail_screen ───────────────────────
+  'business_detail.error_message': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'business_detail.rate_before_submit': {'ru': 'Поставь оценку от 1 до 5 звёзд', 'en': 'Give a rating from 1 to 5 stars', 'ka': 'დაასვი შეფასება 1-დან 5 ვარსკვლავამდე'},
+  'business_detail.review_submitted': {'ru': 'Отзыв отправлен', 'en': 'Review submitted', 'ka': 'შეფასება გაიგზავნა'},
+  'business_detail.premium_only_title': {'ru': 'Только для Premium', 'en': 'Premium only', 'ka': 'მხოლოდ Premium-სთვის'},
+  'business_detail.boost_premium_only_desc': {'ru': 'Поднимать заведение в топ каталога могут только подписчики CarSpot Premium.', 'en': 'Only CarSpot Premium subscribers can boost a business to the top of the catalog.', 'ka': 'ბიზნესის კატალოგის თავში აწევა შეუძლიათ მხოლოდ CarSpot Premium-ის გამომწერებს.'},
+  'business_detail.learn_more': {'ru': 'Узнать больше', 'en': 'Learn more', 'ka': 'გაიგე მეტი'},
+  'business_detail.boosted_success': {'ru': 'Заведение поднято в топ каталога на 24 часа 🚀', 'en': 'Business boosted to the top of the catalog for 24 hours 🚀', 'ka': 'ბიზნესი აიწია კატალოგის თავში 24 საათით 🚀'},
+  'business_detail.delete_confirm_title': {'ru': 'Удалить заведение?', 'en': 'Delete this business?', 'ka': 'წავშალოთ ბიზნესი?'},
+  'business_detail.delete_confirm_desc': {'ru': 'Вместе с ним удалятся все отзывы. Это нельзя отменить.', 'en': 'All its reviews will be deleted too. This cannot be undone.', 'ka': 'მასთან ერთად წაიშლება ყველა შეფასება. ამის გაუქმება შეუძლებელია.'},
+  'business_detail.deleted_success': {'ru': 'Заведение удалено', 'en': 'Business deleted', 'ka': 'ბიზნესი წაიშალა'},
+  'business_detail.not_found': {'ru': 'Заведение не найдено', 'en': 'Business not found', 'ka': 'ბიზნესი ვერ მოიძებნა'},
+  'business_detail.favorite_tooltip': {'ru': 'В избранное', 'en': 'Add to favorites', 'ka': 'რჩეულებში დამატება'},
+  'business_detail.boosted_tooltip': {'ru': 'Заведение в топе', 'en': 'Business is boosted', 'ka': 'ბიზნესი თავშია'},
+  'business_detail.boost_tooltip': {'ru': 'Поднять в топ каталога (Premium)', 'en': 'Boost to top of catalog (Premium)', 'ka': 'კატალოგის თავში აწევა (Premium)'},
+  'business_detail.edit_tooltip': {'ru': 'Изменить', 'en': 'Edit', 'ka': 'რედაქტირება'},
+  'business_detail.report_tooltip': {'ru': 'Пожаловаться', 'en': 'Report', 'ka': 'საჩივრის გაგზავნა'},
+  'business_detail.services_title': {'ru': 'Услуги', 'en': 'Services', 'ka': 'სერვისები'},
+  'business_detail.contacts_title': {'ru': 'Контакты', 'en': 'Contacts', 'ka': 'კონტაქტები'},
+  'business_detail.location_on_map_only': {'ru': 'Место указано на карте', 'en': 'Location shown on the map', 'ka': 'ადგილმდებარეობა მითითებულია რუკაზე'},
+  'business_detail.directions_tooltip': {'ru': 'Маршрут в Google Maps', 'en': 'Directions in Google Maps', 'ka': 'მარშრუტი Google Maps-ში'},
+  'business_detail.reviews_title': {'ru': 'Отзывы', 'en': 'Reviews', 'ka': 'შეფასებები'},
+  'business_detail.no_reviews_yet': {'ru': 'Пока нет отзывов — стань первым', 'en': 'No reviews yet — be the first', 'ka': 'ჯერ შეფასებები არ არის — იყავი პირველი'},
+  'business_detail.rating_summary': {'ru': '{rating} ({count} отзывов)', 'en': '{rating} ({count} reviews)', 'ka': '{rating} ({count} შეფასება)'},
+  'business_detail.unknown_user': {'ru': 'Неизвестный', 'en': 'Unknown', 'ka': 'უცნობი'},
+  'business_detail.hide_review_form': {'ru': 'Скрыть форму отзыва', 'en': 'Hide review form', 'ka': 'შეფასების ფორმის დამალვა'},
+  'business_detail.edit_my_review': {'ru': 'Изменить свой отзыв', 'en': 'Edit my review', 'ka': 'ჩემი შეფასების რედაქტირება'},
+  'business_detail.leave_review': {'ru': 'Оставить отзыв', 'en': 'Leave a review', 'ka': 'შეფასების დატოვება'},
+  'business_detail.your_rating_title': {'ru': 'Твоя оценка', 'en': 'Your rating', 'ka': 'შენი შეფასება'},
+  'business_detail.review_hint': {'ru': 'Твой отзыв (опционально)', 'en': 'Your review (optional)', 'ka': 'შენი შეფასება (არასავალდებულო)'},
+  'business_detail.submit_review_button': {'ru': 'Отправить отзыв', 'en': 'Submit review', 'ka': 'შეფასების გაგზავნა'},
+
+  // ─────────────────────── businesses_list_screen ───────────────────────
+  'businesses_list.error_message': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'businesses_list.title': {'ru': 'Автосервисы и ателье', 'en': 'Auto shops & studios', 'ka': 'ავტოსერვისები და ატელიეები'},
+  'businesses_list.map_tooltip': {'ru': 'Карта заведений', 'en': 'Businesses map', 'ka': 'ბიზნესების რუკა'},
+  'businesses_list.premium_only_title': {'ru': 'Только для Premium', 'en': 'Premium only', 'ka': 'მხოლოდ Premium-სთვის'},
+  'businesses_list.premium_required_desc': {'ru': 'Добавлять автосервисы и ателье могут только подписчики CarSpot Premium. Попробуй 14 дней бесплатно!', 'en': 'Only CarSpot Premium subscribers can add auto shops and studios. Try 14 days free!', 'ka': 'ავტოსერვისებისა და ატელიეების დამატება შეუძლიათ მხოლოდ CarSpot Premium-ის გამომწერებს. სცადე 14 დღე უფასოდ!'},
+  'businesses_list.learn_more': {'ru': 'Узнать больше', 'en': 'Learn more', 'ka': 'გაიგე მეტი'},
+  'businesses_list.filter_all': {'ru': 'Все', 'en': 'All', 'ka': 'ყველა'},
+  'businesses_list.filter_favorites': {'ru': 'Избранное', 'en': 'Favorites', 'ka': 'რჩეულები'},
+  'businesses_list.search_hint': {'ru': 'Поиск по названию или услугам...', 'en': 'Search by name or services...', 'ka': 'ძებნა სახელით ან სერვისით...'},
+  'businesses_list.all_categories': {'ru': 'Все категории', 'en': 'All categories', 'ka': 'ყველა კატეგორია'},
+  'businesses_list.no_favorites_empty': {'ru': 'Пока нет избранных заведений', 'en': 'No favorite businesses yet', 'ka': 'ჯერ რჩეული ბიზნესები არ არის'},
+  'businesses_list.nothing_found': {'ru': 'Ничего не найдено', 'en': 'Nothing found', 'ka': 'ვერაფერი მოიძებნა'},
+
+  // ─────────────────────── businesses_map_screen ───────────────────────
+  'businesses_map.error_message': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'businesses_map.directions_button': {'ru': 'Маршрут', 'en': 'Directions', 'ka': 'მარშრუტი'},
+  'businesses_map.open_business_button': {'ru': 'Открыть заведение', 'en': 'Open business', 'ka': 'ბიზნესის გახსნა'},
+  'businesses_map.title': {'ru': 'Карта заведений', 'en': 'Businesses map', 'ka': 'ბიზნესების რუკა'},
+  'businesses_map.no_businesses_with_coords': {'ru': 'Пока нет заведений с координатами', 'en': 'No businesses with coordinates yet', 'ka': 'ჯერ არცერთ ბიზნესს არ აქვს კოორდინატები'},
+
+  // ─────────────────────── business_form_screen ───────────────────────
+  'business_form.name_too_short': {'ru': 'Название — минимум 2 символа', 'en': 'Name must be at least 2 characters', 'ka': 'სახელი — მინიმუმ 2 სიმბოლო'},
+  'business_form.updated_success': {'ru': 'Заведение обновлено', 'en': 'Business updated', 'ka': 'ბიზნესი განახლდა'},
+  'business_form.created_success': {'ru': 'Заведение добавлено 🔧', 'en': 'Business added 🔧', 'ka': 'ბიზნესი დაემატა 🔧'},
+  'business_form.error_message': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'business_form.edit_business_title': {'ru': 'Изменить заведение', 'en': 'Edit business', 'ka': 'ბიზნესის რედაქტირება'},
+  'business_form.add_business': {'ru': 'Добавить заведение', 'en': 'Add business', 'ka': 'ბიზნესის დამატება'},
+  'business_form.label_name': {'ru': 'Название', 'en': 'Name', 'ka': 'სახელი'},
+  'business_form.label_category': {'ru': 'Категория *', 'en': 'Category *', 'ka': 'კატეგორია *'},
+  'business_form.label_description': {'ru': 'Описание', 'en': 'Description', 'ka': 'აღწერა'},
+  'business_form.label_services': {'ru': 'Услуги через запятую (Развал-схождение, Чип-тюнинг)', 'en': 'Services, comma-separated (Wheel alignment, Chip tuning)', 'ka': 'სერვისები მძიმით გამოყოფილი (განვითარება-გასწორება, ჩიპ-ტიუნინგი)'},
+  'business_form.label_logo_url': {'ru': 'Ссылка на логотип (URL)', 'en': 'Logo link (URL)', 'ka': 'ლოგოს ბმული (URL)'},
+  'business_form.label_cover_url': {'ru': 'Ссылка на обложку (URL)', 'en': 'Cover link (URL)', 'ka': 'ყდის ბმული (URL)'},
+  'business_form.label_country': {'ru': 'Страна', 'en': 'Country', 'ka': 'ქვეყანა'},
+  'business_form.label_city': {'ru': 'Город', 'en': 'City', 'ka': 'ქალაქი'},
+  'business_form.label_address': {'ru': 'Адрес', 'en': 'Address', 'ka': 'მისამართი'},
+  'business_form.pick_location_button': {'ru': 'Указать точку на карте', 'en': 'Pick a point on the map', 'ka': 'აირჩიე წერტილი რუკაზე'},
+  'business_form.label_latitude': {'ru': 'Широта (latitude)', 'en': 'Latitude', 'ka': 'განედი (latitude)'},
+  'business_form.label_longitude': {'ru': 'Долгота (longitude)', 'en': 'Longitude', 'ka': 'გრძედი (longitude)'},
+  'business_form.label_phone': {'ru': 'Телефон', 'en': 'Phone', 'ka': 'ტელეფონი'},
+  'business_form.label_website': {'ru': 'Сайт', 'en': 'Website', 'ka': 'ვებსაიტი'},
+  'business_form.label_work_hours': {'ru': 'Режим работы (Пн-Сб 09:00-19:00)', 'en': 'Working hours (Mon-Sat 09:00-19:00)', 'ka': 'სამუშაო საათები (ორშ-შაბ 09:00-19:00)'},
+
+  // ─────────────────────── report_dialog ───────────────────────
+  'report_dialog.title': {'ru': 'Пожаловаться', 'en': 'Report', 'ka': 'საჩივარი'},
+  'report_dialog.reason_spam': {'ru': 'Спам / реклама', 'en': 'Spam / advertising', 'ka': 'სპამი / რეკლამა'},
+  'report_dialog.reason_abuse': {'ru': 'Оскорбления, агрессия', 'en': 'Abuse, aggression', 'ka': 'შეურაცხყოფა, აგრესია'},
+  'report_dialog.reason_fake_profile': {'ru': 'Фейковый профиль', 'en': 'Fake profile', 'ka': 'ყალბი პროფილი'},
+  'report_dialog.reason_inappropriate': {'ru': 'Неприемлемый контент', 'en': 'Inappropriate content', 'ka': 'შეუფერებელი კონტენტი'},
+  'report_dialog.reason_scam': {'ru': 'Мошенничество', 'en': 'Fraud', 'ka': 'თაღლითობა'},
+  'report_dialog.reason_other': {'ru': 'Другое', 'en': 'Other', 'ka': 'სხვა'},
+  'report_dialog.details_label': {'ru': 'Подробности (необязательно)', 'en': 'Details (optional)', 'ka': 'დეტალები (არასავალდებულო)'},
+  'report_dialog.report_sent': {'ru': 'Жалоба отправлена, спасибо', 'en': 'Report sent, thank you', 'ka': 'საჩივარი გაიგზავნა, გმადლობთ'},
+  'report_dialog.error_message': {'ru': 'Ошибка: {error}', 'en': 'Error: {error}', 'ka': 'შეცდომა: {error}'},
+  'report_dialog.submit_button': {'ru': 'Отправить жалобу', 'en': 'Submit report', 'ka': 'საჩივრის გაგზავნა'},
+
+  // ─────────────────────── stories_bar ───────────────────────
+  'stories_bar.gallery_open_failed': {'ru': 'Не удалось открыть галерею: {error}', 'en': 'Could not open the gallery: {error}', 'ka': 'გალერეის გახსნა ვერ მოხერხდა: {error}'},
+  'stories_bar.story_published': {'ru': 'История опубликована', 'en': 'Story published', 'ka': 'ისტორია გამოქვეყნდა'},
+  'stories_bar.publish_failed': {'ru': 'Не удалось опубликовать: {error}', 'en': 'Could not publish: {error}', 'ka': 'გამოქვეყნება ვერ მოხერხდა: {error}'},
+  'stories_bar.you_label': {'ru': 'Вы', 'en': 'You', 'ka': 'შენ'},
+};

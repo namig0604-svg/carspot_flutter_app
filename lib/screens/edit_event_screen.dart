@@ -6,6 +6,7 @@ import '../utils/event_duration.dart';
 import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Редактирование существующей сходки — доступно только создателю.
 /// Дата/время, продолжительность и точка на карте настраиваются здесь же:
@@ -123,11 +124,11 @@ class _EditEventScreenState extends State<EditEventScreen> {
         _cityController.text.trim().isEmpty ||
         _dateController.text.isEmpty ||
         _timeController.text.isEmpty) {
-      setState(() => _errorMessage = 'Заполни все обязательные поля (*)');
+      setState(() => _errorMessage = context.t('edit_event.fill_required_fields'));
       return;
     }
     if (_latitude == null || _longitude == null) {
-      setState(() => _errorMessage = 'Укажи точку проведения на карте');
+      setState(() => _errorMessage = context.t('edit_event.pick_location_on_map'));
       return;
     }
 
@@ -161,11 +162,11 @@ class _EditEventScreenState extends State<EditEventScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Сходка обновлена')),
+          SnackBar(content: Text(context.t('edit_event.event_updated'))),
         );
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Ошибка: $e');
+      setState(() => _errorMessage = context.tArgs('edit_event.error_prefix', {'error': '$e'}));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -175,13 +176,13 @@ class _EditEventScreenState extends State<EditEventScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить сходку?'),
-        content: const Text('Сходка будет отменена для всех участников. Это нельзя отменить.'),
+        title: Text(context.t('edit_event.delete_confirm_title')),
+        content: Text(context.t('edit_event.delete_confirm_body')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -195,11 +196,11 @@ class _EditEventScreenState extends State<EditEventScreen> {
       if (mounted) {
         Navigator.pop(context, 'deleted');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Сходка удалена')),
+          SnackBar(content: Text(context.t('edit_event.event_deleted'))),
         );
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('edit_event.error_prefix', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -209,11 +210,11 @@ class _EditEventScreenState extends State<EditEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Изменить сходку'),
+        title: Text(context.t('edit_event.title')),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: 'Удалить сходку',
+            tooltip: context.t('edit_event.delete_tooltip'),
             onPressed: _isLoading ? null : _delete,
           ),
         ],
@@ -225,7 +226,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                labelText: 'Название сходки *',
+                labelText: context.t('edit_event.title_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -235,7 +236,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
               controller: _descriptionController,
               maxLines: 4,
               decoration: InputDecoration(
-                labelText: 'Описание',
+                labelText: context.t('edit_event.description_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -244,7 +245,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             DropdownButtonFormField<String>(
               value: _selectedType,
               decoration: InputDecoration(
-                labelText: 'Тип сходки *',
+                labelText: context.t('edit_event.type_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               items: _eventTypes.map((type) {
@@ -259,7 +260,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             TextField(
               controller: _countryController,
               decoration: InputDecoration(
-                labelText: 'Страна *',
+                labelText: context.t('edit_event.country_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -268,7 +269,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             TextField(
               controller: _cityController,
               decoration: InputDecoration(
-                labelText: 'Город *',
+                labelText: context.t('edit_event.city_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -277,7 +278,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             TextField(
               controller: _locationController,
               decoration: InputDecoration(
-                labelText: 'Место проведения *',
+                labelText: context.t('edit_event.location_label'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -288,8 +289,11 @@ class _EditEventScreenState extends State<EditEventScreen> {
               icon: Icon(_latitude == null ? Icons.map_outlined : Icons.check_circle, color: _latitude == null ? null : Colors.green),
               label: Text(
                 _latitude == null
-                    ? 'Указать точку на карте *'
-                    : 'Точка: ${_latitude!.toStringAsFixed(4)}, ${_longitude!.toStringAsFixed(4)}',
+                    ? context.t('edit_event.pick_location_button')
+                    : context.tArgs('edit_event.location_point', {
+                        'lat': _latitude!.toStringAsFixed(4),
+                        'lng': _longitude!.toStringAsFixed(4),
+                      }),
               ),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
@@ -304,7 +308,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 controller: _dateController,
                 enabled: false,
                 decoration: InputDecoration(
-                  labelText: 'Дата (YYYY-MM-DD) *',
+                  labelText: context.t('edit_event.date_label'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   suffixIcon: const Icon(Icons.calendar_today),
                 ),
@@ -318,7 +322,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 controller: _timeController,
                 enabled: false,
                 decoration: InputDecoration(
-                  labelText: 'Время (HH:MM) *',
+                  labelText: context.t('edit_event.time_label'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                   suffixIcon: const Icon(Icons.access_time),
                 ),
@@ -329,8 +333,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
             DropdownButtonFormField<int>(
               value: _durationMinutes,
               decoration: InputDecoration(
-                labelText: 'Продолжительность *',
-                helperText: 'Сходка автоматически закроется, когда это время истечёт',
+                labelText: context.t('edit_event.duration_label'),
+                helperText: context.t('edit_event.duration_helper'),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               items: eventDurationOptions
@@ -346,8 +350,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 secondary: const Icon(Icons.lock_outline, color: Colors.blueGrey),
-                title: const Text('Закрытая сходка'),
-                subtitle: const Text('Видна и доступна только участникам клуба'),
+                title: Text(context.t('edit_event.private_event_title')),
+                subtitle: Text(context.t('edit_event.private_event_subtitle')),
                 value: _isPrivate,
                 onChanged: (v) => setState(() => _isPrivate = v),
               ),
@@ -377,7 +381,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 ),
                 child: _isLoading
                     ? AppLoader(size: 22, color: Colors.white)
-                    : const Text('Сохранить', style: TextStyle(color: Colors.white, fontSize: 16)),
+                    : Text(context.t('common.save'), style: const TextStyle(color: Colors.white, fontSize: 16)),
               ),
             ),
             const SizedBox(height: 20),

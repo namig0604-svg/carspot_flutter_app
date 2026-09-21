@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Полноэкранный просмотр историй — как в Instagram: свайп по горизонтали
 /// между людьми (PageView), тап слева/справа внутри — назад/вперёд по
@@ -172,10 +173,10 @@ class _UserStoriesPageState extends State<_UserStoriesPage> with SingleTickerPro
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Удалить историю?'),
+        title: Text(context.t('story_viewer.delete_title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Удалить')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(context.t('common.delete'))),
         ],
       ),
     );
@@ -193,7 +194,7 @@ class _UserStoriesPageState extends State<_UserStoriesPage> with SingleTickerPro
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Не удалось удалить: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('story_viewer.delete_failed', {'error': '$e'}))));
       }
     }
   }

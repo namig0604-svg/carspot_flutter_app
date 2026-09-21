@@ -12,6 +12,7 @@ import '../theme/app_colors.dart';
 import '../widgets/animated_counter.dart';
 import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Публичный профиль пользователя (не свой): машины, клубы, статистика.
 class UserProfileScreen extends StatefulWidget {
@@ -69,7 +70,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         } catch (_) {}
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -86,7 +87,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       });
       SoundPlayer.play(context, AppSound.click);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     }
   }
 
@@ -102,11 +103,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => ChatRoomScreen(roomId: room['id'], title: room['title'] ?? _user?['username'] ?? 'Чат'),
+          builder: (_) => ChatRoomScreen(roomId: room['id'], title: room['title'] ?? _user?['username'] ?? context.t('user_profile.chat_default_title')),
         ),
       );
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     }
   }
 
@@ -126,7 +127,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       });
       SoundPlayer.play(context, AppSound.click);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _friendActionLoading = false);
     }
@@ -148,7 +149,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       });
       SoundPlayer.play(context, AppSound.click);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _friendActionLoading = false);
     }
@@ -166,7 +167,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _friendshipId = null;
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _friendActionLoading = false);
     }
@@ -177,13 +178,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Удалить из друзей?'),
-        content: Text('${_user?['username'] ?? 'Пользователь'} больше не будет в списке друзей.'),
+        title: Text(context.t('user_profile.remove_friend_title')),
+        content: Text(context.tArgs('user_profile.remove_friend_content', {'name': (_user?['username'] as String?) ?? context.t('user_profile.default_user')})),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -199,7 +200,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _friendshipId = null;
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _friendActionLoading = false);
     }
@@ -220,7 +221,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: OutlinedButton.icon(
             onPressed: _removeFriend,
             icon: const Icon(Icons.how_to_reg, color: AppColors.blue),
-            label: const Text('Друзья ✓'),
+            label: Text(context.t('user_profile.friends_label')),
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: AppColors.blue),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -234,7 +235,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: OutlinedButton.icon(
             onPressed: _declineOrCancelFriendRequest,
             icon: const Icon(Icons.hourglass_top, color: Colors.grey),
-            label: const Text('Заявка отправлена · отменить'),
+            label: Text(context.t('user_profile.pending_sent_label')),
             style: OutlinedButton.styleFrom(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -249,7 +250,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _acceptFriendRequest,
                   icon: const Icon(Icons.check),
-                  label: const Text('Принять'),
+                  label: Text(context.t('user_profile.accept_label')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -261,7 +262,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: OutlinedButton.icon(
                   onPressed: _declineOrCancelFriendRequest,
                   icon: const Icon(Icons.close, color: AppColors.red),
-                  label: const Text('Отклонить'),
+                  label: Text(context.t('user_profile.decline_label')),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
@@ -277,7 +278,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           child: ElevatedButton.icon(
             onPressed: _sendFriendRequest,
             icon: const Icon(Icons.person_add_alt_1),
-            label: const Text('Добавить в друзья'),
+            label: Text(context.t('user_profile.add_friend_label')),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green.shade600,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -425,14 +426,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_user != null ? '@${_user!['username']}' : 'Профиль'),
+        title: Text(_user != null ? '@${_user!['username']}' : context.t('user_profile.title_fallback')),
         backgroundColor: AppColors.black,
         elevation: 0,
         actions: [
           if (!_isMe)
             IconButton(
               icon: const Icon(Icons.flag_outlined),
-              tooltip: 'Пожаловаться',
+              tooltip: context.t('user_profile.report_tooltip'),
               onPressed: () => showReportDialog(context, targetType: 'user', targetId: widget.userId),
             ),
         ],
@@ -440,7 +441,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: _isLoading
           ? Center(child: AppLoader())
           : _user == null
-              ? const Center(child: Text('Пользователь не найден'))
+              ? Center(child: Text(context.t('user_profile.user_not_found')))
               : RefreshIndicator(
                   color: AppColors.red,
                   backgroundColor: AppColors.surfaceDark,
@@ -501,11 +502,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   ),
                                   if (_user!['is_verified'] == true) ...[
                                     const SizedBox(width: 6),
-                                    const Tooltip(message: 'Подтверждённый аккаунт', child: Icon(Icons.verified, color: AppColors.blue, size: 20)),
+                                    Tooltip(message: context.t('user_profile.verified_tooltip'), child: const Icon(Icons.verified, color: AppColors.blue, size: 20)),
                                   ],
                                   if (_user!['is_admin'] == true) ...[
                                     const SizedBox(width: 6),
-                                    const Tooltip(message: 'Администратор', child: Icon(Icons.shield, color: AppColors.red, size: 20)),
+                                    Tooltip(message: context.t('user_profile.admin_tooltip'), child: const Icon(Icons.shield, color: AppColors.red, size: 20)),
                                   ],
                                   if (_user!['is_premium'] == true) ...[
                                     const SizedBox(width: 6),
@@ -514,7 +515,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   if (_clubs.isNotEmpty) ...[
                                     const SizedBox(width: 6),
                                     Tooltip(
-                                      message: '${_clubs.first['name'] ?? 'Клуб'}',
+                                      message: '${_clubs.first['name'] ?? context.t('user_profile.club_fallback')}',
                                       child: CircleAvatar(
                                         radius: 10,
                                         backgroundColor: AppColors.blue.withOpacity(0.15),
@@ -560,7 +561,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   child: ElevatedButton.icon(
                                     onPressed: _openChat,
                                     icon: const Icon(Icons.chat_bubble_outline),
-                                    label: const Text('Написать'),
+                                    label: Text(context.t('user_profile.write_message_label')),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.blue,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -610,9 +611,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       onLongPress: () {
                                         HapticFeedback.mediumImpact();
                                         final jokes = [
-                                          '🔧 Серьёзный соперник на трассе',
-                                          '🏁 Такой уровень просто так не даётся',
-                                          '⚡ Вот это гонщик!',
+                                          context.t('user_profile.joke_1'),
+                                          context.t('user_profile.joke_2'),
+                                          context.t('user_profile.joke_3'),
                                         ];
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(content: Text(jokes[Random().nextInt(jokes.length)])),
@@ -636,12 +637,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Уровень ${stats.level} · ${stats.levelTitle}',
+                                            context.tArgs('user_profile.level_title', {'level': '${stats.level}', 'title': '${stats.levelTitle}'}),
                                             style: TextStyle(fontWeight: FontWeight.bold, color: cardText),
                                           ),
                                           AnimatedCountText(
                                             end: stats.xp,
-                                            formatter: (v) => '${v.round()} XP всего',
+                                            formatter: (v) => context.tArgs('user_profile.xp_total', {'xp': '${v.round()}'}),
                                             style: const TextStyle(fontSize: 12, color: Colors.grey),
                                           ),
                                         ],
@@ -667,9 +668,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _stat((_user!['cars_count'] ?? 0) as num, 'Авто'),
-                            _stat((_user!['events_attended'] ?? 0) as num, 'Сходок'),
-                            _stat((_user!['average_rating'] ?? 0) as num, 'Рейтинг', formatter: (v) => '${v.toStringAsFixed(1)}⭐'),
+                            _stat((_user!['cars_count'] ?? 0) as num, context.t('user_profile.stat_cars')),
+                            _stat((_user!['events_attended'] ?? 0) as num, context.t('user_profile.stat_meetups')),
+                            _stat((_user!['average_rating'] ?? 0) as num, context.t('user_profile.stat_rating'), formatter: (v) => '${v.toStringAsFixed(1)}⭐'),
                           ],
                         ),
 
@@ -682,7 +683,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('О себе', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                                Text(context.t('user_profile.about_title'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
                                 const SizedBox(height: 8),
                                 Text(_user!['bio'], style: const TextStyle(color: Colors.black87)),
                               ],
@@ -692,14 +693,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                         if (_clubs.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          const Text('Клубы', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(context.t('user_profile.clubs_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
                             children: _clubs.map<Widget>((c) {
                               final role = c['role'] as String?;
-                              final roleLabel = role == 'owner' ? ' · владелец' : (role == 'admin' ? ' · админ' : '');
+                              final roleLabel = role == 'owner' ? ' · ${context.t('user_profile.role_owner')}' : (role == 'admin' ? ' · ${context.t('user_profile.role_admin')}' : '');
                               return Chip(
                                 avatar: const Icon(Icons.groups, size: 16, color: AppColors.blue),
                                 label: Text('${c['name']}$roleLabel'),
@@ -711,13 +712,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                         if (_cars.isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          const Text('Гараж', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(context.t('user_profile.garage_section_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           ..._cars.map((c) => _carCard(c as Map<String, dynamic>)),
                         ],
 
                         const SizedBox(height: 20),
-                        const Text('Достижения', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(context.t('user_profile.achievements_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 10,

@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
+import '../l10n/l10n_extensions.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 const SizedBox(height: 4),
                 Container(width: 60, height: 4, color: AppColors.red),
                 const SizedBox(height: 14),
-                Text(_isLogin ? 'ВХОД' : 'РЕГИСТРАЦИЯ',
+                Text(_isLogin ? context.t('login.tab_login') : context.t('login.tab_register'),
                   style: const TextStyle(fontSize: 14, color: Colors.white70, letterSpacing: 2)),
                 const SizedBox(height: 40),
 
@@ -113,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       TextField(
                         controller: _usernameController,
                         decoration: InputDecoration(
-                          labelText: 'Логин',
+                          labelText: context.t('login.field_username'),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                       ),
@@ -124,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            labelText: 'Email',
+                            labelText: context.t('login.field_email'),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
@@ -132,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         TextField(
                           controller: _fullNameController,
                           decoration: InputDecoration(
-                            labelText: 'Полное имя',
+                            labelText: context.t('login.field_full_name'),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
@@ -140,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         TextField(
                           controller: _countryController,
                           decoration: InputDecoration(
-                            labelText: 'Страна',
+                            labelText: context.t('login.field_country'),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
@@ -148,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         TextField(
                           controller: _cityController,
                           decoration: InputDecoration(
-                            labelText: 'Город',
+                            labelText: context.t('login.field_city'),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
@@ -157,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           controller: _referralCodeController,
                           textCapitalization: TextCapitalization.characters,
                           decoration: InputDecoration(
-                            labelText: 'Реферальный код (если есть)',
+                            labelText: context.t('login.field_referral_code'),
                             prefixIcon: const Icon(Icons.card_giftcard),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           ),
@@ -169,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Пароль',
+                          labelText: context.t('login.field_password'),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                       ),
@@ -198,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               ),
                               child: authProvider.isLoading
                                 ? AppLoader(size: 22, color: Colors.white)
-                                : Text(_isLogin ? 'Войти' : 'Зарегистрироваться',
+                                : Text(_isLogin ? context.t('login.submit_login') : context.t('login.submit_register'),
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                             ),
                           );
@@ -209,11 +210,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(_isLogin ? 'Нет аккаунта? ' : 'Уже есть аккаунт? ',
+                          Text(_isLogin ? context.t('login.no_account_prompt') : context.t('login.has_account_prompt'),
                             style: const TextStyle(color: Colors.grey)),
                           GestureDetector(
                             onTap: () => setState(() => _isLogin = !_isLogin),
-                            child: Text(_isLogin ? 'Зарегистрируйся' : 'Войди',
+                            child: Text(_isLogin ? context.t('login.switch_to_register') : context.t('login.switch_to_login'),
                               style: const TextStyle(color: AppColors.blue, fontWeight: FontWeight.bold)),
                           ),
                         ],

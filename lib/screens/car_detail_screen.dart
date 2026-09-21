@@ -9,6 +9,7 @@ import 'premium_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Карточка машины: полные характеристики, лайк (для чужой машины),
 /// быстрый доступ к фото-галерее и — для владельца — редактирование/удаление.
@@ -42,7 +43,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       final response = await ApiService.get('/api/cars/${widget.carId}', token: authProvider.accessToken);
       setState(() => _car = response as Map<String, dynamic>);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('car_detail.generic_error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -55,11 +56,11 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       final goPremium = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Только для Premium'),
-          content: const Text('Список тех, кто лайкнул машину, доступен только с CarSpot Premium.'),
+          title: Text(context.t('car_detail.premium_only_title')),
+          content: Text(context.t('car_detail.premium_only_content')),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Узнать больше')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(context.t('car_detail.learn_more_button'))),
           ],
         ),
       );
@@ -74,10 +75,10 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       if (!mounted) return;
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => PeopleListScreen(title: 'Кто лайкнул машину', people: people)),
+        MaterialPageRoute(builder: (_) => PeopleListScreen(title: context.t('car_detail.likers_title'), people: people)),
       );
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('car_detail.generic_error', {'error': '$e'}))));
     }
   }
 
@@ -93,7 +94,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       });
       if (mounted) SoundPlayer.play(context, AppSound.click);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('car_detail.generic_error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isActionLoading = false);
     }
@@ -113,7 +114,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       await ApiService.post('/api/cars/${widget.carId}/primary', {}, token: authProvider.accessToken);
       _load();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('car_detail.generic_error', {'error': '$e'}))));
     }
   }
 
@@ -121,13 +122,13 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Удалить машину?'),
-        content: const Text('Это нельзя отменить.'),
+        title: Text(context.t('car_detail.delete_confirm_title')),
+        content: Text(context.t('car_detail.delete_confirm_content')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -139,7 +140,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
       await ApiService.delete('/api/cars/${widget.carId}', token: authProvider.accessToken);
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('car_detail.generic_error', {'error': '$e'}))));
     }
   }
 
@@ -164,22 +165,22 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     final car = _car;
     return Scaffold(
       appBar: AppBar(
-        title: Text(car != null ? '${car['make'] ?? ''} ${car['model'] ?? ''}'.trim() : 'Машина'),
+        title: Text(car != null ? '${car['make'] ?? ''} ${car['model'] ?? ''}'.trim() : context.t('car_detail.title_fallback')),
         backgroundColor: AppColors.black,
         elevation: 0,
         actions: [
           if (car != null && _isOwner) ...[
-            IconButton(icon: const Icon(Icons.edit), tooltip: 'Изменить', onPressed: _openEdit),
+            IconButton(icon: const Icon(Icons.edit), tooltip: context.t('common.edit'), onPressed: _openEdit),
             if (!(car['is_primary'] ?? false))
-              IconButton(icon: const Icon(Icons.star_outline), tooltip: 'Сделать основной', onPressed: _setPrimary),
-            IconButton(icon: const Icon(Icons.delete_outline), tooltip: 'Удалить', onPressed: _delete),
+              IconButton(icon: const Icon(Icons.star_outline), tooltip: context.t('car_detail.set_primary_tooltip'), onPressed: _setPrimary),
+            IconButton(icon: const Icon(Icons.delete_outline), tooltip: context.t('common.delete'), onPressed: _delete),
           ],
         ],
       ),
       body: _isLoading
           ? Center(child: AppLoader())
           : car == null
-              ? const Center(child: Text('Машина не найдена'))
+              ? Center(child: Text(context.t('car_detail.not_found')))
               : RefreshIndicator(
                   color: AppColors.red,
                   backgroundColor: AppColors.surfaceDark,
@@ -215,8 +216,8 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                       Wrap(
                         spacing: 6,
                         children: [
-                          if (car['is_primary'] == true) _badge('Основная', Colors.orange),
-                          if (car['is_for_sale'] == true) _badge('Продаётся', Colors.green),
+                          if (car['is_primary'] == true) _badge(context.t('car_detail.badge_primary'), Colors.orange),
+                          if (car['is_for_sale'] == true) _badge(context.t('car_detail.badge_for_sale'), Colors.green),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -246,7 +247,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                               child: OutlinedButton.icon(
                                 onPressed: _openLikers,
                                 icon: const Icon(Icons.favorite, color: AppColors.red),
-                                label: Text('${car['likes_count'] ?? 0} · кто?'),
+                                label: Text(context.tArgs('car_detail.likes_who_label', {'count': '${car['likes_count'] ?? 0}'})),
                                 style: OutlinedButton.styleFrom(
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 ),
@@ -260,12 +261,12 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                                 MaterialPageRoute(
                                   builder: (_) => PhotoGalleryScreen(
                                     carId: widget.carId,
-                                    title: 'Фото машины',
+                                    title: context.t('car_detail.photo_gallery_title'),
                                   ),
                                 ),
                               ),
                               icon: const Icon(Icons.photo_library_outlined),
-                              label: const Text('Фото'),
+                              label: Text(context.t('car_detail.photo_button')),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.blue,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -275,28 +276,28 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      const Text('Характеристики', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(context.t('car_detail.specs_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       const Divider(),
-                      _specRow('Двигатель', car['engine']),
-                      _specRow('Объём', car['engine_volume']),
-                      _specRow('Мощность', car['power_hp'] != null ? '${car['power_hp']} л.с.' : null),
-                      _specRow('Крутящий момент', car['torque_nm'] != null ? '${car['torque_nm']} Нм' : null),
-                      _specRow('Привод', car['drivetrain']),
-                      _specRow('Трансмиссия', car['transmission']),
-                      _specRow('Топливо', car['fuel_type']),
-                      _specRow('Вес', car['weight_kg'] != null ? '${car['weight_kg']} кг' : null),
-                      _specRow('0-100', car['zero_to_hundred'] != null ? '${car['zero_to_hundred']} с' : null),
-                      _specRow('Цвет', car['color']),
-                      _specRow('Госномер', car['license_plate']),
+                      _specRow(context.t('car_detail.spec_engine'), car['engine']),
+                      _specRow(context.t('car_detail.spec_volume'), car['engine_volume']),
+                      _specRow(context.t('car_detail.spec_power'), car['power_hp'] != null ? context.tArgs('car_detail.unit_hp', {'value': '${car['power_hp']}'}) : null),
+                      _specRow(context.t('car_detail.spec_torque'), car['torque_nm'] != null ? context.tArgs('car_detail.unit_nm', {'value': '${car['torque_nm']}'}) : null),
+                      _specRow(context.t('car_detail.spec_drivetrain'), car['drivetrain']),
+                      _specRow(context.t('car_detail.spec_transmission'), car['transmission']),
+                      _specRow(context.t('car_detail.spec_fuel'), car['fuel_type']),
+                      _specRow(context.t('car_detail.spec_weight'), car['weight_kg'] != null ? context.tArgs('car_detail.unit_kg', {'value': '${car['weight_kg']}'}) : null),
+                      _specRow(context.t('car_detail.spec_zero_to_hundred'), car['zero_to_hundred'] != null ? context.tArgs('car_detail.unit_sec', {'value': '${car['zero_to_hundred']}'}) : null),
+                      _specRow(context.t('car_detail.spec_color'), car['color']),
+                      _specRow(context.t('car_detail.spec_plate'), car['license_plate']),
                       if ((car['mods'] ?? '').toString().isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        const Text('Доработки', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(context.t('car_detail.mods_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 6),
                         Text(car['mods']),
                       ],
                       if ((car['description'] ?? '').toString().isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        const Text('Описание', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text(context.t('car_detail.description_title'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 6),
                         Text(car['description']),
                       ],

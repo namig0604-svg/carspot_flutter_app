@@ -7,6 +7,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/comments_section.dart';
 import '../utils/sound_player.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Общая фото-галерея — для сходки (eventId) или машины (carId).
 /// Ровно один из двух должен быть задан.
@@ -47,7 +48,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
       final response = await ApiService.get(endpoint, token: _token);
       setState(() => _photos = response is Map ? (response['items'] as List? ?? []) : []);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('photo_gallery.error_prefix', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -59,7 +60,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
     try {
       picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Не удалось открыть галерею: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('photo_gallery.gallery_open_error', {'error': '$e'}))));
       return;
     }
     if (picked == null) return;
@@ -80,7 +81,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
       );
       await _load();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка загрузки: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('photo_gallery.upload_error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isUploading = false);
     }
@@ -95,7 +96,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
       });
       if (mounted) SoundPlayer.play(context, AppSound.click);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('photo_gallery.error_prefix', {'error': '$e'}))));
     }
   }
 
@@ -104,7 +105,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
       final result = await ApiService.post('/api/photos/${photo['id']}/feature', {}, token: _token);
       setState(() => photo['is_featured'] = result['is_featured']);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('photo_gallery.error_prefix', {'error': '$e'}))));
     }
   }
 
@@ -112,12 +113,12 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Удалить фото?'),
+        title: Text(context.t('photo_gallery.delete_photo_title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -129,7 +130,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
       if (mounted) Navigator.pop(context);
       _load();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('photo_gallery.error_prefix', {'error': '$e'}))));
     }
   }
 
@@ -153,7 +154,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
                     photo['is_featured'] == true ? Icons.push_pin : Icons.push_pin_outlined,
                     color: Colors.amber,
                   ),
-                  tooltip: photo['is_featured'] == true ? 'Открепить' : 'Закрепить сверху галереи (Premium)',
+                  tooltip: photo['is_featured'] == true ? context.t('photo_gallery.unpin') : context.t('photo_gallery.pin_premium'),
                   onPressed: () async {
                     await _toggleFeature(photo);
                     setLocal(() {});
@@ -252,9 +253,9 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
                         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                         const Icon(Icons.photo_library_outlined, size: 64, color: Colors.grey),
                         const SizedBox(height: 16),
-                        const Center(child: Text('Пока нет фото', style: TextStyle(color: Colors.grey, fontSize: 16))),
+                        Center(child: Text(context.t('photo_gallery.empty_title'), style: const TextStyle(color: Colors.grey, fontSize: 16))),
                         const SizedBox(height: 8),
-                        const Center(child: Text('Нажми на камеру, чтобы добавить первое', style: TextStyle(color: Colors.grey))),
+                        Center(child: Text(context.t('photo_gallery.empty_subtitle'), style: const TextStyle(color: Colors.grey))),
                       ],
                     )
                   : GridView.builder(

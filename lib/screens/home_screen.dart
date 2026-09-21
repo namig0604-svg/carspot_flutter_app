@@ -35,6 +35,7 @@ import '../widgets/animated_menu_tile.dart';
 import '../widgets/animated_bottom_nav.dart';
 import '../utils/sound_player.dart';
 import '../utils/event_category.dart';
+import '../l10n/l10n_extensions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -179,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await showCelebration(
           context,
           emoji: '🏁',
-          title: 'Новый уровень ${stats.level}!',
+          title: context.tArgs('home.new_level_title', {'level': '${stats.level}'}),
           subtitle: stats.levelTitle,
         );
         await prefs.setInt('seen_level', stats.level);
@@ -193,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
           await showCelebration(
             context,
             emoji: a.emoji,
-            title: 'Новое достижение!',
+            title: context.t('home.new_achievement_title'),
             subtitle: a.title,
           );
         }
@@ -278,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => event['is_favorite'] = wasFavorite);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('home.error_snackbar', {'error': '$e'}))));
       }
     }
   }
@@ -292,7 +293,7 @@ class _HomeScreenState extends State<HomeScreen> {
             HapticFeedback.mediumImpact();
             SoundPlayer.play(context, AppSound.success);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('🏁 Полный газ! Увидимся на трассе')),
+              SnackBar(content: Text(context.t('home.easter_egg_message'))),
             );
           },
           child: const Text('CarSpot'),
@@ -303,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_selectedIndex == 0)
             IconButton(
               icon: const Icon(Icons.map_outlined),
-              tooltip: 'Карта сходок',
+              tooltip: context.t('home.tooltip_events_map'),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -316,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_outlined),
-                tooltip: 'Уведомления',
+                tooltip: context.t('home.tooltip_notifications'),
                 onPressed: _openNotifications,
               ),
               if (_unreadNotifications > 0)
@@ -381,11 +382,11 @@ class _HomeScreenState extends State<HomeScreen> {
       // а остальное — на расстоянии одного тапа с анимацией нажатия.
       bottomNavigationBar: AnimatedBottomNav(
         currentIndex: _selectedIndex,
-        items: const [
-          NavBarItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: 'Сходки'),
-          NavBarItem(icon: Icons.directions_car_outlined, activeIcon: Icons.directions_car, label: 'Гараж'),
-          NavBarItem(icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble, label: 'Чаты'),
-          NavBarItem(icon: Icons.person_outline, activeIcon: Icons.person, label: 'Профиль'),
+        items: [
+          NavBarItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: context.t('home.nav_events')),
+          NavBarItem(icon: Icons.directions_car_outlined, activeIcon: Icons.directions_car, label: context.t('home.nav_garage')),
+          NavBarItem(icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble, label: context.t('home.nav_chats')),
+          NavBarItem(icon: Icons.person_outline, activeIcon: Icons.person, label: context.t('home.nav_profile')),
         ],
         onTap: (index) {
           // У "Гаража" и "Чатов" свой AppBar (и своя кнопка "+" у гаража),
@@ -436,7 +437,7 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             decoration: InputDecoration(
-              hintText: 'Поиск сходок...',
+              hintText: context.t('home.search_hint'),
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -481,11 +482,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Сходок не найдено'),
+                      Text(context.t('home.no_events_found')),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: _loadEvents,
-                        child: const Text('Обновить'),
+                        child: Text(context.t('home.refresh')),
                       ),
                     ],
                   ),
@@ -516,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                               Expanded(
                                 child: Text(
-                                  event['title'] ?? 'Без названия',
+                                  event['title'] ?? context.t('home.untitled_event'),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -524,7 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           subtitle: Text(
                             '${event['city']}, ${event['event_date']}\n'
-                            'Участников: ${event['participants_count']}',
+                            '${context.tArgs('home.participants_count', {'count': '${event['participants_count']}'})}',
                           ),
                           trailing: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -549,7 +550,7 @@ class _HomeScreenState extends State<HomeScreen> {
 color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,                                  borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
-(event['is_joined'] ?? false) ? 'Участвую' : 'Нет',                                  style: const TextStyle(color: Colors.white, fontSize: 10),
+(event['is_joined'] ?? false) ? context.t('home.status_joined') : context.t('home.status_not_joined'),                                  style: const TextStyle(color: Colors.white, fontSize: 10),
                                 ),
                               ),
                             ],
@@ -717,16 +718,16 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                user['full_name'] ?? 'Неизвестный',
+                user['full_name'] ?? context.t('home.unknown_user'),
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               if (user['is_verified'] == true) ...[
                 const SizedBox(width: 6),
-                const Tooltip(message: 'Подтверждённый аккаунт', child: Icon(Icons.verified, color: AppColors.blue, size: 20)),
+                Tooltip(message: context.t('home.tooltip_verified'), child: const Icon(Icons.verified, color: AppColors.blue, size: 20)),
               ],
               if (user['is_admin'] == true) ...[
                 const SizedBox(width: 6),
-                const Tooltip(message: 'Администратор', child: Icon(Icons.shield, color: AppColors.red, size: 20)),
+                Tooltip(message: context.t('home.tooltip_admin'), child: const Icon(Icons.shield, color: AppColors.red, size: 20)),
               ],
               if (user['is_premium'] == true) ...[
                 const SizedBox(width: 6),
@@ -735,7 +736,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
               if (_myClubs.isNotEmpty) ...[
                 const SizedBox(width: 6),
                 Tooltip(
-                  message: '${_myClubs.first['name'] ?? 'Клуб'}',
+                  message: '${_myClubs.first['name'] ?? context.t('home.club_fallback')}',
                   child: CircleAvatar(
                     radius: 10,
                     backgroundColor: AppColors.blue.withOpacity(0.15),
@@ -776,7 +777,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
               if (result == true) setState(() {});
             },
             icon: const Icon(Icons.edit, size: 16),
-            label: const Text('Редактировать профиль'),
+            label: Text(context.t('home.edit_profile')),
           ),
 
           const SizedBox(height: 6),
@@ -797,10 +798,10 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                         HapticFeedback.mediumImpact();
                         SoundPlayer.play(context, AppSound.click);
                         final jokes = [
-                          '🔧 Ещё немного и ты уже мастер дрифта',
-                          '🏁 Скоро обгонишь всех на трассе',
-                          '⚡ Уровень растёт быстрее, чем цены на бензин',
-                          '🚗 Продолжай в том же духе, гонщик',
+                          context.t('home.joke_drift'),
+                          context.t('home.joke_race'),
+                          context.t('home.joke_gas_price'),
+                          context.t('home.joke_keep_going'),
                         ];
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(jokes[Random().nextInt(jokes.length)])),
@@ -824,12 +825,12 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Уровень ${stats.level} · ${stats.levelTitle}',
+                            context.tArgs('home.level_label', {'level': '${stats.level}', 'title': stats.levelTitle}),
                             style: TextStyle(fontWeight: FontWeight.bold, color: cardText),
                           ),
                           AnimatedCountText(
                             end: stats.xp,
-                            formatter: (v) => '${v.round()} XP всего',
+                            formatter: (v) => context.tArgs('home.xp_total', {'xp': '${v.round()}'}),
                             style: const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
@@ -850,7 +851,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 const SizedBox(height: 4),
                 AnimatedCountText(
                   end: stats.xpIntoLevel,
-                  formatter: (v) => '${v.round()} / ${stats.xpForNextLevel} XP до следующего уровня',
+                  formatter: (v) => context.tArgs('home.xp_to_next_level', {'current': '${v.round()}', 'next': '${stats.xpForNextLevel}'}),
                   style: const TextStyle(fontSize: 11, color: Colors.grey),
                 ),
               ],
@@ -872,7 +873,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                     formatter: (v) => '${v.round()}',
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const Text('Авто', style: TextStyle(decoration: TextDecoration.underline)),
+                  Text(context.t('home.stat_cars'), style: const TextStyle(decoration: TextDecoration.underline)),
                 ]),
               ),
               Column(children: [
@@ -881,7 +882,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                   formatter: (v) => '${v.round()}',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const Text('Сходок'),
+                Text(context.t('home.stat_events')),
               ]),
               Column(children: [
                 AnimatedCountText(
@@ -889,7 +890,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                   formatter: (v) => '${v.toStringAsFixed(1)}⭐',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const Text('Рейтинг'),
+                Text(context.t('home.stat_rating')),
               ]),
             ],
           ),
@@ -901,7 +902,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerLeft,
-            child: Text('Меню', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
+            child: Text(context.t('home.menu_title'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
           ),
           const SizedBox(height: 10),
           Wrap(
@@ -912,7 +913,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.people,
-                  label: 'Друзья',
+                  label: context.t('home.menu_friends'),
                   color: AppColors.blue,
                   onTap: () => Navigator.push(
                     context,
@@ -924,7 +925,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.groups,
-                  label: 'Клубы',
+                  label: context.t('home.menu_clubs'),
                   color: AppColors.blue,
                   badge: _myClubs.isNotEmpty ? '${_myClubs.length}' : null,
                   onTap: () => Navigator.push(
@@ -937,7 +938,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.emoji_events,
-                  label: 'Лидеры',
+                  label: context.t('home.menu_leaders'),
                   color: Colors.amber,
                   onTap: () => Navigator.push(
                     context,
@@ -949,7 +950,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.bookmark,
-                  label: 'Избранное',
+                  label: context.t('home.menu_favorites'),
                   color: AppColors.red,
                   onTap: () => Navigator.push(
                     context,
@@ -961,7 +962,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.military_tech,
-                  label: 'Достижения',
+                  label: context.t('home.menu_achievements'),
                   color: Colors.amber,
                   onTap: () => Navigator.push(
                     context,
@@ -979,7 +980,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.car_repair,
-                  label: 'Сервисы',
+                  label: context.t('home.menu_services'),
                   color: AppColors.red,
                   onTap: () => Navigator.push(
                     context,
@@ -991,7 +992,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.settings,
-                  label: 'Настройки',
+                  label: context.t('home.menu_settings'),
                   color: Colors.grey,
                   onTap: () => Navigator.push(
                     context,
@@ -1004,7 +1005,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                   width: 78,
                   child: AnimatedMenuTile(
                     icon: Icons.admin_panel_settings,
-                    label: 'Админка',
+                    label: context.t('home.menu_admin'),
                     color: AppColors.red,
                     onTap: () => Navigator.push(
                       context,
@@ -1022,18 +1023,18 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('О себе', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                Text(context.t('home.about_title'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
                 const SizedBox(height: 10),
-                Text(user['bio'] ?? 'Нет информации', style: const TextStyle(color: Colors.black87)),
+                Text(user['bio'] ?? context.t('home.no_bio_info'), style: const TextStyle(color: Colors.black87)),
               ],
             ),
           ),
 
           if (_myCars.isNotEmpty) ...[
             const SizedBox(height: 20),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
-              child: Text('Мои машины', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text(context.t('home.my_cars_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
             const SizedBox(height: 10),
             ..._myCars.map((c) => _miniCarCard(c as Map<String, dynamic>)),
@@ -1041,9 +1042,9 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
 
           if (_myClubs.isNotEmpty) ...[
             const SizedBox(height: 20),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
-              child: Text('Мои клубы', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text(context.t('home.my_clubs_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
             const SizedBox(height: 10),
             Wrap(
@@ -1051,7 +1052,9 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
               runSpacing: 8,
               children: _myClubs.map<Widget>((c) {
                 final role = c['role'] as String?;
-                final roleLabel = role == 'owner' ? ' · владелец' : (role == 'admin' ? ' · админ' : '');
+                final roleLabel = role == 'owner'
+                    ? ' · ${context.t('home.role_owner')}'
+                    : (role == 'admin' ? ' · ${context.t('home.role_admin')}' : '');
                 return Chip(
                   avatar: const Icon(Icons.groups, size: 16, color: AppColors.blue),
                   label: Text('${c['name']}$roleLabel'),
@@ -1094,7 +1097,10 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Достижения · ${achievements.where((a) => a.unlocked).length}/${achievements.length}',
+                          context.tArgs('home.achievements_progress', {
+                            'unlocked': '${achievements.where((a) => a.unlocked).length}',
+                            'total': '${achievements.length}',
+                          }),
                           style: TextStyle(fontWeight: FontWeight.bold, color: cardText),
                         ),
                         const SizedBox(height: 6),
@@ -1102,7 +1108,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                           children: achievements.where((a) => a.unlocked).take(6).isEmpty
                               ? [
                                   Text(
-                                    'Пока пусто — сходи на первую сходку!',
+                                    context.t('home.achievements_empty'),
                                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                                   ),
                                 ]
@@ -1141,14 +1147,14 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                     const Icon(Icons.card_giftcard, color: Colors.green, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text('Реферальная программа', style: TextStyle(fontWeight: FontWeight.bold, color: cardText)),
+                      child: Text(context.t('home.referral_program_title'), style: TextStyle(fontWeight: FontWeight.bold, color: cardText)),
                     ),
                     TextButton(
                       onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const PremiumScreen()),
                       ),
-                      child: const Text('Premium →'),
+                      child: Text(context.t('home.premium_link')),
                     ),
                   ],
                 ),
@@ -1173,11 +1179,11 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                       const SizedBox(width: 8),
                       IconButton(
                         icon: const Icon(Icons.copy, color: Colors.green),
-                        tooltip: 'Скопировать код',
+                        tooltip: context.t('home.tooltip_copy_code'),
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: '${_referral!['code']}'));
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Код скопирован')),
+                            SnackBar(content: Text(context.t('home.code_copied'))),
                           );
                         },
                       ),
@@ -1185,23 +1191,23 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                   ),
                   const SizedBox(height: 8),
                 ] else if (_referral == null) ...[
-                  const Row(
+                  Row(
                     children: [
-                      SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
-                      SizedBox(width: 8),
-                      Text('Загружаем код...', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                      const SizedBox(width: 8),
+                      Text(context.t('home.loading_code'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
                   ),
                   const SizedBox(height: 8),
                 ],
                 Text(
-                  'Приглашено друзей: ${_referral?['referrals_count'] ?? 0}',
+                  context.tArgs('home.referrals_invited', {'count': '${_referral?['referrals_count'] ?? 0}'}),
                   style: TextStyle(color: cardText),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Поделись кодом — 10 друзей = месяц Premium бесплатно',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                Text(
+                  context.t('home.referral_share_hint'),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
@@ -1211,7 +1217,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
           TextButton.icon(
             onPressed: () => Provider.of<AuthProvider>(context, listen: false).logout(),
             icon: const Icon(Icons.logout, size: 18, color: AppColors.red),
-            label: const Text('Выйти из аккаунта', style: TextStyle(color: AppColors.red, fontSize: 13)),
+            label: Text(context.t('home.logout'), style: const TextStyle(color: AppColors.red, fontSize: 13)),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               minimumSize: Size.zero,

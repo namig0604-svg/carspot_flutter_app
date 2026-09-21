@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../utils/map_config.dart';
 import '../theme/app_colors.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Выбор точки на карте тапом. Возвращает {'latitude': double, 'longitude': double}
 /// через Navigator.pop, либо null если отменили.
@@ -33,7 +34,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Укажи точку на карте'),
+        title: Text(context.t('location_picker.title')),
         backgroundColor: AppColors.black,
       ),
       body: Stack(
@@ -77,7 +78,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               ),
               child: Text(
                 _picked == null
-                    ? 'Нажми на карту, чтобы поставить метку'
+                    ? context.t('location_picker.tap_hint')
                     : '${_picked!.latitude.toStringAsFixed(5)}, ${_picked!.longitude.toStringAsFixed(5)}',
                 style: const TextStyle(fontSize: 13),
               ),
@@ -96,7 +97,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               },
         backgroundColor: _picked == null ? Colors.grey : AppColors.blue,
         icon: const Icon(Icons.check),
-        label: const Text('Подтвердить'),
+        label: Text(context.t('common.confirm')),
       ),
     );
   }

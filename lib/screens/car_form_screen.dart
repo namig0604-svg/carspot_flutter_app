@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Форма машины: добавление новой (car == null) или редактирование существующей.
 class CarFormScreen extends StatefulWidget {
@@ -99,7 +100,7 @@ class _CarFormScreenState extends State<CarFormScreen> {
 
   Future<void> _submit() async {
     if (_makeController.text.trim().isEmpty || _modelController.text.trim().isEmpty) {
-      setState(() => _errorMessage = 'Укажи марку и модель');
+      setState(() => _errorMessage = context.t('car_form.error_required_fields'));
       return;
     }
 
@@ -146,11 +147,11 @@ class _CarFormScreenState extends State<CarFormScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_isEditing ? 'Машина обновлена' : 'Машина добавлена в гараж 🚗')),
+          SnackBar(content: Text(_isEditing ? context.t('car_form.updated_message') : context.t('car_form.added_message'))),
         );
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Ошибка: $e');
+      setState(() => _errorMessage = context.tArgs('car_form.error', {'error': '$e'}));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -185,41 +186,41 @@ class _CarFormScreenState extends State<CarFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Изменить машину' : 'Добавить машину')),
+      appBar: AppBar(title: Text(_isEditing ? context.t('car_form.title_edit') : context.t('car_form.title_add'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle('Основное'),
-            _field(_makeController, 'Марка', required: true),
-            _field(_modelController, 'Модель', required: true),
-            _field(_yearController, 'Год выпуска', keyboardType: TextInputType.number),
-            _field(_generationController, 'Поколение (например S15)'),
-            _field(_bodyTypeController, 'Тип кузова (coupe / sedan / suv...)'),
+            _sectionTitle(context.t('car_form.section_basic')),
+            _field(_makeController, context.t('car_form.field_make'), required: true),
+            _field(_modelController, context.t('car_form.field_model'), required: true),
+            _field(_yearController, context.t('car_form.field_year'), keyboardType: TextInputType.number),
+            _field(_generationController, context.t('car_form.field_generation')),
+            _field(_bodyTypeController, context.t('car_form.field_body_type')),
 
-            _sectionTitle('Характеристики'),
-            _field(_engineController, 'Двигатель (например SR20DET)'),
-            _field(_engineVolumeController, 'Объём (л)'),
-            _field(_powerController, 'Мощность (л.с.)', keyboardType: TextInputType.number),
-            _field(_torqueController, 'Крутящий момент (Нм)', keyboardType: TextInputType.number),
-            _field(_drivetrainController, 'Привод (RWD / FWD / AWD)'),
-            _field(_transmissionController, 'Трансмиссия (manual / automatic)'),
-            _field(_fuelTypeController, 'Тип топлива (petrol / diesel / electric)'),
-            _field(_weightController, 'Вес (кг)', keyboardType: TextInputType.number),
-            _field(_zeroToHundredController, 'Разгон 0-100 (сек)'),
+            _sectionTitle(context.t('car_form.section_specs')),
+            _field(_engineController, context.t('car_form.field_engine')),
+            _field(_engineVolumeController, context.t('car_form.field_engine_volume')),
+            _field(_powerController, context.t('car_form.field_power'), keyboardType: TextInputType.number),
+            _field(_torqueController, context.t('car_form.field_torque'), keyboardType: TextInputType.number),
+            _field(_drivetrainController, context.t('car_form.field_drivetrain')),
+            _field(_transmissionController, context.t('car_form.field_transmission')),
+            _field(_fuelTypeController, context.t('car_form.field_fuel_type')),
+            _field(_weightController, context.t('car_form.field_weight'), keyboardType: TextInputType.number),
+            _field(_zeroToHundredController, context.t('car_form.field_zero_to_hundred')),
 
-            _sectionTitle('Внешний вид'),
-            _field(_colorController, 'Цвет'),
-            _field(_plateController, 'Гос. номер'),
-            _field(_photoUrlController, 'Ссылка на фото (URL)'),
+            _sectionTitle(context.t('car_form.section_appearance')),
+            _field(_colorController, context.t('car_form.field_color')),
+            _field(_plateController, context.t('car_form.field_plate')),
+            _field(_photoUrlController, context.t('car_form.field_photo_url')),
             Padding(
               padding: const EdgeInsets.only(bottom: 15),
               child: TextField(
                 controller: _modsController,
                 maxLines: 2,
                 decoration: InputDecoration(
-                  labelText: 'Доработки (тюнинг)',
+                  labelText: context.t('car_form.field_mods'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
@@ -230,7 +231,7 @@ class _CarFormScreenState extends State<CarFormScreen> {
                 controller: _descriptionController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  labelText: 'Описание',
+                  labelText: context.t('car_form.field_description'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
@@ -238,7 +239,7 @@ class _CarFormScreenState extends State<CarFormScreen> {
 
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Продаётся'),
+              title: Text(context.t('car_form.for_sale_label')),
               value: _isForSale,
               onChanged: (v) => setState(() => _isForSale = v),
             ),
@@ -268,7 +269,7 @@ class _CarFormScreenState extends State<CarFormScreen> {
                 child: _isLoading
                     ? AppLoader(size: 22, color: Colors.white)
                     : Text(
-                        _isEditing ? 'Сохранить' : 'Добавить в гараж',
+                        _isEditing ? context.t('common.save') : context.t('car_form.submit_add'),
                         style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
               ),

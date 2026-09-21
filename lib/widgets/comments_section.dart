@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../screens/user_profile_screen.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Универсальный блок комментариев — используется и на странице сходки,
 /// и в просмотрщике фото. Нужен ограниченный по высоте родитель
@@ -60,7 +61,7 @@ class _CommentsSectionState extends State<CommentsSection> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = 'Не удалось загрузить комментарии';
+        _error = context.t('comments_section.load_error');
       });
     }
   }
@@ -94,7 +95,7 @@ class _CommentsSectionState extends State<CommentsSection> {
       if (!mounted) return;
       setState(() => _isSending = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось отправить комментарий')),
+        SnackBar(content: Text(context.t('comments_section.send_error'))),
       );
     }
   }
@@ -103,10 +104,10 @@ class _CommentsSectionState extends State<CommentsSection> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Удалить комментарий?'),
+        title: Text(context.t('comments_section.delete_confirm_title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Удалить')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(context.t('common.delete'))),
         ],
       ),
     );
@@ -118,7 +119,7 @@ class _CommentsSectionState extends State<CommentsSection> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось удалить комментарий')),
+        SnackBar(content: Text(context.t('comments_section.delete_error'))),
       );
     }
   }
@@ -129,10 +130,10 @@ class _CommentsSectionState extends State<CommentsSection> {
       final dt = DateTime.parse(iso).toLocal();
       final now = DateTime.now();
       final diff = now.difference(dt);
-      if (diff.inMinutes < 1) return 'сейчас';
-      if (diff.inMinutes < 60) return '${diff.inMinutes} мин';
-      if (diff.inHours < 24) return '${diff.inHours} ч';
-      if (diff.inDays < 7) return '${diff.inDays} д';
+      if (diff.inMinutes < 1) return context.t('comments_section.time_now');
+      if (diff.inMinutes < 60) return context.tArgs('comments_section.time_minutes_ago', {'n': '${diff.inMinutes}'});
+      if (diff.inHours < 24) return context.tArgs('comments_section.time_hours_ago', {'n': '${diff.inHours}'});
+      if (diff.inDays < 7) return context.tArgs('comments_section.time_days_ago', {'n': '${diff.inDays}'});
       return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}';
     } catch (_) {
       return '';
@@ -153,7 +154,7 @@ class _CommentsSectionState extends State<CommentsSection> {
             Icon(Icons.chat_bubble_outline, size: 18, color: subColor),
             const SizedBox(width: 6),
             Text(
-              'Комментарии${_comments.isNotEmpty ? ' (${_comments.length})' : ''}',
+              '${context.t('comments_section.title')}${_comments.isNotEmpty ? ' (${_comments.length})' : ''}',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
             ),
           ],
@@ -165,7 +166,7 @@ class _CommentsSectionState extends State<CommentsSection> {
               : _error != null
                   ? Center(child: Text(_error!, style: TextStyle(color: subColor)))
                   : _comments.isEmpty
-                      ? Center(child: Text('Пока нет комментариев', style: TextStyle(color: subColor)))
+                      ? Center(child: Text(context.t('comments_section.empty'), style: TextStyle(color: subColor)))
                       : ListView.builder(
                           controller: _scrollController,
                           itemCount: _comments.length,
@@ -210,7 +211,7 @@ class _CommentsSectionState extends State<CommentsSection> {
                                           children: [
                                             Flexible(
                                               child: Text(
-                                                username.isNotEmpty ? username : 'Пользователь',
+                                                username.isNotEmpty ? username : context.t('comments_section.default_username'),
                                                 overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textColor),
                                               ),
@@ -248,7 +249,7 @@ class _CommentsSectionState extends State<CommentsSection> {
                   maxLength: 1000,
                   style: TextStyle(color: textColor),
                   decoration: InputDecoration(
-                    hintText: 'Написать комментарий...',
+                    hintText: context.t('comments_section.input_hint'),
                     hintStyle: TextStyle(color: subColor),
                     isDense: true,
                     counterText: '',

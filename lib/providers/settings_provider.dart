@@ -6,16 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// сохраняется и будет использован, когда локализация появится.
 const Map<String, String> kSupportedLanguages = {
   'ru': 'Русский',
-  'uk': 'Українська',
-  'be': 'Беларуская',
-  'kk': 'Қазақша',
-  'uz': "O'zbekcha",
-  'az': 'Azərbaycanca',
-  'hy': 'Հայերեն',
-  'ky': 'Кыргызча',
-  'tg': 'Тоҷикӣ',
-  'tk': 'Türkmençe',
-  'ro': 'Română (Молдова)',
+  'en': 'English',
+  'ka': 'ქართული',
 };
 
 const List<String> kSupportedCountries = [

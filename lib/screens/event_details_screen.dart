@@ -18,6 +18,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/comments_section.dart';
 import '../utils/sound_player.dart';
+import '../l10n/l10n_extensions.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> event;
@@ -90,7 +91,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }
       if (mounted) setState(() => _event['is_favorite'] = !wasFavorite);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('event_details.error_message', {'error': '$e'}))));
     }
   }
 
@@ -143,11 +144,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       final goPremium = await showDialog<bool>(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('Только для Premium'),
-          content: const Text('Поднимать сходку в топ ленты могут только подписчики CarSpot Premium.'),
+          title: Text(context.t('event_details.premium_only_title')),
+          content: Text(context.t('event_details.premium_only_body')),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('Узнать больше')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('event_details.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(context.t('event_details.learn_more'))),
           ],
         ),
       );
@@ -166,7 +167,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       setState(() => _event = response);
       SoundPlayer.play(context, AppSound.success);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Сходка поднята в топ ленты на 24 часа 🚀')),
+        SnackBar(content: Text(context.t('event_details.boosted_success'))),
       );
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
@@ -184,11 +185,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ты присоединился! 🎉')),
+        SnackBar(content: Text(context.t('event_details.joined_success'))),
       );
       _loadData();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('event_details.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -205,11 +206,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ты покинул сходку')),
+        SnackBar(content: Text(context.t('event_details.left_success'))),
       );
       _loadData();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('event_details.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -246,14 +247,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('event_details.error_message', {'error': '$e'}))));
     }
   }
 
   Future<void> _submitRating() async {
     if (_myRating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Выбери оценку')),
+        SnackBar(content: Text(context.t('event_details.select_rating'))),
       );
       return;
     }
@@ -282,11 +283,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Спасибо за оценку! ⭐')),
+        SnackBar(content: Text(context.t('event_details.rating_thanks'))),
       );
       _loadRatings();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('event_details.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -296,7 +297,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Детали сходки'),
+        title: Text(context.t('event_details.title')),
         elevation: 0,
         backgroundColor: AppColors.black,
         actions: [
@@ -305,20 +306,20 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               _event['is_favorite'] == true ? Icons.favorite : Icons.favorite_border,
               color: _event['is_favorite'] == true ? AppColors.red : null,
             ),
-            tooltip: 'В избранное',
+            tooltip: context.t('event_details.favorite_tooltip'),
             onPressed: _toggleFavorite,
           ),
           if (_isJoined && _event['chat_room_id'] != null)
             IconButton(
               icon: const Icon(Icons.chat_bubble),
-              tooltip: 'Чат сходки',
+              tooltip: context.t('event_details.chat_tooltip'),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => ChatRoomScreen(
                       roomId: _event['chat_room_id'],
-                      title: 'Чат: ${_event['title'] ?? 'сходка'}',
+                      title: context.tArgs('event_details.chat_room_title', {'title': '${_event['title'] ?? context.t('event_details.default_event_name')}'}),
                     ),
                   ),
                 );
@@ -327,19 +328,19 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           if (_event['is_creator'] == true)
             IconButton(
               icon: Icon(Icons.rocket_launch, color: _isBoosted() ? Colors.amber : null),
-              tooltip: _isBoosted() ? 'Сходка в топе' : 'Поднять в топ ленты (Premium)',
+              tooltip: _isBoosted() ? context.t('event_details.boosted_tooltip') : context.t('event_details.boost_tooltip'),
               onPressed: _isBoosted() ? null : _boostEvent,
             ),
           if (_event['is_creator'] == true)
             IconButton(
               icon: const Icon(Icons.edit),
-              tooltip: 'Изменить сходку',
+              tooltip: context.t('event_details.edit_tooltip'),
               onPressed: _openEdit,
             ),
           if (_event['is_creator'] != true)
             IconButton(
               icon: const Icon(Icons.flag_outlined),
-              tooltip: 'Пожаловаться',
+              tooltip: context.t('event_details.report_tooltip'),
               onPressed: () => showReportDialog(context, targetType: 'event', targetId: _event['id']),
             ),
         ],
@@ -355,7 +356,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    _event['title'] ?? 'Без названия',
+                    _event['title'] ?? context.t('event_details.untitled'),
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -372,10 +373,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             if (_event['is_private'] == true) ...[
               const SizedBox(height: 8),
               Row(
-                children: const [
+                children: [
                   Icon(Icons.lock, size: 14, color: Colors.orange),
                   SizedBox(width: 4),
-                  Text('Закрытая сходка · только для клуба', style: TextStyle(fontSize: 12, color: Colors.orange)),
+                  Text(context.t('event_details.private_event_notice'), style: const TextStyle(fontSize: 12, color: Colors.orange)),
                 ],
               ),
             ],
@@ -386,7 +387,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   const Icon(Icons.event_busy, size: 14, color: AppColors.red),
                   const SizedBox(width: 4),
                   Text(
-                    _event['is_cancelled'] == true ? 'Сходка отменена' : 'Сходка завершилась',
+                    _event['is_cancelled'] == true ? context.t('event_details.event_cancelled') : context.t('event_details.event_ended'),
                     style: const TextStyle(fontSize: 12, color: AppColors.red),
                   ),
                 ],
@@ -406,7 +407,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 }),
                 const SizedBox(width: 10),
                 Text(
-                  '${_event['average_rating'] ?? 0} (${_event['ratings_count'] ?? 0} оценок)',
+                  context.tArgs('event_details.average_rating_summary', {'rating': '${_event['average_rating'] ?? 0}', 'count': '${_event['ratings_count'] ?? 0}'}),
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
@@ -416,7 +417,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             // Информация
             _buildInfoCard(
               icon: Icons.calendar_today,
-              title: 'Дата и время',
+              title: context.t('event_details.date_time_label'),
               value: '${_event['event_date']} ${_event['event_time']}'
                   '${_event['duration_minutes'] != null ? " · ${formatEventDuration(_event['duration_minutes'] as int)}" : ""}',
             ),
@@ -424,12 +425,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
             _buildInfoCard(
               icon: Icons.location_on,
-              title: 'Место',
+              title: context.t('event_details.location_label'),
               value: '${_event['city']}, ${_event['location_name']}',
               trailing: (_event['latitude'] != null && _event['longitude'] != null)
                   ? IconButton(
                       icon: const Icon(Icons.directions, color: AppColors.blue),
-                      tooltip: 'Маршрут в Google Maps',
+                      tooltip: context.t('event_details.directions_tooltip'),
                       onPressed: () => openDirections(
                         context,
                         (_event['latitude'] as num).toDouble(),
@@ -480,9 +481,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
             _buildInfoCard(
               icon: Icons.people,
-              title: 'Участники',
+              title: context.t('event_details.participants'),
               value: '${_event['participants_count'] ?? 0}'
-                  '${_onlineCount > 0 ? " ($_onlineCount онлайн)" : ""}',
+                  '${_onlineCount > 0 ? context.tArgs('event_details.online_suffix', {'count': '$_onlineCount'}) : ""}',
             ),
             const SizedBox(height: 10),
             SizedBox(
@@ -493,12 +494,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   MaterialPageRoute(
                     builder: (_) => PhotoGalleryScreen(
                       eventId: _event['id'],
-                      title: 'Фото сходки',
+                      title: context.t('event_details.photos_title'),
                     ),
                   ),
                 ),
                 icon: const Icon(Icons.photo_library_outlined),
-                label: Text('Фото сходки${(_event['photos_count'] ?? 0) > 0 ? " (${_event['photos_count']})" : ""}'),
+                label: Text(context.tArgs('event_details.photos_button', {'count': (_event['photos_count'] ?? 0) > 0 ? ' (${_event['photos_count']})' : ''})),
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
@@ -507,22 +508,22 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             const SizedBox(height: 20),
 
             // Описание
-            const Text('Описание', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(context.t('event_details.description_label'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-            Text(_event['description'] ?? 'Нет описания'),
+            Text(_event['description'] ?? context.t('event_details.no_description')),
             const SizedBox(height: 30),
 
             // Участники
             Row(
               children: [
-                const Text('Участники', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(context.t('event_details.participants'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(width: 8),
                 Text('(${_participants.length})', style: const TextStyle(color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 10),
             _participants.isEmpty
-              ? const Text('Пока никто не присоединился')
+              ? Text(context.t('event_details.no_participants'))
               : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -531,7 +532,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     final p = _participants[index];
                     final user = p['user'] as Map<String, dynamic>?;
                     final avatarUrl = user?['avatar_url'] as String?;
-                    final username = user?['username'] as String? ?? 'Неизвестный';
+                    final username = user?['username'] as String? ?? context.t('event_details.unknown_user');
                     final isVerified = user?['is_verified'] == true;
                     final isOnline = user?['is_online'] == true;
                     final rating = user?['average_rating'] ?? 0;
@@ -579,15 +580,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                       subtitle: Text(
                         isOnline
-                            ? 'Онлайн · ⭐ $rating'
-                            : '⭐ $rating',
+                            ? context.tArgs('event_details.online_rating', {'rating': '$rating'})
+                            : context.tArgs('event_details.rating_only', {'rating': '$rating'}),
                         style: TextStyle(color: isOnline ? Colors.green : Colors.grey),
                       ),
                       trailing: isMe || userId == null
                           ? null
                           : IconButton(
                               icon: const Icon(Icons.chat_bubble_outline, color: AppColors.blue),
-                              tooltip: 'Написать',
+                              tooltip: context.t('event_details.message_tooltip'),
                               onPressed: () => _openDirectChat(userId, username),
                             ),
                       onTap: userId == null
@@ -604,10 +605,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             const SizedBox(height: 30),
 
             // Рейтинги
-            const Text('Отзывы', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(context.t('event_details.reviews_label'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             _ratings.isEmpty
-              ? const Text('Нет отзывов')
+              ? Text(context.t('event_details.no_reviews'))
               : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -623,7 +624,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(rating['username'] ?? 'Неизвестный'),
+                                Text(rating['username'] ?? context.t('event_details.unknown_user')),
                                 Row(
                                   children: List.generate(5, (i) {
                                     return Icon(
@@ -664,8 +665,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   ? AppLoader(size: 22, color: Colors.white)
                   : Text(
                       _isEventOver
-                          ? (_event['is_cancelled'] == true ? 'Сходка отменена' : 'Сходка завершилась')
-                          : (_isJoined ? 'Покинуть сходку' : 'Присоединиться'),
+                          ? (_event['is_cancelled'] == true ? context.t('event_details.event_cancelled') : context.t('event_details.event_ended'))
+                          : (_isJoined ? context.t('event_details.leave_button') : context.t('event_details.join_button')),
                       style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
               ),
@@ -683,7 +684,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     setState(() => _showRatingForm = !_showRatingForm);
                   },
                   icon: const Icon(Icons.star),
-                  label: Text(_showRatingForm ? 'Скрыть оценку' : 'Оценить сходку'),
+                  label: Text(_showRatingForm ? context.t('event_details.hide_rating') : context.t('event_details.rate_event')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -694,7 +695,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             // Форма оценки
             if (_showRatingForm && _isJoined) ...[
               const SizedBox(height: 20),
-              const Text('Оцени сходку', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(context.t('event_details.rate_prompt'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -714,7 +715,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                 controller: _reviewController,
                 maxLines: 3,
                 decoration: InputDecoration(
-                  hintText: 'Твой отзыв (опционально)',
+                  hintText: context.t('event_details.review_hint'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
@@ -728,7 +729,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     backgroundColor: Colors.orange,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Отправить оценку', style: TextStyle(color: Colors.white)),
+                  child: Text(context.t('event_details.submit_rating'), style: const TextStyle(color: Colors.white)),
                 ),
               ),
             ],
@@ -736,7 +737,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             const SizedBox(height: 20),
 
             // Комментарии
-            const Text('Комментарии', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(context.t('event_details.comments_label'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             SizedBox(
               height: 340,

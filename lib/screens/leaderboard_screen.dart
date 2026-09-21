@@ -9,6 +9,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import 'club_detail_screen.dart';
 import 'user_profile_screen.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Таблица лидеров: два таба — рейтинг пользователей по опыту (XP, считается
 /// на клиенте, как и раньше) и рейтинг клубов по активности (считается на
@@ -72,7 +73,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
 
       setState(() => _rows = rows);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('leaderboard.error_with_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -85,7 +86,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
       final response = await ApiService.get('/api/clubs/leaderboard?limit=100', token: authProvider.accessToken);
       setState(() => _clubRows = response is List ? response : []);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('leaderboard.error_with_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoadingClubs = false);
     }
@@ -136,8 +137,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                       SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                       const Icon(Icons.emoji_events_outlined, size: 64, color: Colors.grey),
                       const SizedBox(height: 16),
-                      const Center(
-                        child: Text('Рейтинг пока пуст', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                      Center(
+                        child: Text(context.t('leaderboard.no_users'), style: const TextStyle(fontSize: 18, color: Colors.grey)),
                       ),
                     ],
                   )
@@ -191,12 +192,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                               ),
                               if (isMe) ...[
                                 const SizedBox(width: 6),
-                                const Text('(Вы)', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                Text(context.t('leaderboard.you_tag'), style: const TextStyle(color: Colors.grey, fontSize: 12)),
                               ],
                             ],
                           ),
                           subtitle: Text(
-                            'Уровень ${stats.level} · ${stats.levelTitle}',
+                            context.tArgs('leaderboard.level_line', {'level': '${stats.level}', 'title': stats.levelTitle}),
                             style: const TextStyle(color: Colors.grey),
                           ),
                           trailing: Column(
@@ -204,7 +205,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '${stats.xp} XP',
+                                context.tArgs('leaderboard.xp_suffix', {'xp': '${stats.xp}'}),
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.blue),
                               ),
                             ],
@@ -233,8 +234,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                       SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                       const Icon(Icons.groups_outlined, size: 64, color: Colors.grey),
                       const SizedBox(height: 16),
-                      const Center(
-                        child: Text('Клубов пока нет', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                      Center(
+                        child: Text(context.t('leaderboard.no_clubs'), style: const TextStyle(fontSize: 18, color: Colors.grey)),
                       ),
                     ],
                   )
@@ -292,7 +293,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                             ],
                           ),
                           subtitle: Text(
-                            '$membersCount участников · $eventsCount сходок'
+                            context.tArgs('leaderboard.club_stats_line', {'members': '$membersCount', 'events': '$eventsCount'}) +
                             '${avgRating > 0 ? ' · ★${avgRating.toStringAsFixed(1)}' : ''}',
                             style: const TextStyle(color: Colors.grey),
                           ),
@@ -301,7 +302,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '${club['score'] ?? 0} pts',
+                                context.tArgs('leaderboard.points_suffix', {'score': '${club['score'] ?? 0}'}),
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.red),
                               ),
                             ],
@@ -321,7 +322,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Таблица лидеров'),
+        title: Text(context.t('leaderboard.title')),
         backgroundColor: AppColors.black,
         elevation: 0,
         bottom: TabBar(
@@ -329,9 +330,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
           indicatorColor: AppColors.red,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey,
-          tabs: const [
-            Tab(text: 'Пользователи'),
-            Tab(text: 'Клубы'),
+          tabs: [
+            Tab(text: context.t('leaderboard.tab_users')),
+            Tab(text: context.t('leaderboard.tab_clubs')),
           ],
         ),
       ),

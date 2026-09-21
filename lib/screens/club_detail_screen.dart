@@ -10,6 +10,7 @@ import 'event_details_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 class ClubDetailScreen extends StatefulWidget {
   final String clubId;
@@ -55,7 +56,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       final response = await ApiService.get('/api/clubs/${widget.clubId}', token: authProvider.accessToken);
       setState(() => _club = response);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoadingDetail = false);
     }
@@ -111,7 +112,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       }
       if (mounted) setState(() => _club!['is_favorite'] = !wasFavorite);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     }
   }
 
@@ -121,11 +122,11 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final result = await ApiService.post('/api/clubs/${widget.clubId}/join', {}, token: authProvider.accessToken);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? 'Готово')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? context.t('common.done'))));
       }
       await _loadAll();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isActionLoading = false);
     }
@@ -135,12 +136,12 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Покинуть клуб?'),
+        title: Text(context.t('club_detail.leave_confirm_title')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Покинуть', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('club_detail.leave_confirm_action'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -153,7 +154,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       await ApiService.post('/api/clubs/${widget.clubId}/leave', {}, token: authProvider.accessToken);
       await _loadAll();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isActionLoading = false);
     }
@@ -171,7 +172,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       await _loadPending();
       _refreshMembersCountLocal();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     }
   }
 
@@ -184,7 +185,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       );
       await _loadPending();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     }
   }
 
@@ -192,13 +193,13 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Исключить участника?'),
-        content: Text('$username будет исключён из клуба.'),
+        title: Text(context.t('club_detail.kick_confirm_title')),
+        content: Text(context.tArgs('club_detail.kick_confirm_body', {'username': username})),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Исключить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('club_detail.kick_action'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -214,7 +215,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       await _loadMembers();
       _refreshMembersCountLocal();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     }
   }
 
@@ -230,7 +231,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ChatRoomScreen(roomId: roomId, title: 'Клуб: ${_club?['name'] ?? ''}'),
+        builder: (_) => ChatRoomScreen(roomId: roomId, title: context.tArgs('club_detail.chat_title', {'name': '${_club?['name'] ?? ''}'})),
       ),
     );
   }
@@ -255,16 +256,15 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Удалить клуб?'),
+        title: Text(context.t('club_detail.delete_confirm_title')),
         content: Text(
-          '"${_club?['name'] ?? ''}" будет удалён вместе с составом участников и чатом клуба. '
-          'Сходки клуба останутся, но перестанут быть клубными. Это нельзя отменить.',
+          context.tArgs('club_detail.delete_confirm_body', {'name': '${_club?['name'] ?? ''}'}),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить', style: TextStyle(color: AppColors.red)),
+            child: Text(context.t('common.delete'), style: const TextStyle(color: AppColors.red)),
           ),
         ],
       ),
@@ -278,11 +278,11 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Клуб удалён')),
+          SnackBar(content: Text(context.t('club_detail.club_deleted'))),
         );
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isActionLoading = false);
     }
@@ -301,14 +301,14 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
   Widget build(BuildContext context) {
     if (_isLoadingDetail && _club == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Клуб'), backgroundColor: AppColors.black, elevation: 0),
+        appBar: AppBar(title: Text(context.t('club_detail.title')), backgroundColor: AppColors.black, elevation: 0),
         body: Center(child: AppLoader()),
       );
     }
     if (_club == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Клуб'), backgroundColor: AppColors.black, elevation: 0),
-        body: const Center(child: Text('Клуб не найден')),
+        appBar: AppBar(title: Text(context.t('club_detail.title')), backgroundColor: AppColors.black, elevation: 0),
+        body: Center(child: Text(context.t('club_detail.not_found'))),
       );
     }
 
@@ -318,28 +318,28 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(club['name'] ?? 'Клуб', overflow: TextOverflow.ellipsis),
+        title: Text(club['name'] ?? context.t('club_detail.title'), overflow: TextOverflow.ellipsis),
         elevation: 0,
         backgroundColor: AppColors.black,
         actions: [
           IconButton(
             icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border, color: _isFavorite ? AppColors.red : null),
-            tooltip: 'В избранное',
+            tooltip: context.t('club_detail.add_favorite_tooltip'),
             onPressed: _toggleFavorite,
           ),
           if (_isMember && club['chat_room_id'] != null)
-            IconButton(icon: const Icon(Icons.chat_bubble), tooltip: 'Чат клуба', onPressed: _openChat),
-          if (_isAdmin) IconButton(icon: const Icon(Icons.edit), tooltip: 'Изменить', onPressed: _openEdit),
+            IconButton(icon: const Icon(Icons.chat_bubble), tooltip: context.t('club_detail.chat_tooltip'), onPressed: _openChat),
+          if (_isAdmin) IconButton(icon: const Icon(Icons.edit), tooltip: context.t('common.edit'), onPressed: _openEdit),
           if (_isOwner)
             IconButton(
               icon: const Icon(Icons.delete_outline),
-              tooltip: 'Удалить клуб',
+              tooltip: context.t('club_detail.delete_club_tooltip'),
               onPressed: _isActionLoading ? null : _deleteClub,
             ),
           if (!_isOwner)
             IconButton(
               icon: const Icon(Icons.flag_outlined),
-              tooltip: 'Пожаловаться',
+              tooltip: context.t('club_detail.report_tooltip'),
               onPressed: () => showReportDialog(context, targetType: 'club', targetId: widget.clubId),
             ),
         ],
@@ -348,7 +348,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
           ? FloatingActionButton(
               onPressed: _createClubEvent,
               backgroundColor: AppColors.red,
-              tooltip: 'Создать сходку клуба',
+              tooltip: context.t('club_detail.create_event_tooltip'),
               child: const Icon(Icons.add),
             )
           : null,
@@ -406,11 +406,11 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                           children: [
                             const Icon(Icons.people, size: 16, color: Colors.blueGrey),
                             const SizedBox(width: 4),
-                            Text('${club['members_count'] ?? 0} участников'),
+                            Text(context.tArgs('club_detail.members_count', {'count': '${club['members_count'] ?? 0}'})),
                             const SizedBox(width: 14),
                             const Icon(Icons.event, size: 16, color: Colors.blueGrey),
                             const SizedBox(width: 4),
-                            Text('${club['events_count'] ?? 0} сходок'),
+                            Text(context.tArgs('club_detail.events_count', {'count': '${club['events_count'] ?? 0}'})),
                           ],
                         ),
                       ],
@@ -436,7 +436,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
 
               if ((club['description'] ?? '').toString().isNotEmpty) ...[
                 const SizedBox(height: 16),
-                const Text('О клубе', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(context.t('club_detail.about'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 Text(club['description']),
               ],
@@ -461,10 +461,10 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                         ? AppLoader(size: 22, color: Colors.white)
                         : Text(
                             _isMember
-                                ? 'Покинуть клуб'
+                                ? context.t('club_detail.leave_club_button')
                                 : (_isPending
-                                    ? 'Заявка на рассмотрении'
-                                    : (club['is_public'] == false ? 'Отправить заявку' : 'Вступить в клуб')),
+                                    ? context.t('club_detail.pending_request')
+                                    : (club['is_public'] == false ? context.t('club_detail.send_request') : context.t('club_detail.join_club'))),
                             style: const TextStyle(color: Colors.white, fontSize: 15),
                           ),
                   ),
@@ -473,12 +473,12 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
               const SizedBox(height: 24),
 
               if (_isAdmin && _pending.isNotEmpty) ...[
-                Text('Заявки на вступление (${_pending.length})',
+                Text(context.tArgs('club_detail.pending_requests_count', {'count': '${_pending.length}'}),
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 ...(_pending.map((m) {
                   final user = m['user'] as Map<String, dynamic>?;
-                  final username = user?['username'] as String? ?? 'Неизвестный';
+                  final username = user?['username'] as String? ?? context.t('club_detail.unknown_user');
                   final userId = m['user_id'] as String;
                   return Card(
                     child: ListTile(
@@ -505,14 +505,14 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
 
               Row(
                 children: [
-                  const Text('Участники', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(context.t('club_detail.members'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(width: 8),
                   Text('(${_members.length})', style: const TextStyle(color: Colors.grey)),
                 ],
               ),
               const SizedBox(height: 8),
               _members.isEmpty
-                  ? const Text('Пока нет участников')
+                  ? Text(context.t('club_detail.no_members'))
                   : ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -520,7 +520,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                       itemBuilder: (context, index) {
                         final m = _members[index];
                         final user = m['user'] as Map<String, dynamic>?;
-                        final username = user?['username'] as String? ?? 'Неизвестный';
+                        final username = user?['username'] as String? ?? context.t('club_detail.unknown_user');
                         final avatarUrl = user?['avatar_url'] as String?;
                         final role = m['role'] as String? ?? 'member';
                         final memberUserId = m['user_id'] as String?;
@@ -536,14 +536,14 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                           title: Text(username),
                           subtitle: role != 'member'
                               ? Text(
-                                  role == 'owner' ? 'Владелец' : 'Админ',
+                                  role == 'owner' ? context.t('club_detail.owner') : context.t('club_detail.admin'),
                                   style: TextStyle(color: role == 'owner' ? Colors.orange : AppColors.blue, fontSize: 12),
                                 )
                               : null,
                           trailing: canKick
                               ? IconButton(
                                   icon: const Icon(Icons.person_remove, color: AppColors.red),
-                                  tooltip: 'Исключить',
+                                  tooltip: context.t('club_detail.kick_action'),
                                   onPressed: () => _kick(memberUserId!, username),
                                 )
                               : null,
@@ -561,10 +561,10 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
 
               const SizedBox(height: 24),
 
-              const Text('События клуба', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(context.t('club_detail.events_heading'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               _events.isEmpty
-                  ? const Text('Клуб пока не проводил сходок')
+                  ? Text(context.t('club_detail.no_events'))
                   : ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -580,10 +580,10 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                             ),
                             title: Row(
                               children: [
-                                Flexible(child: Text(e['title'] ?? 'Без названия', overflow: TextOverflow.ellipsis)),
+                                Flexible(child: Text(e['title'] ?? context.t('club_detail.untitled_event'), overflow: TextOverflow.ellipsis)),
                                 if (isPrivateEvent) ...[
                                   const SizedBox(width: 6),
-                                  const Text('· закрытая', style: TextStyle(fontSize: 12, color: Colors.orange)),
+                                  Text(context.t('club_detail.private_tag'), style: const TextStyle(fontSize: 12, color: Colors.orange)),
                                 ],
                               ],
                             ),

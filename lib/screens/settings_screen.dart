@@ -8,6 +8,7 @@ import 'premium_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/section_background.dart';
+import '../l10n/l10n_extensions.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -71,7 +72,7 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Настройки'),
+        title: Text(context.t('common.settings')),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
@@ -87,11 +88,11 @@ class SettingsScreen extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons.workspace_premium, color: Colors.amber),
-                title: const Text('Premium подписка'),
+                title: Text(context.t('settings.premium_subscription')),
                 subtitle: Text(
                   context.watch<AuthProvider>().user?['is_premium'] == true
-                      ? 'Подписка активна'
-                      : '14 дней бесплатно, автосервисы, больше машин и другое',
+                      ? context.t('settings.premium_active')
+                      : context.t('settings.premium_promo'),
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
@@ -106,12 +107,12 @@ class SettingsScreen extends StatelessWidget {
           // приложения, чтобы этот экран не дублировал навигацию.
           if (isAdmin)
             _sectionCard(
-              title: 'Администрирование',
+              title: context.t('settings.admin_section_title'),
               children: [
                 ListTile(
                   leading: const Icon(Icons.admin_panel_settings, color: AppColors.blue),
-                  title: const Text('Админ-панель'),
-                  subtitle: const Text('Жалобы и блокировка пользователей'),
+                  title: Text(context.t('settings.admin_panel_link')),
+                  subtitle: Text(context.t('settings.admin_panel_subtitle')),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.push(
                     context,
@@ -121,22 +122,22 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           _sectionCard(
-            title: 'Оформление',
+            title: context.t('settings.appearance_section_title'),
             children: [
               RadioListTile<ThemeMode>(
-                title: const Text('Системная'),
+                title: Text(context.t('settings.theme_system')),
                 value: ThemeMode.system,
                 groupValue: themeProvider.themeMode,
                 onChanged: (v) => themeProvider.setThemeMode(v!),
               ),
               RadioListTile<ThemeMode>(
-                title: const Text('Светлая'),
+                title: Text(context.t('settings.theme_light')),
                 value: ThemeMode.light,
                 groupValue: themeProvider.themeMode,
                 onChanged: (v) => themeProvider.setThemeMode(v!),
               ),
               RadioListTile<ThemeMode>(
-                title: const Text('Тёмная'),
+                title: Text(context.t('settings.theme_dark')),
                 value: ThemeMode.dark,
                 groupValue: themeProvider.themeMode,
                 onChanged: (v) => themeProvider.setThemeMode(v!),
@@ -145,22 +146,22 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           _sectionCard(
-            title: 'Уведомления',
-            subtitle: 'Пуш-уведомления по-настоящему заработают после подключения сервиса рассылки — пока это твои личные настройки в приложении.',
+            title: context.t('settings.notifications_label'),
+            subtitle: context.t('settings.notifications_section_subtitle'),
             children: [
               SwitchListTile(
-                title: const Text('Уведомления'),
+                title: Text(context.t('settings.notifications_label')),
                 value: settings.notificationsEnabled,
                 onChanged: settings.setNotificationsEnabled,
               ),
               SwitchListTile(
-                title: const Text('Напоминания о сходках'),
+                title: Text(context.t('settings.event_reminders')),
                 value: settings.eventReminders,
                 onChanged: settings.notificationsEnabled ? settings.setEventReminders : null,
               ),
               SwitchListTile(
-                title: const Text('Звуковые эффекты'),
-                subtitle: const Text('Звук лайков, загрузок, новых уровней и достижений'),
+                title: Text(context.t('settings.sound_effects')),
+                subtitle: Text(context.t('settings.sound_effects_subtitle')),
                 value: settings.soundEffectsEnabled,
                 onChanged: settings.setSoundEffectsEnabled,
               ),
@@ -168,17 +169,17 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           _sectionCard(
-            title: 'Язык и регион',
-            subtitle: 'Полный перевод интерфейса на выбранный язык добавим отдельным обновлением.',
+            title: context.t('settings.language_region_section_title'),
+            subtitle: context.t('settings.language_section_subtitle'),
             children: [
               ListTile(
                 leading: const Icon(Icons.language),
-                title: const Text('Язык интерфейса'),
+                title: Text(context.t('settings.interface_language')),
                 subtitle: Text(settings.languageName),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showPicker(
                   context,
-                  title: 'Язык интерфейса',
+                  title: context.t('settings.interface_language'),
                   children: kSupportedLanguages.entries
                       .map(
                         (e) => RadioListTile<String>(
@@ -196,12 +197,12 @@ class SettingsScreen extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.public),
-                title: const Text('Страна использования'),
+                title: Text(context.t('settings.country_used')),
                 subtitle: Text(settings.country),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => _showPicker(
                   context,
-                  title: 'Страна использования',
+                  title: context.t('settings.country_used'),
                   children: kSupportedCountries
                       .map(
                         (c) => RadioListTile<String>(

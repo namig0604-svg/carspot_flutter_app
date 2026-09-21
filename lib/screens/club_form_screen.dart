@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Форма клуба: создание нового (club == null) или редактирование (owner/admin).
 class ClubFormScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _ClubFormScreenState extends State<ClubFormScreen> {
 
   Future<void> _submit() async {
     if (_nameController.text.trim().length < 3) {
-      setState(() => _errorMessage = 'Название клуба — минимум 3 символа');
+      setState(() => _errorMessage = context.t('club_form.name_min_length_error'));
       return;
     }
 
@@ -97,11 +98,11 @@ class _ClubFormScreenState extends State<ClubFormScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_isEditing ? 'Клуб обновлён' : 'Клуб создан 🏁')),
+          SnackBar(content: Text(_isEditing ? context.t('club_form.club_updated_snackbar') : context.t('club_form.club_created_snackbar'))),
         );
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Ошибка: $e');
+      setState(() => _errorMessage = context.tArgs('club_form.generic_error', {'error': '$e'}));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -129,24 +130,24 @@ class _ClubFormScreenState extends State<ClubFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Изменить клуб' : 'Создать клуб')),
+      appBar: AppBar(title: Text(_isEditing ? context.t('club_form.edit_title') : context.t('club_form.create_title'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _field(_nameController, 'Название клуба', required: true),
-            _field(_descriptionController, 'Описание', maxLines: 3),
-            _field(_countryController, 'Страна'),
-            _field(_cityController, 'Город'),
-            _field(_tagsController, 'Тематика через запятую (JDM, Drift, Stance)'),
-            _field(_logoUrlController, 'Ссылка на логотип (URL)'),
-            _field(_coverUrlController, 'Ссылка на обложку (URL)'),
+            _field(_nameController, context.t('club_form.field_name'), required: true),
+            _field(_descriptionController, context.t('club_form.field_description'), maxLines: 3),
+            _field(_countryController, context.t('club_form.field_country')),
+            _field(_cityController, context.t('club_form.field_city')),
+            _field(_tagsController, context.t('club_form.field_tags')),
+            _field(_logoUrlController, context.t('club_form.field_logo_url')),
+            _field(_coverUrlController, context.t('club_form.field_cover_url')),
 
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Открытый клуб'),
-              subtitle: const Text('Вступление сразу, без одобрения'),
+              title: Text(context.t('club_form.public_club_title')),
+              subtitle: Text(context.t('club_form.public_club_subtitle')),
               value: _isPublic,
               onChanged: (v) => setState(() => _isPublic = v),
             ),
@@ -176,7 +177,7 @@ class _ClubFormScreenState extends State<ClubFormScreen> {
                 child: _isLoading
                     ? AppLoader(size: 22, color: Colors.white)
                     : Text(
-                        _isEditing ? 'Сохранить' : 'Создать клуб',
+                        _isEditing ? context.t('common.save') : context.t('club_form.create_title'),
                         style: const TextStyle(color: Colors.white, fontSize: 16),
                       ),
               ),

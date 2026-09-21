@@ -6,6 +6,7 @@ import '../widgets/report_dialog.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Простая админ-панель: рассмотрение жалоб и блокировка пользователей.
 /// Пункт меню, ведущий сюда, показывается только если is_admin == true —
@@ -53,7 +54,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
       final response = await ApiService.get('/api/admin/reports$query', token: _token);
       setState(() => _reports = response is Map ? (response['items'] as List? ?? []) : []);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('admin_panel.error_with_details', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoadingReports = false);
     }
@@ -70,7 +71,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
       final response = await ApiService.get('/api/admin/users$query', token: _token);
       setState(() => _users = response is List ? response : []);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('admin_panel.error_with_details', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoadingUsers = false);
     }
@@ -85,7 +86,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
       );
       _loadReports();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('admin_panel.error_with_details', {'error': '$e'}))));
     }
   }
 
@@ -94,18 +95,18 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Заблокировать пользователя?'),
+        title: Text(context.t('admin_panel.ban_user_confirm_title')),
         content: TextField(
           controller: reasonController,
-          decoration: const InputDecoration(labelText: 'Причина (необязательно)'),
+          decoration: InputDecoration(labelText: context.t('admin_panel.ban_reason_label')),
           maxLines: 2,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.red),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Заблокировать'),
+            child: Text(context.t('admin_panel.ban_action')),
           ),
         ],
       ),
@@ -121,10 +122,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
       _loadUsers();
       _loadReports();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Пользователь заблокирован')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('admin_panel.user_banned'))));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('admin_panel.error_with_details', {'error': '$e'}))));
     }
   }
 
@@ -133,10 +134,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
       await ApiService.post('/api/admin/users/$userId/unban', {}, token: _token);
       _loadUsers();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Пользователь разблокирован')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('admin_panel.user_unbanned'))));
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('admin_panel.error_with_details', {'error': '$e'}))));
     }
   }
 
@@ -154,28 +155,28 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
   String _statusLabel(String status) {
     switch (status) {
       case 'resolved':
-        return 'Решено';
+        return context.t('admin_panel.status_resolved');
       case 'dismissed':
-        return 'Отклонено';
+        return context.t('admin_panel.status_dismissed');
       default:
-        return 'Ожидает';
+        return context.t('admin_panel.status_pending');
     }
   }
 
   String _targetTypeLabel(String type) {
     switch (type) {
       case 'user':
-        return 'Пользователь';
+        return context.t('admin_panel.target_user');
       case 'event':
-        return 'Сходка';
+        return context.t('admin_panel.target_event');
       case 'club':
-        return 'Клуб';
+        return context.t('admin_panel.target_club');
       case 'business':
-        return 'Автосервис';
+        return context.t('admin_panel.target_business');
       case 'message':
-        return 'Сообщение в чате';
+        return context.t('admin_panel.target_message');
       case 'photo':
-        return 'Фото';
+        return context.t('admin_panel.target_photo');
       default:
         return type;
     }
@@ -221,7 +222,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
             ],
             const SizedBox(height: 8),
             if (reporter != null)
-              Text('От: @${reporter['username']}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              Text(context.tArgs('admin_panel.report_from', {'username': '${reporter['username']}'}), style: const TextStyle(fontSize: 12, color: Colors.grey)),
             if (targetUser != null)
               GestureDetector(
                 onTap: () => Navigator.push(
@@ -229,7 +230,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
                   MaterialPageRoute(builder: (_) => UserProfileScreen(userId: targetUser['id'])),
                 ),
                 child: Text(
-                  'На пользователя: @${targetUser['username']}',
+                  context.tArgs('admin_panel.report_target_user', {'username': '${targetUser['username']}'}),
                   style: const TextStyle(fontSize: 12, color: AppColors.blue),
                 ),
               ),
@@ -238,13 +239,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
               Wrap(
                 spacing: 8,
                 children: [
-                  OutlinedButton(onPressed: () => _resolveReport(report, 'dismissed'), child: const Text('Отклонить')),
-                  ElevatedButton(onPressed: () => _resolveReport(report, 'resolved'), child: const Text('Решено')),
+                  OutlinedButton(onPressed: () => _resolveReport(report, 'dismissed'), child: Text(context.t('admin_panel.dismiss'))),
+                  ElevatedButton(onPressed: () => _resolveReport(report, 'resolved'), child: Text(context.t('admin_panel.status_resolved'))),
                   if (targetUser != null)
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(foregroundColor: AppColors.red),
                       onPressed: () => _banUser(targetUser['id']),
-                      child: const Text('Заблокировать'),
+                      child: Text(context.t('admin_panel.ban_action')),
                     ),
                 ],
               ),
@@ -274,7 +275,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
           [
             user['email']?.toString() ?? '',
             if (isBanned)
-              'Заблокирован${(user['ban_reason'] ?? '').toString().isNotEmpty ? ': ${user['ban_reason']}' : ''}',
+              '${context.t('admin_panel.banned_label')}${(user['ban_reason'] ?? '').toString().isNotEmpty ? ': ${user['ban_reason']}' : ''}',
           ].where((s) => s.isNotEmpty).join(' • '),
           style: TextStyle(color: isBanned ? AppColors.red : Colors.grey, fontSize: 12),
         ),
@@ -287,7 +288,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
             : TextButton(
                 onPressed: () => isBanned ? _unbanUser(user['id']) : _banUser(user['id']),
                 child: Text(
-                  isBanned ? 'Разблок.' : 'Блок.',
+                  isBanned ? context.t('admin_panel.unban_short') : context.t('admin_panel.ban_short'),
                   style: TextStyle(color: isBanned ? Colors.green : AppColors.red),
                 ),
               ),
@@ -299,12 +300,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Админ-панель'),
+        title: Text(context.t('admin_panel.title')),
         backgroundColor: AppColors.black,
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [Tab(text: 'Жалобы'), Tab(text: 'Пользователи')],
+          tabs: [Tab(text: context.t('admin_panel.tab_reports')), Tab(text: context.t('admin_panel.tab_users'))],
         ),
       ),
       body: TabBarView(
@@ -316,11 +317,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
                 padding: const EdgeInsets.all(12),
                 child: DropdownButton<String>(
                   value: _statusFilter,
-                  items: const [
-                    DropdownMenuItem(value: 'pending', child: Text('Ожидают')),
-                    DropdownMenuItem(value: 'resolved', child: Text('Решённые')),
-                    DropdownMenuItem(value: 'dismissed', child: Text('Отклонённые')),
-                    DropdownMenuItem(value: 'all', child: Text('Все')),
+                  items: [
+                    DropdownMenuItem(value: 'pending', child: Text(context.t('admin_panel.filter_pending'))),
+                    DropdownMenuItem(value: 'resolved', child: Text(context.t('admin_panel.filter_resolved'))),
+                    DropdownMenuItem(value: 'dismissed', child: Text(context.t('admin_panel.filter_dismissed'))),
+                    DropdownMenuItem(value: 'all', child: Text(context.t('admin_panel.filter_all'))),
                   ],
                   onChanged: (v) {
                     setState(() => _statusFilter = v!);
@@ -337,9 +338,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
                         onRefresh: _loadReports,
                         child: _reports.isEmpty
                             ? ListView(
-                                children: const [
-                                  SizedBox(height: 100),
-                                  Center(child: Text('Жалоб нет', style: TextStyle(color: Colors.grey))),
+                                children: [
+                                  const SizedBox(height: 100),
+                                  Center(child: Text(context.t('admin_panel.no_reports'), style: const TextStyle(color: Colors.grey))),
                                 ],
                               )
                             : ListView.builder(
@@ -360,11 +361,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
                     Expanded(
                       child: TextField(
                         controller: _searchController,
-                        decoration: const InputDecoration(
-                          hintText: 'Поиск по логину/email',
-                          prefixIcon: Icon(Icons.search),
+                        decoration: InputDecoration(
+                          hintText: context.t('admin_panel.search_hint'),
+                          prefixIcon: const Icon(Icons.search),
                           isDense: true,
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                         onSubmitted: (_) => _loadUsers(),
                       ),
@@ -374,7 +375,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
                 ),
               ),
               SwitchListTile(
-                title: const Text('Только заблокированные'),
+                title: Text(context.t('admin_panel.banned_only')),
                 value: _bannedOnly,
                 onChanged: (v) {
                   setState(() => _bannedOnly = v);
@@ -390,9 +391,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
                         onRefresh: _loadUsers,
                         child: _users.isEmpty
                             ? ListView(
-                                children: const [
-                                  SizedBox(height: 100),
-                                  Center(child: Text('Никого не найдено', style: TextStyle(color: Colors.grey))),
+                                children: [
+                                  const SizedBox(height: 100),
+                                  Center(child: Text(context.t('admin_panel.no_users_found'), style: const TextStyle(color: Colors.grey))),
                                 ],
                               )
                             : ListView.builder(

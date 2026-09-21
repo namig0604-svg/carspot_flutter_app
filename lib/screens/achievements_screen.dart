@@ -3,6 +3,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../utils/gamification.dart';
 import '../widgets/section_background.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Полный экран достижений — вынесен из профиля, чтобы не растягивать его
 /// длинной простынёй из 28 плиток. Для незалоченных достижений показывает
@@ -31,7 +32,7 @@ class AchievementsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Достижения'),
+        title: Text(context.t('achievements.title')),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
@@ -66,7 +67,7 @@ class AchievementsScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Открыто $unlockedCount из ${achievements.length}',
+                                context.tArgs('achievements.unlocked_count', {'unlocked': '$unlockedCount', 'total': '${achievements.length}'}),
                                 style: const TextStyle(
                                   color: AppColors.textOnDark,
                                   fontWeight: FontWeight.bold,
@@ -75,7 +76,7 @@ class AchievementsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Уровень $level · $levelTitle',
+                                context.tArgs('achievements.level_title', {'level': '$level', 'title': levelTitle}),
                                 style: const TextStyle(color: Colors.grey, fontSize: 12),
                               ),
                             ],

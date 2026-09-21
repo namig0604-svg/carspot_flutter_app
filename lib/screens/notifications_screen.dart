@@ -9,6 +9,7 @@ import '../widgets/section_background.dart';
 import 'club_detail_screen.dart';
 import 'event_details_screen.dart';
 import 'user_profile_screen.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Лента уведомлений: заявки в друзья, лайки профиля, кто присоединился
 /// к сходке, комментарии — всё в одном месте.
@@ -38,7 +39,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       setState(() => _items = items);
       await ApiService.post('/api/notifications/read-all', {}, token: authProvider.accessToken);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('notifications.error_message', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -81,10 +82,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       final dt = DateTime.parse(iso).toLocal();
       final now = DateTime.now();
       final diff = now.difference(dt);
-      if (diff.inMinutes < 1) return 'сейчас';
-      if (diff.inMinutes < 60) return '${diff.inMinutes} мин';
-      if (diff.inHours < 24) return '${diff.inHours} ч';
-      return '${diff.inDays} дн';
+      if (diff.inMinutes < 1) return context.t('notifications.time_now');
+      if (diff.inMinutes < 60) return context.tArgs('notifications.time_minutes', {'count': '${diff.inMinutes}'});
+      if (diff.inHours < 24) return context.tArgs('notifications.time_hours', {'count': '${diff.inHours}'});
+      return context.tArgs('notifications.time_days', {'count': '${diff.inDays}'});
     } catch (_) {
       return '';
     }
@@ -109,7 +110,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Уведомления'),
+        title: Text(context.t('notifications.title')),
         backgroundColor: AppColors.black,
         elevation: 0,
       ),
@@ -131,8 +132,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                               const Icon(Icons.notifications_none, size: 64, color: Colors.grey),
                               const SizedBox(height: 16),
-                              const Center(
-                                child: Text('Уведомлений пока нет', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                              Center(
+                                child: Text(context.t('notifications.empty'), style: const TextStyle(fontSize: 18, color: Colors.grey)),
                               ),
                             ],
                           )
