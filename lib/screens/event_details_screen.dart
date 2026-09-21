@@ -67,6 +67,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         '/api/events/${widget.event['id']}',
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       setState(() {
         _event = response;
         _isJoined = response['is_joined'] ?? false;
@@ -74,7 +75,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     } catch (e) {
       print('Ошибка: $e');
     } finally {
-      setState(() => _isLoadingDetail = false);
+      if (mounted) setState(() => _isLoadingDetail = false);
     }
   }
 
@@ -100,6 +101,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         '/api/events/${widget.event['id']}/participants',
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       setState(() {
         _participants = response is List ? response : [];
       });
@@ -115,6 +117,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         '/api/ratings/events/${widget.event['id']}',
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       setState(() {
         _ratings = response is List ? response : [];
       });
@@ -159,13 +162,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         {},
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       setState(() => _event = response);
       SoundPlayer.play(context, AppSound.success);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Сходка поднята в топ ленты на 24 часа 🚀')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     }
   }
 
@@ -178,14 +182,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         {},
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ты присоединился! 🎉')),
       );
       _loadData();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -198,14 +203,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         {},
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ты покинул сходку')),
       );
       _loadData();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -268,6 +274,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         token: authProvider.accessToken,
       );
 
+      if (!mounted) return;
       setState(() {
         _showRatingForm = false;
         _myRating = 0;
@@ -279,9 +286,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       );
       _loadRatings();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

@@ -62,12 +62,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         '/api/chats/${widget.roomId}/messages?limit=100',
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       final items = response['items'] ?? [];
       final grew = items.length != _messages.length;
       setState(() => _messages = items);
       if (grew) _scrollToBottom();
     } catch (e) {
-      if (!silent) {
+      if (!silent && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
       }
     } finally {

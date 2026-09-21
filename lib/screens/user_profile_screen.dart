@@ -79,11 +79,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final result = await ApiService.post('/api/users/${widget.userId}/like', {}, token: authProvider.accessToken);
+      if (!mounted) return;
       setState(() {
         _user!['is_liked'] = result['liked'];
         _user!['likes_count'] = result['likes_count'];
       });
-      if (mounted) SoundPlayer.play(context, AppSound.click);
+      SoundPlayer.play(context, AppSound.click);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
     }
@@ -105,7 +106,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
     }
   }
 
@@ -118,11 +119,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         {},
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       setState(() {
         _friendStatus = (result['status'] as String?) ?? 'pending_sent';
         _friendshipId = result['friendship_id'] as String?;
       });
-      if (mounted) SoundPlayer.play(context, AppSound.click);
+      SoundPlayer.play(context, AppSound.click);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
     } finally {
@@ -140,10 +142,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         {},
         token: authProvider.accessToken,
       );
+      if (!mounted) return;
       setState(() {
         _friendStatus = (result['status'] as String?) ?? 'friends';
       });
-      if (mounted) SoundPlayer.play(context, AppSound.click);
+      SoundPlayer.play(context, AppSound.click);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
     } finally {

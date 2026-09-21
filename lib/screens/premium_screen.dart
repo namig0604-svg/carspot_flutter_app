@@ -30,6 +30,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
   String? _activePaymentId;
   Timer? _paymentPollTimer;
   int _pollAttempts = 0;
+  bool _isCheckingOut = false;
 
   @override
   void initState() {
@@ -93,9 +94,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
   }
 
   Future<void> _startCheckout(String planId) async {
+    if (_isCheckingOut) return; // защита от двойного тапа — не открываем два счёта на оплату
+    setState(() => _isCheckingOut = true);
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final result = await ApiService.post('/api/payments/checkout', {'plan': planId}, token: authProvider.accessToken);
+      if (!mounted) return;
       final payUrl = result['pay_url'] as String?;
       final paymentId = result['payment_id'] as String?;
       if (payUrl == null || paymentId == null) {
@@ -103,12 +107,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
       }
 
       final opened = await launchUrl(Uri.parse(payUrl), mode: LaunchMode.externalApplication);
+      if (!mounted) return;
       if (!opened) throw Exception('Не удалось открыть страницу оплаты');
 
       setState(() => _activePaymentId = paymentId);
       _startPolling(paymentId);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+    } finally {
+      if (mounted) setState(() => _isCheckingOut = false);
     }
   }
 
@@ -401,7 +408,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: () => _startCheckout(plan['id'] as String),
+                      onPressed: _isCheckingOut ? null : () => _startCheckout(plan['id'] as String),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: BorderSide(color: Colors.amber.shade700),

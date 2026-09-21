@@ -74,7 +74,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       PushService.instance.registerWithBackend(_accessToken!);
     } catch (e) {
-      _errorMessage = 'Неверный логин или пароль';
+      _errorMessage = e.toString();
       _isLoading = false;
       notifyListeners();
       rethrow;

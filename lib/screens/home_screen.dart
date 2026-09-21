@@ -502,7 +502,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         margin: const EdgeInsets.all(10),
                         child: ListTile(
                           leading: CircleAvatar(
-                            child: Text(event['event_type'][0].toUpperCase()),
+                            child: Text(
+                              ((event['event_type'] as String?) ?? '').isNotEmpty
+                                  ? (event['event_type'] as String)[0].toUpperCase()
+                                  : '?',
+                            ),
                           ),
                           title: Row(
                             children: [
