@@ -180,7 +180,6 @@ class _CarFormScreenState extends State<CarFormScreen> {
   }
 
   Future<void> _pickBrand() async {
-    debugPrint('CarForm._pickBrand: tap received'); // диагностика — увидите в консоли flutter run, даже если дальше что-то упадёт
     try {
       final brands = kCarModelsByBrand.keys.toList()..sort();
       brands.add(kOtherBrandLabel);
@@ -212,7 +211,6 @@ class _CarFormScreenState extends State<CarFormScreen> {
   }
 
   Future<void> _pickModel() async {
-    debugPrint('CarForm._pickModel: tap received'); // диагностика — увидите в консоли flutter run, даже если дальше что-то упадёт
     try {
       final brand = _makeController.text.trim();
       if (brand.isEmpty) {
