@@ -13,6 +13,7 @@ import '../widgets/animated_counter.dart';
 import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Публичный профиль пользователя (не свой): машины, клубы, статистика.
 class UserProfileScreen extends StatefulWidget {
@@ -315,7 +316,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           borderRadius: BorderRadius.circular(8),
           child: (photoUrl != null && photoUrl.isNotEmpty)
               ? Image.network(
-                  photoUrl,
+                  resolveImageUrl(photoUrl),
                   width: 48,
                   height: 48,
                   fit: BoxFit.cover,
@@ -463,7 +464,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     radius: 45,
                                     backgroundImage: (_user!['avatar_url'] != null &&
                                             (_user!['avatar_url'] as String).isNotEmpty)
-                                        ? NetworkImage(_user!['avatar_url'])
+                                        ? NetworkImage(resolveImageUrl(_user!['avatar_url']))
                                         : null,
                                     child: (_user!['avatar_url'] == null ||
                                             (_user!['avatar_url'] as String).isEmpty)
@@ -522,7 +523,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         radius: 10,
                                         backgroundColor: AppColors.blue.withOpacity(0.15),
                                         backgroundImage: ((_clubs.first['logo_url'] as String?) ?? '').isNotEmpty
-                                            ? NetworkImage(_clubs.first['logo_url'])
+                                            ? NetworkImage(resolveImageUrl(_clubs.first['logo_url']))
                                             : null,
                                         child: ((_clubs.first['logo_url'] as String?) ?? '').isEmpty
                                             ? const Icon(Icons.groups, size: 12, color: AppColors.blue)

@@ -6,6 +6,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../screens/user_profile_screen.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Универсальный блок комментариев — используется и на странице сходки,
 /// и в просмотрщике фото. Нужен ограниченный по высоте родитель
@@ -193,7 +194,7 @@ class _CommentsSectionState extends State<CommentsSection> {
                                     child: CircleAvatar(
                                       radius: 16,
                                       backgroundColor: AppColors.blue,
-                                      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                                      backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
                                       child: avatarUrl.isEmpty
                                           ? Text(
                                               username.isNotEmpty ? username.substring(0, 1).toUpperCase() : '?',

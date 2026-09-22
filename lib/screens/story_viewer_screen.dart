@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Полноэкранный просмотр историй — как в Instagram: свайп по горизонтали
 /// между людьми (PageView), тап слева/справа внутри — назад/вперёд по
@@ -288,7 +289,7 @@ class _UserStoriesPageState extends State<_UserStoriesPage> with SingleTickerPro
                           radius: 16,
                           backgroundColor: Colors.white24,
                           backgroundImage: (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty)
-                              ? NetworkImage(widget.avatarUrl!)
+                              ? NetworkImage(resolveImageUrl(widget.avatarUrl!))
                               : null,
                           child: (widget.avatarUrl == null || widget.avatarUrl!.isEmpty)
                               ? Text(

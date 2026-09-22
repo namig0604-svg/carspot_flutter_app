@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'user_profile_screen.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Общий список людей — используется для "кто лайкнул" и "кто смотрел профиль" (Premium).
 /// Каждый элемент people — карта пользователя, опционально с ключом 'subtitle_override'
@@ -33,7 +34,7 @@ class PeopleListScreen extends StatelessWidget {
                 final subtitle = person['subtitle_override'] as String? ?? '@${person['username'] ?? ''}';
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(avatarUrl) : null,
+                    backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
                     child: (avatarUrl == null || avatarUrl.isEmpty)
                         ? Text(((person['full_name'] ?? person['username'] ?? 'U') as String).substring(0, 1).toUpperCase())
                         : null,

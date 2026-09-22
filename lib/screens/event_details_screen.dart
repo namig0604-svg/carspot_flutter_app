@@ -19,6 +19,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/comments_section.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> event;
@@ -550,7 +551,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         children: [
                           CircleAvatar(
                             backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
-                                ? NetworkImage(avatarUrl)
+                                ? NetworkImage(resolveImageUrl(avatarUrl))
                                 : null,
                             child: (avatarUrl == null || avatarUrl.isEmpty)
                                 ? Text(username.isNotEmpty ? username[0].toUpperCase() : 'U')

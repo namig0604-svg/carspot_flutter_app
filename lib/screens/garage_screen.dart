@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 class GarageScreen extends StatefulWidget {
   const GarageScreen({Key? key}) : super(key: key);
@@ -161,7 +162,7 @@ class _GarageScreenState extends State<GarageScreen> {
                 borderRadius: BorderRadius.circular(10),
                 child: (photoUrl != null && photoUrl.isNotEmpty)
                     ? Image.network(
-                        photoUrl,
+                        resolveImageUrl(photoUrl),
                         width: 64,
                         height: 64,
                         fit: BoxFit.cover,

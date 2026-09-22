@@ -8,6 +8,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import 'user_profile_screen.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Друзья: список друзей + входящие/исходящие заявки в друзья.
 class FriendsListScreen extends StatefulWidget {
@@ -101,7 +102,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
     final username = (user['username'] as String?) ?? '?';
     return CircleAvatar(
       backgroundColor: AppColors.blue.withOpacity(0.15),
-      backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(avatarUrl) : null,
+      backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
       child: (avatarUrl == null || avatarUrl.isEmpty)
           ? Text(username.isNotEmpty ? username[0].toUpperCase() : '?')
           : null,

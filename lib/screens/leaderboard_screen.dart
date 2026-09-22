@@ -10,6 +10,7 @@ import '../widgets/section_background.dart';
 import 'club_detail_screen.dart';
 import 'user_profile_screen.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Таблица лидеров: два таба — рейтинг пользователей по опыту (XP, считается
 /// на клиенте, как и раньше) и рейтинг клубов по активности (считается на
@@ -172,7 +173,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                               CircleAvatar(
                                 backgroundColor: AppColors.blue.withOpacity(0.15),
                                 backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
-                                    ? NetworkImage(avatarUrl)
+                                    ? NetworkImage(resolveImageUrl(avatarUrl))
                                     : null,
                                 child: (avatarUrl == null || avatarUrl.isEmpty)
                                     ? Text(username.isNotEmpty ? username[0].toUpperCase() : '?')
@@ -268,7 +269,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                               CircleAvatar(
                                 backgroundColor: AppColors.red.withOpacity(0.15),
                                 backgroundImage: (logoUrl != null && logoUrl.isNotEmpty)
-                                    ? NetworkImage(logoUrl)
+                                    ? NetworkImage(resolveImageUrl(logoUrl))
                                     : null,
                                 child: (logoUrl == null || logoUrl.isEmpty)
                                     ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?')

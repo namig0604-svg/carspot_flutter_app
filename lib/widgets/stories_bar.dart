@@ -6,6 +6,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../screens/story_viewer_screen.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Лента историй сверху главного экрана: своя история/кнопка добавить + кольца
 /// друзей (градиент — есть непросмотренные, серая рамка — уже всё видел).
@@ -136,7 +137,7 @@ class _StoriesBarState extends State<StoriesBar> {
                     decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                     child: CircleAvatar(
                       backgroundColor: AppColors.blue.withOpacity(0.15),
-                      backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(avatarUrl) : null,
+                      backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
                       child: (avatarUrl == null || avatarUrl.isEmpty)
                           ? Text(username.isNotEmpty ? username[0].toUpperCase() : '?')
                           : null,
@@ -189,7 +190,7 @@ class _StoriesBarState extends State<StoriesBar> {
                         ),
                         child: CircleAvatar(
                           backgroundColor: AppColors.blue.withOpacity(0.15),
-                          backgroundImage: (myAvatar != null && myAvatar.isNotEmpty) ? NetworkImage(myAvatar) : null,
+                          backgroundImage: (myAvatar != null && myAvatar.isNotEmpty) ? NetworkImage(resolveImageUrl(myAvatar)) : null,
                           child: (myAvatar == null || myAvatar.isEmpty)
                               ? Text(myUsername.isNotEmpty ? myUsername[0].toUpperCase() : '?')
                               : null,

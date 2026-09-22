@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Карточка машины: полные характеристики, лайк (для чужой машины),
 /// быстрый доступ к фото-галерее и — для владельца — редактирование/удаление.
@@ -191,7 +192,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: (car['photo_url'] != null && (car['photo_url'] as String).isNotEmpty)
-                            ? Image.network(car['photo_url'], height: 200, width: double.infinity, fit: BoxFit.cover)
+                            ? Image.network(resolveImageUrl(car['photo_url']), height: 200, width: double.infinity, fit: BoxFit.cover)
                             : Container(
                                 height: 200,
                                 width: double.infinity,

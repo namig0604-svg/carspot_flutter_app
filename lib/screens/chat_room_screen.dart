@@ -9,6 +9,7 @@ import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Экран одного чата (личный / чат сходки / чат клуба).
 /// Обновляется по таймеру каждые несколько секунд — без WebSocket,
@@ -290,7 +291,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       },
                 child: CircleAvatar(
                   radius: 14,
-                  backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(avatarUrl) : null,
+                  backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
                   child: (avatarUrl == null || avatarUrl.isEmpty)
                       ? Text(username.isNotEmpty ? username[0].toUpperCase() : 'U', style: const TextStyle(fontSize: 12))
                       : null,

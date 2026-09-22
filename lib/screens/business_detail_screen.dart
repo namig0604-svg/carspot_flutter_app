@@ -16,6 +16,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/image_url_picker.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 class BusinessDetailScreen extends StatefulWidget {
   final String businessId;
@@ -282,14 +283,14 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
             if (coverUrl != null && coverUrl.isNotEmpty)
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(coverUrl, height: 160, width: double.infinity, fit: BoxFit.cover),
+                child: Image.network(resolveImageUrl(coverUrl), height: 160, width: double.infinity, fit: BoxFit.cover),
               ),
             const SizedBox(height: 12),
 
             Row(
               children: [
                 (logoUrl != null && logoUrl.isNotEmpty)
-                    ? CircleAvatar(radius: 28, backgroundImage: NetworkImage(logoUrl))
+                    ? CircleAvatar(radius: 28, backgroundImage: NetworkImage(resolveImageUrl(logoUrl)))
                     : CircleAvatar(
                         radius: 28,
                         backgroundColor: AppColors.blue.withOpacity(0.15),
@@ -481,7 +482,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.network(
-                                    review['photo_url'],
+                                    resolveImageUrl(review['photo_url']),
                                     height: 140,
                                     width: double.infinity,
                                     fit: BoxFit.cover,

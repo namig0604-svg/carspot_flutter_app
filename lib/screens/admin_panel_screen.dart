@@ -7,6 +7,7 @@ import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Простая админ-панель: рассмотрение жалоб и блокировка пользователей.
 /// Пункт меню, ведущий сюда, показывается только если is_admin == true —
@@ -264,7 +265,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
       child: ListTile(
         leading: CircleAvatar(
           backgroundImage: (user['avatar_url'] != null && (user['avatar_url'] as String).isNotEmpty)
-              ? NetworkImage(user['avatar_url'])
+              ? NetworkImage(resolveImageUrl(user['avatar_url']))
               : null,
           child: (user['avatar_url'] == null || (user['avatar_url'] as String).isEmpty)
               ? Text(username.isNotEmpty ? username[0].toUpperCase() : 'U')

@@ -38,6 +38,7 @@ import '../widgets/animated_bottom_nav.dart';
 import '../utils/sound_player.dart';
 import '../utils/event_category.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -592,7 +593,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
           borderRadius: BorderRadius.circular(8),
           child: (photoUrl != null && photoUrl.isNotEmpty)
               ? Image.network(
-                  photoUrl,
+                  resolveImageUrl(photoUrl),
                   width: 48,
                   height: 48,
                   fit: BoxFit.cover,
@@ -711,7 +712,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
           CircleAvatar(
             radius: 50,
             backgroundImage: (user['avatar_url'] != null && (user['avatar_url'] as String).isNotEmpty)
-                ? NetworkImage(user['avatar_url'])
+                ? NetworkImage(resolveImageUrl(user['avatar_url']))
                 : null,
             child: (user['avatar_url'] == null || (user['avatar_url'] as String).isEmpty)
                 ? Text(
@@ -751,7 +752,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                     radius: 10,
                     backgroundColor: AppColors.blue.withOpacity(0.15),
                     backgroundImage: ((_myClubs.first['logo_url'] as String?) ?? '').isNotEmpty
-                        ? NetworkImage(_myClubs.first['logo_url'])
+                        ? NetworkImage(resolveImageUrl(_myClubs.first['logo_url']))
                         : null,
                     child: ((_myClubs.first['logo_url'] as String?) ?? '').isEmpty
                         ? const Icon(Icons.groups, size: 12, color: AppColors.blue)

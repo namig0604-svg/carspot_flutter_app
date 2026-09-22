@@ -8,6 +8,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/comments_section.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Общая фото-галерея — для сходки (eventId) или машины (carId).
 /// Ровно один из двух должен быть задан.
@@ -170,7 +171,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
             Expanded(
               flex: 3,
               child: InteractiveViewer(
-                child: Center(child: Image.network(photo['photo_url'] ?? '', fit: BoxFit.contain)),
+                child: Center(child: Image.network(resolveImageUrl(photo['photo_url'] ?? ''), fit: BoxFit.contain)),
               ),
             ),
             Padding(
@@ -276,7 +277,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
-                                  photo['photo_url'] ?? '',
+                                  resolveImageUrl(photo['photo_url'] ?? ''),
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade200),
                                 ),

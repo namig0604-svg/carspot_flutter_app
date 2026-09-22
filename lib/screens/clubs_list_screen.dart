@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 class ClubsListScreen extends StatefulWidget {
   const ClubsListScreen({Key? key}) : super(key: key);
@@ -183,7 +184,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                                 margin: const EdgeInsets.only(bottom: 10),
                                 child: ListTile(
                                   leading: (logoUrl != null && logoUrl.isNotEmpty)
-                                      ? CircleAvatar(backgroundImage: NetworkImage(logoUrl))
+                                      ? CircleAvatar(backgroundImage: NetworkImage(resolveImageUrl(logoUrl)))
                                       : _logoPlaceholder(),
                                   title: Row(
                                     children: [

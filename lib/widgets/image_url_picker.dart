@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../services/api_service.dart';
+import '../utils/image_url.dart';
 import '../theme/app_colors.dart';
 
 /// Компактный виджет выбора фото вместо ручного ввода URL: показывает
@@ -121,7 +122,7 @@ class _ImageUrlPickerFieldState extends State<ImageUrlPickerField> {
       content = Image.memory(_localPreview!, fit: BoxFit.cover, width: widget.width, height: widget.height);
     } else if (url.isNotEmpty) {
       content = Image.network(
-        url,
+        resolveImageUrl(url),
         fit: BoxFit.cover,
         width: widget.width,
         height: widget.height,

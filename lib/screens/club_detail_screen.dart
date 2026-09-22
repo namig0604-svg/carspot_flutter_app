@@ -11,6 +11,7 @@ import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 class ClubDetailScreen extends StatefulWidget {
   final String clubId;
@@ -368,7 +369,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                     borderRadius: BorderRadius.circular(12),
                     child: (logoUrl != null && logoUrl.isNotEmpty)
                         ? Image.network(
-                            logoUrl,
+                            resolveImageUrl(logoUrl),
                             width: 64,
                             height: 64,
                             fit: BoxFit.cover,
@@ -535,7 +536,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
 
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(avatarUrl) : null,
+                            backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
                             child: (avatarUrl == null || avatarUrl.isEmpty)
                                 ? Text(username.isNotEmpty ? username[0].toUpperCase() : 'U')
                                 : null,

@@ -10,6 +10,7 @@ import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Единый экран "Избранное" — сохранённые сходки, клубы и автосервисы
 /// на трёх вкладках. Каждый тип избранного уже умеет тогглиться со своего
@@ -188,7 +189,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
             margin: const EdgeInsets.only(bottom: 10),
             child: ListTile(
               leading: (logoUrl != null && logoUrl.isNotEmpty)
-                  ? CircleAvatar(backgroundImage: NetworkImage(logoUrl))
+                  ? CircleAvatar(backgroundImage: NetworkImage(resolveImageUrl(logoUrl)))
                   : CircleAvatar(
                       backgroundColor: AppColors.blue.withOpacity(0.15),
                       child: const Icon(Icons.groups, color: AppColors.blue),
@@ -230,7 +231,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
             margin: const EdgeInsets.only(bottom: 10),
             child: ListTile(
               leading: (logoUrl != null && logoUrl.isNotEmpty)
-                  ? CircleAvatar(backgroundImage: NetworkImage(logoUrl))
+                  ? CircleAvatar(backgroundImage: NetworkImage(resolveImageUrl(logoUrl)))
                   : CircleAvatar(
                       backgroundColor: AppColors.red.withOpacity(0.15),
                       child: const Icon(Icons.car_repair, color: AppColors.red),

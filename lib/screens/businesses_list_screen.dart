@@ -15,6 +15,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../widgets/neon_chip.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 class BusinessesListScreen extends StatefulWidget {
   const BusinessesListScreen({Key? key}) : super(key: key);
@@ -264,7 +265,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                                 margin: const EdgeInsets.only(bottom: 10),
                                 child: ListTile(
                                   leading: (logoUrl != null && logoUrl.isNotEmpty)
-                                      ? CircleAvatar(backgroundImage: NetworkImage(logoUrl))
+                                      ? CircleAvatar(backgroundImage: NetworkImage(resolveImageUrl(logoUrl)))
                                       : _logoPlaceholder(business['category']),
                                   title: Row(
                                     children: [
