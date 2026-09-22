@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../widgets/whats_new_dialog.dart';
 
 /// Показывает анимированную заставку CarSpot при старте приложения, затем
 /// плавно (кросс-фейдом) переключается на переданный экран (логин/домашний).
@@ -20,7 +21,13 @@ class _SplashGateState extends State<SplashGate> {
   void initState() {
     super.initState();
     Timer(const Duration(milliseconds: 1400), () {
-      if (mounted) setState(() => _showSplash = false);
+      if (!mounted) return;
+      setState(() => _showSplash = false);
+      // Диалог "Что нового" показываем после первого кадра с реальным
+      // экраном (логин/домашний) — там уже точно есть Navigator/Overlay.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) checkAndShowWhatsNew(context);
+      });
     });
   }
 
