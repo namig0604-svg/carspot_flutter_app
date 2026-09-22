@@ -7,6 +7,7 @@ import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/country_city_picker.dart';
+import '../widgets/image_url_picker.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Форма заведения: добавление нового (business == null) или редактирование (владелец).
@@ -207,8 +208,38 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
 
             _field(_descriptionController, context.t('business_form.label_description'), maxLines: 3),
             _field(_servicesController, context.t('business_form.label_services')),
-            _field(_logoUrlController, context.t('business_form.label_logo_url')),
-            _field(_coverUrlController, context.t('business_form.label_cover_url')),
+            Text(context.t('business_form.label_logo_url'), style: const TextStyle(fontSize: 13, color: Colors.grey)),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: ImageUrlPickerField(
+                controller: _logoUrlController,
+                token: Provider.of<AuthProvider>(context, listen: false).accessToken,
+                circular: true,
+                width: 96,
+                height: 96,
+                placeholderIcon: Icons.storefront_outlined,
+                galleryLabel: context.t('business_form.pick_from_gallery'),
+                cameraLabel: context.t('business_form.pick_from_camera'),
+                errorTextBuilder: (e) => context.tArgs('business_form.logo_upload_error', {'error': '$e'}),
+                onChanged: () => setState(() {}),
+              ),
+            ),
+            Text(context.t('business_form.label_cover_url'), style: const TextStyle(fontSize: 13, color: Colors.grey)),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: ImageUrlPickerField(
+                controller: _coverUrlController,
+                token: Provider.of<AuthProvider>(context, listen: false).accessToken,
+                height: 160,
+                placeholderIcon: Icons.image_outlined,
+                galleryLabel: context.t('business_form.pick_from_gallery'),
+                cameraLabel: context.t('business_form.pick_from_camera'),
+                errorTextBuilder: (e) => context.tArgs('business_form.cover_upload_error', {'error': '$e'}),
+                onChanged: () => setState(() {}),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(bottom: 15),
               child: CountryPickerField(

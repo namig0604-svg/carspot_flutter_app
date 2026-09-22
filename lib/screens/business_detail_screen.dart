@@ -13,6 +13,7 @@ import 'premium_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/image_url_picker.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
 
@@ -34,6 +35,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   bool _showReviewForm = false;
   int _myStars = 0;
   final _reviewController = TextEditingController();
+  final _reviewPhotoUrlController = TextEditingController();
 
   String? get _myId => Provider.of<AuthProvider>(context, listen: false).user?['id'];
   bool get _isOwner => _business != null && _business!['owner_id'] != null && _business!['owner_id'] == _myId;
@@ -48,6 +50,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   @override
   void dispose() {
     _reviewController.dispose();
+    _reviewPhotoUrlController.dispose();
     super.dispose();
   }
 
@@ -119,10 +122,12 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
         {
           'rating': _myStars,
           'text': _reviewController.text.trim().isEmpty ? null : _reviewController.text.trim(),
+          'photo_url': _reviewPhotoUrlController.text.trim().isEmpty ? null : _reviewPhotoUrlController.text.trim(),
         },
         token: authProvider.accessToken,
       );
       _reviewController.clear();
+      _reviewPhotoUrlController.clear();
       setState(() => _showReviewForm = false);
       await _loadAll();
       if (mounted) {
@@ -471,6 +476,19 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                                 const SizedBox(height: 5),
                                 Text(review['text'], style: const TextStyle(fontSize: 12)),
                               ],
+                              if ((review['photo_url'] ?? '').toString().isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    review['photo_url'],
+                                    height: 140,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -521,6 +539,17 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                   hintText: context.t('business_detail.review_hint'),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
+              ),
+              const SizedBox(height: 10),
+              ImageUrlPickerField(
+                controller: _reviewPhotoUrlController,
+                token: Provider.of<AuthProvider>(context, listen: false).accessToken,
+                height: 120,
+                placeholderIcon: Icons.add_a_photo_outlined,
+                galleryLabel: context.t('business_detail.review_photo_pick_from_gallery'),
+                cameraLabel: context.t('business_detail.review_photo_pick_from_camera'),
+                errorTextBuilder: (e) => context.tArgs('business_detail.review_photo_upload_error', {'error': '$e'}),
+                onChanged: () => setState(() {}),
               ),
               const SizedBox(height: 15),
               SizedBox(
