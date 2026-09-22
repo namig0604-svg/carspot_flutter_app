@@ -226,7 +226,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title, overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         elevation: 0,
       ),

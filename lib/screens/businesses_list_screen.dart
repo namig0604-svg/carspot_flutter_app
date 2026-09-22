@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../utils/location_helper.dart';
+import 'package:geolocator/geolocator.dart';
 import '../utils/business_category.dart';
 import 'business_detail_screen.dart';
 import 'business_form_screen.dart';
@@ -48,10 +50,14 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
         final response = await ApiService.get('/api/businesses/my/favorites', token: authProvider.accessToken);
         setState(() => _businesses = response is List ? response : []);
       } else {
+        final Position? position = await determineCurrentPosition();
         final q = _searchController.text.trim();
         final params = StringBuffer('limit=100');
         if (q.isNotEmpty) params.write('&q=${Uri.encodeQueryComponent(q)}');
         if (_selectedCategory != null) params.write('&category=$_selectedCategory');
+        if (position != null) {
+          params.write('&latitude=${position.latitude}&longitude=${position.longitude}');
+        }
         final response = await ApiService.get('/api/businesses/?$params', token: authProvider.accessToken);
         setState(() => _businesses = response['items'] ?? []);
       }
@@ -82,7 +88,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('businesses_list.title')),
+        title: Text(context.t('businesses_list.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         elevation: 0,
         backgroundColor: AppColors.black,
         actions: [

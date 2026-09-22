@@ -301,13 +301,13 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
   Widget build(BuildContext context) {
     if (_isLoadingDetail && _club == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(context.t('club_detail.title')), backgroundColor: AppColors.black, elevation: 0),
+        appBar: AppBar(title: Text(context.t('club_detail.title'), overflow: TextOverflow.ellipsis, maxLines: 1), backgroundColor: AppColors.black, elevation: 0),
         body: Center(child: AppLoader()),
       );
     }
     if (_club == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(context.t('club_detail.title')), backgroundColor: AppColors.black, elevation: 0),
+        appBar: AppBar(title: Text(context.t('club_detail.title'), overflow: TextOverflow.ellipsis, maxLines: 1), backgroundColor: AppColors.black, elevation: 0),
         body: Center(child: Text(context.t('club_detail.not_found'))),
       );
     }
@@ -426,7 +426,10 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                   runSpacing: 6,
                   children: tags
                       .map((t) => Chip(
-                            label: Text(t, style: const TextStyle(fontSize: 12)),
+                            label: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 180),
+                              child: Text(t, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                            ),
                             backgroundColor: AppColors.blue.withOpacity(0.1),
                             visualDensity: VisualDensity.compact,
                           ))
@@ -505,7 +508,11 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
 
               Row(
                 children: [
-                  Text(context.t('club_detail.members'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Flexible(
+                    child: Text(context.t('club_detail.members'),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis),
+                  ),
                   const SizedBox(width: 8),
                   Text('(${_members.length})', style: const TextStyle(color: Colors.grey)),
                 ],

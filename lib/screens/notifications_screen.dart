@@ -110,7 +110,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('notifications.title')),
+        title: Text(context.t('notifications.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         elevation: 0,
       ),

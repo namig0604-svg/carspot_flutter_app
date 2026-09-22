@@ -7,6 +7,10 @@ import 'gen/batch6_tr.dart';
 import 'gen/batch7_tr.dart';
 import 'gen/batch8_tr.dart';
 import 'gen/batch9_tr.dart';
+import 'gen/feature_car_dropdowns_tr.dart';
+import 'gen/feature_country_city_tr.dart';
+import 'gen/feature_forgot_password_tr.dart';
+import 'gen/feature_photo_upload_tr.dart';
 
 /// Переводы интерфейса CarSpot.
 ///
@@ -60,6 +64,13 @@ const Map<String, Map<String, String>> kTranslations = {
   ...kBatch7Translations,
   ...kBatch8Translations,
   ...kBatch9Translations,
+
+  // ────────────── Новые экраны (восстановление пароля, гео-сортировка,
+  // выбор страны/города, марки/модели машины, загрузка фото из галереи) ──────────────
+  ...kFeatureForgotPasswordTranslations,
+  ...kFeatureCountryCityTranslations,
+  ...kFeatureCarDropdownsTranslations,
+  ...kFeaturePhotoUploadTranslations,
 };
 
 /// Возвращает перевод строки [key] на язык [lang]. Если перевода для этого

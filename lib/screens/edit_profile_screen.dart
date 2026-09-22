@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/image_url_picker.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Редактирование своего профиля: юзернейм, имя, фото, описание.
@@ -105,20 +106,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final avatarUrl = _avatarUrlController.text.trim();
-
     return Scaffold(
-      appBar: AppBar(title: Text(context.t('edit_profile.title'))),
+      appBar: AppBar(title: Text(context.t('edit_profile.title'), overflow: TextOverflow.ellipsis, maxLines: 1)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: CircleAvatar(
-                radius: 45,
-                backgroundImage: avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl.isEmpty ? const Icon(Icons.person, size: 40) : null,
+              child: ImageUrlPickerField(
+                controller: _avatarUrlController,
+                token: Provider.of<AuthProvider>(context, listen: false).accessToken,
+                circular: true,
+                width: 90,
+                height: 90,
+                placeholderIcon: Icons.person,
+                galleryLabel: context.t('edit_profile.pick_from_gallery'),
+                cameraLabel: context.t('edit_profile.pick_from_camera'),
+                errorTextBuilder: (e) => context.tArgs('edit_profile.avatar_upload_error', {'error': '$e'}),
+                onChanged: () => setState(() {}),
               ),
             ),
             const SizedBox(height: 20),
@@ -126,17 +132,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _field(_usernameController, context.t('edit_profile.field_username'), required: true, prefixText: '@'),
             _field(_fullNameController, context.t('edit_profile.field_full_name')),
             _field(_bioController, context.t('edit_profile.field_bio'), maxLines: 4),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 15),
-              child: TextField(
-                controller: _avatarUrlController,
-                onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(
-                  labelText: context.t('edit_profile.field_avatar_url'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-              ),
-            ),
 
             const SizedBox(height: 10),
 

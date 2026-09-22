@@ -162,7 +162,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('businesses_map.title')),
+        title: Text(context.t('businesses_map.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
@@ -178,7 +178,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: osmTileUrlTemplate,
+                urlTemplate: yandexTileUrlTemplate,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               MarkerLayer(markers: markers),

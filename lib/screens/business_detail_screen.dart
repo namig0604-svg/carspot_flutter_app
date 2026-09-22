@@ -243,7 +243,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(b['name'] ?? ''),
+        title: Text(b['name'] ?? '', overflow: TextOverflow.ellipsis, maxLines: 1),
         actions: [
           IconButton(
             icon: Icon(_isFavorite ? Icons.favorite : Icons.favorite_border, color: _isFavorite ? AppColors.red : null),
@@ -344,7 +344,12 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
-                children: services.map((s) => Chip(label: Text(s))).toList(),
+                children: services.map((s) => Chip(
+                      label: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 180),
+                        child: Text(s, overflow: TextOverflow.ellipsis),
+                      ),
+                    )).toList(),
               ),
               const SizedBox(height: 20),
             ],
@@ -389,7 +394,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                       initialZoom: defaultMapZoom,
                     ),
                     children: [
-                      TileLayer(urlTemplate: osmTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
+                      TileLayer(urlTemplate: yandexTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
                       MarkerLayer(
                         markers: [
                           Marker(

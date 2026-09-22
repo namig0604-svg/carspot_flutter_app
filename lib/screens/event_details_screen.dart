@@ -297,7 +297,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('event_details.title')),
+        title: Text(context.t('event_details.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         elevation: 0,
         backgroundColor: AppColors.black,
         actions: [
@@ -454,7 +454,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       initialZoom: defaultMapZoom,
                     ),
                     children: [
-                      TileLayer(urlTemplate: osmTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
+                      TileLayer(urlTemplate: yandexTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
                       MarkerLayer(
                         markers: [
                           Marker(
@@ -516,7 +516,11 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             // Участники
             Row(
               children: [
-                Text(context.t('event_details.participants'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Flexible(
+                  child: Text(context.t('event_details.participants'),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis),
+                ),
                 const SizedBox(width: 8),
                 Text('(${_participants.length})', style: const TextStyle(color: Colors.grey)),
               ],
@@ -624,7 +628,10 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(rating['username'] ?? context.t('event_details.unknown_user')),
+                                Expanded(
+                                  child: Text(rating['username'] ?? context.t('event_details.unknown_user'),
+                                    overflow: TextOverflow.ellipsis),
+                                ),
                                 Row(
                                   children: List.generate(5, (i) {
                                     return Icon(

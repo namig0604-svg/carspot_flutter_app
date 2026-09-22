@@ -84,7 +84,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('clubs_list.title')),
+        title: Text(context.t('clubs_list.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),

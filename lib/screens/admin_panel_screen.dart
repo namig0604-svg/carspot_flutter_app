@@ -300,7 +300,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('admin_panel.title')),
+        title: Text(context.t('admin_panel.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         elevation: 0,
         bottom: TabBar(

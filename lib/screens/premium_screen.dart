@@ -263,7 +263,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CarSpot Premium'),
+        title: const Text('CarSpot Premium', overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: Colors.amber.shade800,
         elevation: 0,
       ),
@@ -417,7 +417,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(plan['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          Flexible(
+                            child: Text(plan['title'] as String,
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis),
+                          ),
+                          const SizedBox(width: 8),
                           Text(
                             '\$${plan['amount_usd']}',
                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber.shade800),

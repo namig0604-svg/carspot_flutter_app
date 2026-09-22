@@ -20,7 +20,7 @@ class PeopleListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title), backgroundColor: Colors.amber.shade800),
+      appBar: AppBar(title: Text(title, overflow: TextOverflow.ellipsis, maxLines: 1), backgroundColor: Colors.amber.shade800),
       body: people.isEmpty
           ? Center(child: Text(emptyText ?? context.t('people_list.empty_default'), style: const TextStyle(color: Colors.grey)))
           : ListView.separated(

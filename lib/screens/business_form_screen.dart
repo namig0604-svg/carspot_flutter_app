@@ -6,6 +6,7 @@ import '../utils/business_category.dart';
 import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/country_city_picker.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Форма заведения: добавление нового (business == null) или редактирование (владелец).
@@ -181,7 +182,7 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? context.t('business_form.edit_business_title') : context.t('business_form.add_business'))),
+      appBar: AppBar(title: Text(_isEditing ? context.t('business_form.edit_business_title') : context.t('business_form.add_business'), overflow: TextOverflow.ellipsis, maxLines: 1)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -208,8 +209,22 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
             _field(_servicesController, context.t('business_form.label_services')),
             _field(_logoUrlController, context.t('business_form.label_logo_url')),
             _field(_coverUrlController, context.t('business_form.label_cover_url')),
-            _field(_countryController, context.t('business_form.label_country')),
-            _field(_cityController, context.t('business_form.label_city')),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: CountryPickerField(
+                controller: _countryController,
+                label: context.t('business_form.label_country'),
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: CityPickerField(
+                controller: _cityController,
+                label: context.t('business_form.label_city'),
+                country: _countryController.text.isEmpty ? null : _countryController.text,
+              ),
+            ),
             _field(_addressController, context.t('business_form.label_address')),
 
             OutlinedButton.icon(

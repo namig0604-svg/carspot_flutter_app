@@ -322,7 +322,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('leaderboard.title')),
+        title: Text(context.t('leaderboard.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         elevation: 0,
         bottom: TabBar(

@@ -239,7 +239,7 @@ class _GarageScreenState extends State<GarageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('garage.title')),
+        title: Text(context.t('garage.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),

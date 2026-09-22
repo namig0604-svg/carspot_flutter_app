@@ -165,7 +165,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
     final car = _car;
     return Scaffold(
       appBar: AppBar(
-        title: Text(car != null ? '${car['make'] ?? ''} ${car['model'] ?? ''}'.trim() : context.t('car_detail.title_fallback')),
+        title: Text(car != null ? '${car['make'] ?? ''} ${car['model'] ?? ''}'.trim() : context.t('car_detail.title_fallback'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         elevation: 0,
         actions: [

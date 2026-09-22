@@ -173,7 +173,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('events_map.title')),
+        title: Text(context.t('events_map.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
@@ -189,7 +189,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: osmTileUrlTemplate,
+                urlTemplate: yandexTileUrlTemplate,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               MarkerLayer(markers: markers),

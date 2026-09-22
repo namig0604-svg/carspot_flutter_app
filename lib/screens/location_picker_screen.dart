@@ -34,7 +34,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('location_picker.title')),
+        title: Text(context.t('location_picker.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
       ),
       body: Stack(
@@ -49,7 +49,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: osmTileUrlTemplate,
+                urlTemplate: yandexTileUrlTemplate,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               if (_picked != null)

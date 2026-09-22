@@ -32,7 +32,7 @@ class AchievementsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('achievements.title')),
+        title: Text(context.t('achievements.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         elevation: 0,
         backgroundColor: AppColors.black,
       ),

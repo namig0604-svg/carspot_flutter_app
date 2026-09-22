@@ -6,6 +6,8 @@ import '../utils/event_duration.dart';
 import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/country_city_picker.dart';
+import '../widgets/image_url_picker.dart';
 import '../l10n/l10n_extensions.dart';
 
 class CreateEventScreen extends StatefulWidget {
@@ -22,6 +24,7 @@ class CreateEventScreen extends StatefulWidget {
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
   final _titleController = TextEditingController();
+  final _coverUrlController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController();
   final _cityController = TextEditingController();
@@ -47,6 +50,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   void dispose() {
     _titleController.dispose();
+    _coverUrlController.dispose();
     _descriptionController.dispose();
     _locationController.dispose();
     _cityController.dispose();
@@ -100,11 +104,24 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.clubId != null ? context.t('create_event.title_club') : context.t('create_event.title'))),
+      appBar: AppBar(title: Text(widget.clubId != null ? context.t('create_event.title_club') : context.t('create_event.title'), overflow: TextOverflow.ellipsis, maxLines: 1)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: ImageUrlPickerField(
+                controller: _coverUrlController,
+                token: Provider.of<AuthProvider>(context, listen: false).accessToken,
+                height: 150,
+                placeholderIcon: Icons.image_outlined,
+                galleryLabel: context.t('create_event.pick_from_gallery'),
+                cameraLabel: context.t('create_event.pick_from_camera'),
+                errorTextBuilder: (e) => context.tArgs('create_event.cover_upload_error', {'error': '$e'}),
+                onChanged: () => setState(() {}),
+              ),
+            ),
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -139,21 +156,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             const SizedBox(height: 15),
 
-            TextField(
+            CountryPickerField(
               controller: _countryController,
-              decoration: InputDecoration(
-                labelText: context.t('create_event.country_label'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+              label: context.t('create_event.country_label'),
+              onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 15),
 
-            TextField(
+            CityPickerField(
               controller: _cityController,
-              decoration: InputDecoration(
-                labelText: context.t('create_event.city_label'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+              label: context.t('create_event.city_label'),
+              country: _countryController.text.isEmpty ? null : _countryController.text,
             ),
             const SizedBox(height: 15),
 
@@ -295,6 +308,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
       final body = {
         'title': _titleController.text,
+        'cover_url': _coverUrlController.text.trim().isEmpty ? null : _coverUrlController.text.trim(),
         'description': _descriptionController.text,
         'event_type': _selectedType,
         'country': _countryController.text,

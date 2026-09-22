@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../utils/location_helper.dart';
+import 'package:geolocator/geolocator.dart';
 import '../utils/gamification.dart';
 import 'create_event_screen.dart';
 import 'event_details_screen.dart';
@@ -241,8 +243,13 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _isLoading = true);
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final Position? position = await determineCurrentPosition();
+      var endpoint = '/api/events/?limit=100&sort=recommended';
+      if (position != null) {
+        endpoint += '&latitude=${position.latitude}&longitude=${position.longitude}';
+      }
       final response = await ApiService.get(
-        '/api/events/?limit=100',
+        endpoint,
         token: authProvider.accessToken,
       );
       setState(() {
@@ -262,8 +269,6 @@ class _HomeScreenState extends State<HomeScreen> {
       bool matchesType = _selectedType == 'all' || event['event_type'] == _selectedType;
       return matchesSearch && matchesType;
     }).toList();
-
-    _filteredEvents.sort((a, b) => b['average_rating'].compareTo(a['average_rating']));
   }
 
   Future<void> _toggleEventFavorite(Map event) async {
@@ -595,11 +600,13 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 )
               : _carPlaceholder(),
         ),
-        title: Text('${car['make'] ?? ''} ${car['model'] ?? ''}'.trim()),
+        title: Text('${car['make'] ?? ''} ${car['model'] ?? ''}'.trim(), overflow: TextOverflow.ellipsis, maxLines: 1),
         subtitle: Text(
           [car['year']?.toString(), car['color'], car['license_plate']]
               .where((v) => v != null && v.toString().isNotEmpty)
               .join(' · '),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         trailing: (car['is_primary'] ?? false) ? const Icon(Icons.star, color: Colors.orange, size: 18) : null,
         onTap: () => Navigator.push(
@@ -717,9 +724,12 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                user['full_name'] ?? context.t('home.unknown_user'),
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              Flexible(
+                child: Text(
+                  user['full_name'] ?? context.t('home.unknown_user'),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               if (user['is_verified'] == true) ...[
                 const SizedBox(width: 6),
@@ -1057,7 +1067,10 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                     : (role == 'admin' ? ' · ${context.t('home.role_admin')}' : '');
                 return Chip(
                   avatar: const Icon(Icons.groups, size: 16, color: AppColors.blue),
-                  label: Text('${c['name']}$roleLabel'),
+                  label: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 180),
+                    child: Text('${c['name']}$roleLabel', overflow: TextOverflow.ellipsis),
+                  ),
                   backgroundColor: AppColors.blue.withOpacity(0.08),
                 );
               }).toList(),

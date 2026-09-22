@@ -4,7 +4,9 @@ import '../providers/auth_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
+import '../widgets/country_city_picker.dart';
 import '../l10n/l10n_extensions.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -138,20 +140,16 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ),
                         ),
                         const SizedBox(height: 15),
-                        TextField(
+                        CountryPickerField(
                           controller: _countryController,
-                          decoration: InputDecoration(
-                            labelText: context.t('login.field_country'),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
+                          label: context.t('login.field_country'),
+                          onChanged: (_) => setState(() {}),
                         ),
                         const SizedBox(height: 15),
-                        TextField(
+                        CityPickerField(
                           controller: _cityController,
-                          decoration: InputDecoration(
-                            labelText: context.t('login.field_city'),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
+                          label: context.t('login.field_city'),
+                          country: _countryController.text.isEmpty ? null : _countryController.text,
                         ),
                         const SizedBox(height: 15),
                         TextField(
@@ -175,6 +173,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                       ),
                       const SizedBox(height: 20),
+
+                      if (_isLogin)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                              );
+                            },
+                            child: Text(
+                              context.t('login.forgot_password_link'),
+                              style: const TextStyle(color: AppColors.blue),
+                            ),
+                          ),
+                        ),
 
                       Consumer<AuthProvider>(
                         builder: (context, authProvider, _) {
@@ -210,12 +224,17 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(_isLogin ? context.t('login.no_account_prompt') : context.t('login.has_account_prompt'),
-                            style: const TextStyle(color: Colors.grey)),
-                          GestureDetector(
-                            onTap: () => setState(() => _isLogin = !_isLogin),
-                            child: Text(_isLogin ? context.t('login.switch_to_register') : context.t('login.switch_to_login'),
-                              style: const TextStyle(color: AppColors.blue, fontWeight: FontWeight.bold)),
+                          Flexible(
+                            child: Text(_isLogin ? context.t('login.no_account_prompt') : context.t('login.has_account_prompt'),
+                              style: const TextStyle(color: Colors.grey)),
+                          ),
+                          Flexible(
+                            child: GestureDetector(
+                              onTap: () => setState(() => _isLogin = !_isLogin),
+                              child: Text(_isLogin ? context.t('login.switch_to_register') : context.t('login.switch_to_login'),
+                                style: const TextStyle(color: AppColors.blue, fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis),
+                            ),
                           ),
                         ],
                       ),

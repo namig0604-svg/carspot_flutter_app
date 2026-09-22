@@ -4,6 +4,8 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/country_city_picker.dart';
+import '../widgets/image_url_picker.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Форма клуба: создание нового (club == null) или редактирование (owner/admin).
@@ -130,7 +132,7 @@ class _ClubFormScreenState extends State<ClubFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? context.t('club_form.edit_title') : context.t('club_form.create_title'))),
+      appBar: AppBar(title: Text(_isEditing ? context.t('club_form.edit_title') : context.t('club_form.create_title'), overflow: TextOverflow.ellipsis, maxLines: 1)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -138,11 +140,52 @@ class _ClubFormScreenState extends State<ClubFormScreen> {
           children: [
             _field(_nameController, context.t('club_form.field_name'), required: true),
             _field(_descriptionController, context.t('club_form.field_description'), maxLines: 3),
-            _field(_countryController, context.t('club_form.field_country')),
-            _field(_cityController, context.t('club_form.field_city')),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: CountryPickerField(
+                controller: _countryController,
+                label: context.t('club_form.field_country'),
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: CityPickerField(
+                controller: _cityController,
+                label: context.t('club_form.field_city'),
+                country: _countryController.text.isEmpty ? null : _countryController.text,
+              ),
+            ),
             _field(_tagsController, context.t('club_form.field_tags')),
-            _field(_logoUrlController, context.t('club_form.field_logo_url')),
-            _field(_coverUrlController, context.t('club_form.field_cover_url')),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: ImageUrlPickerField(
+                controller: _logoUrlController,
+                token: Provider.of<AuthProvider>(context, listen: false).accessToken,
+                circular: true,
+                width: 84,
+                height: 84,
+                placeholderIcon: Icons.groups_outlined,
+                galleryLabel: context.t('club_form.pick_from_gallery'),
+                cameraLabel: context.t('club_form.pick_from_camera'),
+                errorTextBuilder: (e) => context.tArgs('club_form.logo_upload_error', {'error': '$e'}),
+                onChanged: () => setState(() {}),
+              ),
+            ),
+            const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: ImageUrlPickerField(
+                controller: _coverUrlController,
+                token: Provider.of<AuthProvider>(context, listen: false).accessToken,
+                height: 140,
+                placeholderIcon: Icons.image_outlined,
+                galleryLabel: context.t('club_form.pick_from_gallery'),
+                cameraLabel: context.t('club_form.pick_from_camera'),
+                errorTextBuilder: (e) => context.tArgs('club_form.cover_upload_error', {'error': '$e'}),
+                onChanged: () => setState(() {}),
+              ),
+            ),
 
             SwitchListTile(
               contentPadding: EdgeInsets.zero,

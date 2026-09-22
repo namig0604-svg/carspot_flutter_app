@@ -259,7 +259,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.t('favorites.title')),
+        title: Text(context.t('favorites.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         elevation: 0,
         backgroundColor: AppColors.black,
         bottom: TabBar(

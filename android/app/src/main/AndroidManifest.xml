@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Без этого разрешения релизная сборка не сможет обращаться к API (Railway) -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Для показа ближайших сходок и автосервисов (sort=recommended, моя геопозиция на карте) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:label="carspot_project"

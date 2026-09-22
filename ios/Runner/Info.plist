@@ -26,6 +26,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Нужен доступ к галерее, чтобы выбрать фото профиля, машины, сходки или клуба</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Нужен доступ к камере, чтобы сделать фото для профиля, машины, сходки или клуба</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Нужен доступ к геопозиции, чтобы показывать ближайшие сходки и автосервисы</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

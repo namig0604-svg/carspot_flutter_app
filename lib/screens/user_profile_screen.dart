@@ -323,11 +323,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 )
               : _carPlaceholder(),
         ),
-        title: Text('${car['make'] ?? ''} ${car['model'] ?? ''}'.trim()),
+        title: Text('${car['make'] ?? ''} ${car['model'] ?? ''}'.trim(), overflow: TextOverflow.ellipsis, maxLines: 1),
         subtitle: Text(
           [car['year']?.toString(), car['color'], car['license_plate']]
               .where((v) => v != null && v.toString().isNotEmpty)
               .join(' · '),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
         trailing: (car['is_primary'] ?? false) ? const Icon(Icons.star, color: Colors.orange, size: 18) : null,
       ),
@@ -426,7 +428,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_user != null ? '@${_user!['username']}' : context.t('user_profile.title_fallback')),
+        title: Text(_user != null ? '@${_user!['username']}' : context.t('user_profile.title_fallback'), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
         elevation: 0,
         actions: [
@@ -703,7 +705,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               final roleLabel = role == 'owner' ? ' · ${context.t('user_profile.role_owner')}' : (role == 'admin' ? ' · ${context.t('user_profile.role_admin')}' : '');
                               return Chip(
                                 avatar: const Icon(Icons.groups, size: 16, color: AppColors.blue),
-                                label: Text('${c['name']}$roleLabel'),
+                                label: ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 180),
+                                  child: Text('${c['name']}$roleLabel', overflow: TextOverflow.ellipsis),
+                                ),
                                 backgroundColor: AppColors.blue.withOpacity(0.08),
                               );
                             }).toList(),
