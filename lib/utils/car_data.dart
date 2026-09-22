@@ -84,3 +84,26 @@ const List<String> kTransmissionTypes = ['Механика', 'Автомат', '
 /// Типы топлива.
 const List<String> kFuelTypes = ['Бензин', 'Дизель', 'Гибрид', 'Электро', 'Газ'];
 
+/// Типы кузова.
+const List<String> kBodyTypes = [
+  'Седан',
+  'Хэтчбек',
+  'Универсал',
+  'Купе',
+  'Кабриолет',
+  'Внедорожник (SUV)',
+  'Кроссовер',
+  'Минивэн',
+  'Пикап',
+  'Лифтбек',
+  'Фургон',
+];
+
+/// Годы выпуска для пикера — от следующего модельного года вниз до 1960.
+/// Не const (нужен DateTime.now()), но вычисляется один раз при старте.
+final int _kCurrentYear = DateTime.now().year;
+final List<String> kCarYears = List.generate(
+  _kCurrentYear + 1 - 1960 + 1,
+  (i) => (_kCurrentYear + 1 - i).toString(),
+);
+

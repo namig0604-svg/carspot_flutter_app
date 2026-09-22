@@ -76,7 +76,8 @@ class _ImageUrlPickerFieldState extends State<ImageUrlPickerField> {
     XFile? picked;
     try {
       picked = await _picker.pickImage(source: source, imageQuality: 85);
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('ImageUrlPickerField pick error: $e\n$st');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.errorTextBuilder(e))));
       }
@@ -100,7 +101,8 @@ class _ImageUrlPickerFieldState extends State<ImageUrlPickerField> {
       final url = response['url'] as String;
       widget.controller.text = url;
       widget.onChanged?.call();
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('ImageUrlPickerField upload error: $e\n$st');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.errorTextBuilder(e))));
       }

@@ -180,59 +180,77 @@ class _CarFormScreenState extends State<CarFormScreen> {
   }
 
   Future<void> _pickBrand() async {
-    final brands = kCarModelsByBrand.keys.toList()..sort();
-    brands.add(kOtherBrandLabel);
-    final selected = await showSearchablePicker(
-      context,
-      title: context.t('car_form.select_brand'),
-      items: brands,
-      searchHint: context.t('common.search'),
-      emptyText: context.t('common.not_found'),
-      currentValue: _makeController.text.isEmpty ? null : _makeController.text,
-    );
-    if (selected != null) {
-      setState(() {
-        if (_makeController.text != selected) {
-          // Марка поменялась — сбрасываем модель, т.к. старая может не подходить новой марке.
-          _modelController.clear();
-        }
-        _makeController.text = selected;
-      });
+    try {
+      final brands = kCarModelsByBrand.keys.toList()..sort();
+      brands.add(kOtherBrandLabel);
+      final selected = await showSearchablePicker(
+        context,
+        title: context.t('car_form.select_brand'),
+        items: brands,
+        searchHint: context.t('common.search'),
+        emptyText: context.t('common.not_found'),
+        currentValue: _makeController.text.isEmpty ? null : _makeController.text,
+      );
+      if (selected != null) {
+        setState(() {
+          if (_makeController.text != selected) {
+            // Марка поменялась — сбрасываем модель, т.к. старая может не подходить новой марке.
+            _modelController.clear();
+          }
+          _makeController.text = selected;
+        });
+      }
+    } catch (e, st) {
+      debugPrint('CarForm._pickBrand error: $e\n$st');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tArgs('car_form.error', {'error': '$e'}))),
+        );
+      }
     }
   }
 
   Future<void> _pickModel() async {
-    final brand = _makeController.text.trim();
-    if (brand.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.t('car_form.select_brand_first'))),
-      );
-      return;
-    }
-
-    final models = List<String>.from(kCarModelsByBrand[brand] ?? <String>[])..sort();
-    if (models.isEmpty) {
-      // Марка без готового списка моделей (например "Другая марка") — вводим вручную.
-      final typed = await _showTextInputDialog(
-        title: context.t('car_form.select_model'),
-        initialValue: _modelController.text,
-      );
-      if (typed != null) {
-        setState(() => _modelController.text = typed.trim());
+    try {
+      final brand = _makeController.text.trim();
+      if (brand.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.t('car_form.select_brand_first'))),
+        );
+        return;
       }
-      return;
-    }
 
-    final selected = await showSearchablePicker(
-      context,
-      title: context.t('car_form.select_model'),
-      items: models,
-      searchHint: context.t('common.search'),
-      emptyText: context.t('common.not_found'),
-      currentValue: _modelController.text.isEmpty ? null : _modelController.text,
-    );
-    if (selected != null) {
-      setState(() => _modelController.text = selected);
+      final models = List<String>.from(kCarModelsByBrand[brand] ?? <String>[])..sort();
+      if (models.isEmpty) {
+        // Марка без готового списка моделей (например "Другая марка") — вводим вручную.
+        final typed = await _showTextInputDialog(
+          title: context.t('car_form.select_model'),
+          initialValue: _modelController.text,
+        );
+        if (typed != null) {
+          setState(() => _modelController.text = typed.trim());
+        }
+        return;
+      }
+
+      final selected = await showSearchablePicker(
+        context,
+        title: context.t('car_form.select_model'),
+        items: models,
+        searchHint: context.t('common.search'),
+        emptyText: context.t('common.not_found'),
+        currentValue: _modelController.text.isEmpty ? null : _modelController.text,
+      );
+      if (selected != null) {
+        setState(() => _modelController.text = selected);
+      }
+    } catch (e, st) {
+      debugPrint('CarForm._pickModel error: $e\n$st');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tArgs('car_form.error', {'error': '$e'}))),
+        );
+      }
     }
   }
 
@@ -349,9 +367,19 @@ class _CarFormScreenState extends State<CarFormScreen> {
               _pickModel,
               required: true,
             ),
-            _field(_yearController, context.t('car_form.field_year'), keyboardType: TextInputType.number),
+            _dropdownField(
+              context.t('car_form.field_year'),
+              _yearController.text.isEmpty ? null : _yearController.text,
+              kCarYears,
+              (v) => setState(() => _yearController.text = v ?? ''),
+            ),
             _field(_generationController, context.t('car_form.field_generation')),
-            _field(_bodyTypeController, context.t('car_form.field_body_type')),
+            _dropdownField(
+              context.t('car_form.field_body_type'),
+              _bodyTypeController.text.isEmpty ? null : _bodyTypeController.text,
+              kBodyTypes,
+              (v) => setState(() => _bodyTypeController.text = v ?? ''),
+            ),
 
             _sectionTitle(context.t('car_form.section_specs')),
             _field(_engineController, context.t('car_form.field_engine')),
