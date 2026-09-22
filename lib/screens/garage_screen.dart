@@ -273,11 +273,11 @@ class _GarageScreenState extends State<GarageScreen> {
                         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                         const Icon(Icons.directions_car, size: 64, color: Colors.grey),
                         const SizedBox(height: 16),
-                        const Center(
+                        Center(
                           child: Text(context.t('garage.empty_title'), style: const TextStyle(fontSize: 18, color: Colors.grey)),
                         ),
                         const SizedBox(height: 8),
-                        const Center(
+                        Center(
                           child: Text(
                             context.t('garage.empty_subtitle'),
                             style: const TextStyle(color: Colors.grey),
