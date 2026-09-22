@@ -12,6 +12,21 @@ import 'gen/feature_country_city_tr.dart';
 import 'gen/feature_forgot_password_tr.dart';
 import 'gen/feature_photo_upload_tr.dart';
 
+// Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
+// каждый язык разбит на 3 части, заполняется отдельными переводчиками.
+import 'gen/lang_uk_chunk1_tr.dart';
+import 'gen/lang_uk_chunk2_tr.dart';
+import 'gen/lang_uk_chunk3_tr.dart';
+import 'gen/lang_az_chunk1_tr.dart';
+import 'gen/lang_az_chunk2_tr.dart';
+import 'gen/lang_az_chunk3_tr.dart';
+import 'gen/lang_hy_chunk1_tr.dart';
+import 'gen/lang_hy_chunk2_tr.dart';
+import 'gen/lang_hy_chunk3_tr.dart';
+import 'gen/lang_kk_chunk1_tr.dart';
+import 'gen/lang_kk_chunk2_tr.dart';
+import 'gen/lang_kk_chunk3_tr.dart';
+
 /// Переводы интерфейса CarSpot.
 ///
 /// Ключ — уникальный идентификатор строки в формате `screen.snake_case`
@@ -25,7 +40,7 @@ import 'gen/feature_photo_upload_tr.dart';
 /// 2. Добавить сюда запись со всеми тремя языками.
 /// 3. В виджете использовать `context.t('screen_name.what_it_is')`
 ///    (см. lib/l10n/l10n_extensions.dart).
-const Map<String, Map<String, String>> kTranslations = {
+const Map<String, Map<String, String>> _kBaseTranslations = {
   // ─────────────────────────── ОБЩИЕ ───────────────────────────
   'common.save': {'ru': 'Сохранить', 'en': 'Save', 'ka': 'შენახვა'},
   'common.cancel': {'ru': 'Отмена', 'en': 'Cancel', 'ka': 'გაუქმება'},
@@ -72,6 +87,62 @@ const Map<String, Map<String, String>> kTranslations = {
   ...kFeatureCarDropdownsTranslations,
   ...kFeaturePhotoUploadTranslations,
 };
+
+/// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из
+/// 2-3 частей (см. импорты выше), чтобы разные переводчики могли работать
+/// параллельно, не трогая один и тот же файл.
+const Map<String, String> kUkTranslations = {
+  ...kUkChunk1Translations,
+  ...kUkChunk2Translations,
+  ...kUkChunk3Translations,
+};
+const Map<String, String> kAzTranslations = {
+  ...kAzChunk1Translations,
+  ...kAzChunk2Translations,
+  ...kAzChunk3Translations,
+};
+const Map<String, String> kHyTranslations = {
+  ...kHyChunk1Translations,
+  ...kHyChunk2Translations,
+  ...kHyChunk3Translations,
+};
+const Map<String, String> kKkTranslations = {
+  ...kKkChunk1Translations,
+  ...kKkChunk2Translations,
+  ...kKkChunk3Translations,
+};
+
+/// Добавляет к каждой записи базовой таблицы перевод на язык [langCode] из
+/// плоской карты key->текст (там, где он есть — иначе запись просто не
+/// трогается, и tr() откатится на русский, как и раньше).
+Map<String, Map<String, String>> _withLangOverlay(
+  Map<String, Map<String, String>> base,
+  String langCode,
+  Map<String, String> overlay,
+) {
+  if (overlay.isEmpty) return base;
+  final result = <String, Map<String, String>>{};
+  base.forEach((key, langs) {
+    if (overlay.containsKey(key)) {
+      result[key] = {...langs, langCode: overlay[key]!};
+    } else {
+      result[key] = langs;
+    }
+  });
+  return result;
+}
+
+/// Полная таблица переводов: базовые ru/en/ka + наложенные сверху
+/// дополнительные языки. Не const (нужен цикл слияния), но строится один
+/// раз при первом обращении и дальше переиспользуется как обычная таблица.
+final Map<String, Map<String, String>> kTranslations = () {
+  var result = _kBaseTranslations;
+  result = _withLangOverlay(result, 'uk', kUkTranslations);
+  result = _withLangOverlay(result, 'az', kAzTranslations);
+  result = _withLangOverlay(result, 'hy', kHyTranslations);
+  result = _withLangOverlay(result, 'kk', kKkTranslations);
+  return result;
+}();
 
 /// Возвращает перевод строки [key] на язык [lang]. Если перевода для этого
 /// языка нет — откатывается на русский, если нет и русского (не должно

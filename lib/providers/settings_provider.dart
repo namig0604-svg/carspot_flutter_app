@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Языки, которые можно выбрать в настройках. Полный перевод интерфейса
-/// на все эти языки — отдельная большая задача на будущее; сейчас выбор
-/// сохраняется и будет использован, когда локализация появится.
+/// Языки, которые можно выбрать в настройках. Полностью переведён интерфейс
+/// на ru/en/ka/uk/az/hy/kk (см. lib/l10n/app_translations.dart); для
+/// остальных языков стран из выбора страны перевод — задача на будущее,
+/// сейчас такие ключи откатываются на русский (см. tr() в app_translations.dart).
 const Map<String, String> kSupportedLanguages = {
   'ru': 'Русский',
   'en': 'English',
   'ka': 'ქართული',
+  'uk': 'Українська',
+  'az': 'Azərbaycan',
+  'hy': 'Հայերեն',
+  'kk': 'Қазақша',
 };
 
 const List<String> kSupportedCountries = [
