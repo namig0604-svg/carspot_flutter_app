@@ -679,18 +679,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                         if ((_user!['bio'] ?? '').toString().isNotEmpty) ...[
                           const SizedBox(height: 20),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(15),
-                            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(context.t('user_profile.about_title'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-                                const SizedBox(height: 8),
-                                Text(_user!['bio'], style: const TextStyle(color: Colors.black87)),
-                              ],
-                            ),
+                          Builder(
+                            builder: (context) {
+                              final isDark = Theme.of(context).brightness == Brightness.dark;
+                              final cardSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+                              final cardText = isDark ? AppColors.textOnDark : AppColors.textOnLight;
+                              return Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(15),
+                                decoration: BoxDecoration(
+                                  color: cardSurface,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.steel),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(context.t('user_profile.about_title'), style: TextStyle(fontWeight: FontWeight.w800, color: cardText)),
+                                    const SizedBox(height: 8),
+                                    Text(_user!['bio'], style: TextStyle(color: cardText.withOpacity(0.85))),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ],
 

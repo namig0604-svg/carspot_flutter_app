@@ -282,7 +282,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
         ],
       ),
       body: RefreshIndicator(
-        color: AppColors.red,
+        color: AppColors.blue,
         backgroundColor: AppColors.surfaceDark,
         onRefresh: _loadAll,
         child: ListView(

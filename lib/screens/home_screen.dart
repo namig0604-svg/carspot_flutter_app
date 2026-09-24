@@ -930,8 +930,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       width: 48,
       height: 48,
-      color: Colors.grey.shade200,
-      child: const Icon(Icons.directions_car, color: Colors.grey),
+      color: AppColors.blue.withOpacity(0.14),
+      child: const Icon(Icons.directions_car, color: AppColors.blue),
     );
   }
 
@@ -1072,17 +1072,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Text(
             '@${user['username'] ?? ''}',
-            style: const TextStyle(color: Colors.grey, fontSize: 14),
+            style: const TextStyle(color: AppColors.textMutedDark, fontSize: 14),
           ),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.location_on, size: 14, color: Colors.grey),
+              const Icon(Icons.location_on, size: 14, color: AppColors.textMutedDark),
               const SizedBox(width: 4),
               Text(
                 '${user['city'] ?? ''}, ${user['country'] ?? ''}',
-                style: const TextStyle(color: Colors.grey),
+                style: const TextStyle(color: AppColors.textMutedDark),
               ),
             ],
           ),
@@ -1150,7 +1150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           AnimatedCountText(
                             end: stats.xp,
                             formatter: (v) => context.tArgs('home.xp_total', {'xp': '${v.round()}'}),
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
                           ),
                         ],
                       ),
@@ -1171,7 +1171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 AnimatedCountText(
                   end: stats.xpIntoLevel,
                   formatter: (v) => context.tArgs('home.xp_to_next_level', {'current': '${v.round()}', 'next': '${stats.xpForNextLevel}'}),
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  style: const TextStyle(fontSize: 11, color: AppColors.textMutedDark),
                 ),
               ],
             ),
@@ -1374,14 +1374,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 20),
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(
+              color: cardSurface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.steel),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(context.t('home.about_title'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+                Text(context.t('home.about_title'), style: TextStyle(fontWeight: FontWeight.w800, color: cardText)),
                 const SizedBox(height: 10),
-                Text(user['bio'] ?? context.t('home.no_bio_info'), style: const TextStyle(color: Colors.black87)),
+                Text(user['bio'] ?? context.t('home.no_bio_info'), style: TextStyle(color: cardText.withOpacity(0.85))),
               ],
             ),
           ),
@@ -1525,13 +1530,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isDark ? AppColors.surfaceDarkRaised : Colors.white,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.shade300),
+                            border: Border.all(color: isDark ? AppColors.steel : Colors.grey.shade300),
                           ),
                           child: Text(
                             '${_referral!['code']}',
-                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: 1),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: cardText, letterSpacing: 1),
                           ),
                         ),
                       ),

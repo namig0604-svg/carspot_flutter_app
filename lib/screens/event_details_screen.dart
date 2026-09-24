@@ -771,22 +771,31 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       }).length;
 
   Widget _buildInfoCard({required IconData icon, required String title, required String value, Widget? trailing}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final cardText = isDark ? AppColors.textOnDark : AppColors.textOnLight;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(10),
+        color: cardSurface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.steel),
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.blue),
-          const SizedBox(width: 15),
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(color: AppColors.blue.withOpacity(0.16), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: AppColors.blue, size: 18),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+                Text(title, style: const TextStyle(color: AppColors.textMutedDark, fontSize: 12)),
+                Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: cardText)),
               ],
             ),
           ),
