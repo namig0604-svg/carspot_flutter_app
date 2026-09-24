@@ -14,6 +14,7 @@ import '../widgets/map_pin_marker.dart';
 import '../widgets/category_filter_bar.dart';
 import '../widgets/map_theme_toggle.dart';
 import '../widgets/map_filters_sheet.dart';
+import '../widgets/live_location_layer.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Карта всех предстоящих сходок. Метки берутся из лёгкого /api/events/map —
@@ -35,6 +36,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
   final Set<String> _selectedCategories = {};
 
   MapThemeMode _mapTheme = MapThemeMode.auto;
+  late final LiveLocationController _liveLocation;
 
   void _toggleCategory(String value) {
     setState(() {
@@ -50,6 +52,45 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
   void initState() {
     super.initState();
     _load();
+    _liveLocation = LiveLocationController(
+      getToken: () => Provider.of<AuthProvider>(context, listen: false).accessToken,
+    );
+    _liveLocation.addListener(_onLiveLocationChanged);
+    _liveLocation.start();
+  }
+
+  @override
+  void dispose() {
+    _liveLocation.removeListener(_onLiveLocationChanged);
+    _liveLocation.disposeController();
+    super.dispose();
+  }
+
+  void _onLiveLocationChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _showPeerSheet(Map<String, dynamic> peer) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.location_on, color: AppColors.blue),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '${peer['username'] ?? ''} сейчас делится своей геопозицией',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _load() async {
@@ -232,7 +273,13 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                   userAgentPackageName: mapUserAgentPackageName,
                 ),
               ),
-              MarkerLayer(markers: markers),
+              MarkerLayer(
+                markers: [
+                  ...markers,
+                  ..._liveLocation.buildPeerMarkers(onTap: _showPeerSheet),
+                  if (_liveLocation.buildSelfMarker() != null) _liveLocation.buildSelfMarker()!,
+                ],
+              ),
               RichAttributionWidget(
                 attributions: [TextSourceAttribution(osmAttribution)],
               ),
@@ -253,6 +300,11 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                       MapThemeToggle(
                         value: _mapTheme,
                         onChanged: (m) => setState(() => _mapTheme = m),
+                      ),
+                      const SizedBox(width: 8),
+                      LiveLocationToggleButton(
+                        active: _liveLocation.sharing,
+                        onTap: () => showLiveLocationSheet(context, _liveLocation),
                       ),
                       const Spacer(),
                       _FilterIconButton(
