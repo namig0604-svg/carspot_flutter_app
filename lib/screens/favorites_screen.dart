@@ -129,9 +129,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     return ListView(
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-        Icon(icon, size: 56, color: Colors.grey),
+        Icon(icon, size: 56, color: AppColors.textMutedDark),
         const SizedBox(height: 14),
-        Center(child: Text(text, style: const TextStyle(color: Colors.grey, fontSize: 15))),
+        Center(child: Text(text, style: const TextStyle(color: AppColors.textMutedDark, fontSize: 15))),
       ],
     );
   }
@@ -140,7 +140,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     if (_isLoadingEvents) return Center(child: AppLoader());
     if (_events.isEmpty) return _emptyState(context.t('favorites.no_events'), Icons.calendar_today_outlined);
     return RefreshIndicator(
-      color: AppColors.red,
+      color: AppColors.blue,
       backgroundColor: AppColors.surfaceDark,
       onRefresh: _loadEvents,
       child: ListView.builder(
@@ -176,7 +176,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     if (_isLoadingClubs) return Center(child: AppLoader());
     if (_clubs.isEmpty) return _emptyState(context.t('favorites.no_clubs'), Icons.groups_outlined);
     return RefreshIndicator(
-      color: AppColors.red,
+      color: AppColors.blue,
       backgroundColor: AppColors.surfaceDark,
       onRefresh: _loadClubs,
       child: ListView.builder(
@@ -218,7 +218,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     if (_isLoadingBusinesses) return Center(child: AppLoader());
     if (_businesses.isEmpty) return _emptyState(context.t('favorites.no_businesses'), Icons.car_repair);
     return RefreshIndicator(
-      color: AppColors.red,
+      color: AppColors.blue,
       backgroundColor: AppColors.surfaceDark,
       onRefresh: _loadBusinesses,
       child: ListView.builder(
@@ -265,7 +265,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
         backgroundColor: AppColors.black,
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.red,
+          indicatorColor: AppColors.blue,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white54,
           tabs: [

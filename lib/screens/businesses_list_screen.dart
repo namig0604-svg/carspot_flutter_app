@@ -83,9 +83,9 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
 
   Widget _logoPlaceholder(String? category) {
     final color = businessCategoryColor(category);
-    return CircleAvatar(
-      backgroundColor: color,
-      child: Icon(businessCategoryIcon(category), color: Colors.white),
+    return Container(
+      color: color.withOpacity(0.18),
+      child: Icon(businessCategoryIcon(category), color: color, size: 26),
     );
   }
 
@@ -113,7 +113,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
-            BoxShadow(color: AppColors.red.withOpacity(0.6), blurRadius: 20, spreadRadius: 2),
+            BoxShadow(color: AppColors.blue.withOpacity(0.5), blurRadius: 20, spreadRadius: 2),
           ],
         ),
         child: FloatingActionButton(
@@ -146,7 +146,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
           );
           if (result == true) _load();
         },
-        backgroundColor: AppColors.red,
+        backgroundColor: AppColors.blue,
         child: const Icon(Icons.add),
         ),
       ),
@@ -190,11 +190,26 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
               child: TextField(
                 controller: _searchController,
                 onSubmitted: (_) => _load(),
+                style: const TextStyle(color: AppColors.textOnDark),
                 decoration: InputDecoration(
                   hintText: context.t('businesses_list.search_hint'),
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: IconButton(icon: const Icon(Icons.arrow_forward), onPressed: _load),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  hintStyle: const TextStyle(color: AppColors.textMutedDark),
+                  prefixIcon: const Icon(Icons.search, color: AppColors.textMutedDark),
+                  suffixIcon: IconButton(icon: const Icon(Icons.arrow_forward, color: AppColors.blue), onPressed: _load),
+                  filled: true,
+                  fillColor: AppColors.surfaceDarkAlt,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: AppColors.blue.withOpacity(0.35)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: AppColors.blue.withOpacity(0.35)),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(14)),
+                    borderSide: BorderSide(color: AppColors.blue, width: 1.6),
+                  ),
                   isDense: true,
                 ),
               ),
@@ -247,12 +262,12 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                         ? ListView(
                             children: [
                               SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-                              const Icon(Icons.car_repair, size: 64, color: Colors.grey),
+                              const Icon(Icons.car_repair, size: 64, color: AppColors.textMutedDark),
                               const SizedBox(height: 16),
                               Center(
                                 child: Text(
                                   _showFavoritesOnly ? context.t('businesses_list.no_favorites_empty') : context.t('businesses_list.nothing_found'),
-                                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                                  style: const TextStyle(fontSize: 16, color: AppColors.textMutedDark),
                                 ),
                               ),
                             ],
@@ -263,58 +278,124 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                             itemBuilder: (context, index) {
                               final business = _businesses[index] as Map<String, dynamic>;
                               final logoUrl = business['logo_url'] as String?;
+                              final catColor = businessCategoryColor(business['category']);
                               final rating = ((business['average_rating'] ?? 0) as num).toDouble();
                               final reviewsCount = business['reviews_count'] ?? 0;
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: ListTile(
-                                  leading: (logoUrl != null && logoUrl.isNotEmpty)
-                                      ? CircleAvatar(backgroundImage: NetworkImage(resolveImageUrl(logoUrl)))
-                                      : _logoPlaceholder(business['category']),
-                                  title: Row(
-                                    children: [
-                                      if (_isBoosted(business['boosted_until'])) ...[
-                                        const Text('🚀', style: TextStyle(fontSize: 13)),
-                                        const SizedBox(width: 4),
-                                      ],
-                                      Flexible(child: Text(business['name'] ?? '', overflow: TextOverflow.ellipsis)),
-                                      if (business['is_verified'] == true) ...[
-                                        const SizedBox(width: 4),
-                                        const Icon(Icons.verified, color: AppColors.blue, size: 14),
-                                      ],
-                                      if (business['is_favorite'] == true) ...[
-                                        const SizedBox(width: 4),
-                                        const Icon(Icons.favorite, color: AppColors.red, size: 14),
-                                      ],
-                                    ],
-                                  ),
-                                  subtitle: Text(
-                                    [
-                                      businessCategoryLabel(business['category']),
-                                      if ((business['city'] ?? '').toString().isNotEmpty) business['city'],
-                                      if (_userPosition != null && business['latitude'] != null && business['longitude'] != null)
-                                        formatDistance(
-                                          context,
-                                          Geolocator.distanceBetween(
-                                            _userPosition!.latitude,
-                                            _userPosition!.longitude,
-                                            (business['latitude'] as num).toDouble(),
-                                            (business['longitude'] as num).toDouble(),
-                                          ),
-                                        ),
-                                      if (reviewsCount > 0) '⭐ ${rating.toStringAsFixed(1)} ($reviewsCount)',
-                                    ].join(' · '),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                                  onTap: () {
-                                    Navigator.push(
+                              final distanceText = (_userPosition != null && business['latitude'] != null && business['longitude'] != null)
+                                  ? formatDistance(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (_) => BusinessDetailScreen(businessId: business['id']),
+                                      Geolocator.distanceBetween(
+                                        _userPosition!.latitude,
+                                        _userPosition!.longitude,
+                                        (business['latitude'] as num).toDouble(),
+                                        (business['longitude'] as num).toDouble(),
                                       ),
-                                    ).then((_) => _load());
-                                  },
+                                    )
+                                  : null;
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceDark,
+                                  borderRadius: BorderRadius.circular(18),
+                                  border: Border.all(color: AppColors.steel),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(18),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(18),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => BusinessDetailScreen(businessId: business['id']),
+                                        ),
+                                      ).then((_) => _load());
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(14),
+                                            child: (logoUrl != null && logoUrl.isNotEmpty)
+                                                ? Image.network(
+                                                    resolveImageUrl(logoUrl),
+                                                    width: 64,
+                                                    height: 64,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (_, __, ___) => SizedBox(width: 64, height: 64, child: _logoPlaceholder(business['category'])),
+                                                  )
+                                                : SizedBox(width: 64, height: 64, child: _logoPlaceholder(business['category'])),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    if (_isBoosted(business['boosted_until'])) ...[
+                                                      const Text('🚀', style: TextStyle(fontSize: 12)),
+                                                      const SizedBox(width: 4),
+                                                    ],
+                                                    Flexible(
+                                                      child: Text(
+                                                        business['name'] ?? '',
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                                                      ),
+                                                    ),
+                                                    if (business['is_verified'] == true) ...[
+                                                      const SizedBox(width: 4),
+                                                      const Icon(Icons.verified, color: AppColors.blue, size: 15),
+                                                    ],
+                                                    const Spacer(),
+                                                    if (business['is_favorite'] == true)
+                                                      const Icon(Icons.favorite, color: AppColors.red, size: 16),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Row(
+                                                  children: [
+                                                    Icon(businessCategoryIcon(business['category']), size: 13, color: catColor),
+                                                    const SizedBox(width: 3),
+                                                    Expanded(
+                                                      child: Text(
+                                                        [
+                                                          businessCategoryLabel(business['category']),
+                                                          if ((business['city'] ?? '').toString().isNotEmpty) business['city'],
+                                                          if (distanceText != null) distanceText,
+                                                        ].join(' · '),
+                                                        style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Row(
+                                                  children: [
+                                                    if (reviewsCount > 0) ...[
+                                                      const Icon(Icons.star_rounded, size: 14, color: AppColors.amber),
+                                                      const SizedBox(width: 2),
+                                                      Text(
+                                                        '${rating.toStringAsFixed(1)} ($reviewsCount)',
+                                                        style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                                                      ),
+                                                    ],
+                                                    const Spacer(),
+                                                    const Icon(Icons.chevron_right, size: 18, color: AppColors.textMutedDark),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               );
                             },
