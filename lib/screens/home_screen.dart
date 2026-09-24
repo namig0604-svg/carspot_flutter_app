@@ -28,6 +28,7 @@ import 'achievements_screen.dart';
 import 'favorites_screen.dart';
 import 'my_points_screen.dart';
 import 'forum_categories_screen.dart';
+import 'my_bookings_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
@@ -1341,6 +1342,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ForumCategoriesScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.event_available,
+                  label: 'Мои записи',
+                  color: Colors.tealAccent,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
                   ),
                 ),
               ),

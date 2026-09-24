@@ -12,6 +12,8 @@ import '../utils/distance_format.dart';
 import 'package:geolocator/geolocator.dart';
 import '../widgets/report_dialog.dart';
 import 'business_form_screen.dart';
+import 'create_booking_screen.dart';
+import 'business_bookings_screen.dart';
 import 'premium_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
@@ -266,6 +268,16 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
           ),
           if (_isOwner) ...[
             IconButton(
+              icon: const Icon(Icons.event_note),
+              tooltip: 'Заявки на запись',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BusinessBookingsScreen(businessId: widget.businessId, businessName: b['name'] ?? ''),
+                ),
+              ),
+            ),
+            IconButton(
               icon: Icon(Icons.rocket_launch, color: _isBoosted() ? Colors.amber : null),
               tooltip: _isBoosted() ? context.t('business_detail.boosted_tooltip') : context.t('business_detail.boost_tooltip'),
               onPressed: _isBoosted() ? null : _boost,
@@ -273,12 +285,24 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
             IconButton(icon: const Icon(Icons.edit), tooltip: context.t('business_detail.edit_tooltip'), onPressed: _openEdit),
             IconButton(icon: const Icon(Icons.delete_outline), tooltip: context.t('common.delete'), onPressed: _delete),
           ],
-          if (!_isOwner)
+          if (!_isOwner) ...[
+            IconButton(
+              icon: const Icon(Icons.event_available),
+              tooltip: 'Записаться',
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CreateBookingScreen(business: b)),
+                );
+                if (result == true && mounted) _loadAll();
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.flag_outlined),
               tooltip: context.t('business_detail.report_tooltip'),
               onPressed: () => showReportDialog(context, targetType: 'business', targetId: widget.businessId),
             ),
+          ],
         ],
       ),
       body: RefreshIndicator(
