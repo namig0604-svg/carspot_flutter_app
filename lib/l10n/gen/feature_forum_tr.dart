@@ -65,4 +65,5 @@ const Map<String, Map<String, String>> kFeatureForumTranslations = {
     'ka': 'იყავით პირველი, ვინც უპასუხებს ამ თემაში',
   },
   'forum.reply_hint': {'ru': 'Ответить в теме', 'en': 'Reply in topic', 'ka': 'უპასუხეთ თემაში'},
+  'forum.topic_author_badge': {'ru': 'Автор темы', 'en': 'Topic author', 'ka': 'თემის ავტორი'},
 };

@@ -6,6 +6,7 @@ import '../utils/forum_category.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 
 /// Tema foruma: pervoe soobshchenie + spisok otvetov + pole otveta vnizu
 /// (kak "Otvetit v teme" v prilozheniyah-referensah).
@@ -72,13 +73,34 @@ class _ForumTopicScreenState extends State<ForumTopicScreen> {
 
   Widget _authorRow(Map<String, dynamic>? author) {
     final username = (author?['username'] as String?) ?? '?';
+    final avatarUrl = author?['avatar_url'] as String?;
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(radius: 16, child: Text(username.isNotEmpty ? username[0].toUpperCase() : '?')),
+        CircleAvatar(
+          radius: 16,
+          backgroundColor: AppColors.blue.withOpacity(0.2),
+          backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
+          child: (avatarUrl == null || avatarUrl.isEmpty)
+              ? Text(username.isNotEmpty ? username[0].toUpperCase() : '?', style: const TextStyle(fontWeight: FontWeight.w700))
+              : null,
+        ),
         const SizedBox(width: 8),
         Text(username, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],
     );
+  }
+
+  String _formatTime(dynamic value) {
+    if (value == null) return '';
+    try {
+      final dt = DateTime.parse(value.toString()).toLocal();
+      final hh = dt.hour.toString().padLeft(2, '0');
+      final mm = dt.minute.toString().padLeft(2, '0');
+      return '$hh:$mm';
+    } catch (_) {
+      return '';
+    }
   }
 
   @override
@@ -97,18 +119,42 @@ class _ForumTopicScreenState extends State<ForumTopicScreen> {
                   child: ListView(
                     padding: const EdgeInsets.all(14),
                     children: [
-                      Card(
-                        color: style.color.withOpacity(0.12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(color: style.color.withOpacity(0.5)),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.blue.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: AppColors.blue.withOpacity(0.5)),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(14),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _authorRow(topic['author'] as Map<String, dynamic>?),
+                              Row(
+                                children: [
+                                  Expanded(child: _authorRow(topic['author'] as Map<String, dynamic>?)),
+                                  Text(
+                                    _formatTime(topic['created_at']),
+                                    style: const TextStyle(fontSize: 11, color: AppColors.textMutedDark),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.blue.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.edit_note, size: 14, color: AppColors.blueBright),
+                                    const SizedBox(width: 4),
+                                    Text(context.t('forum.topic_author_badge'), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.blueBright)),
+                                  ],
+                                ),
+                              ),
                               const SizedBox(height: 10),
                               Text(topic['body'] ?? '', style: const TextStyle(fontSize: 15)),
                             ],
@@ -121,7 +167,12 @@ class _ForumTopicScreenState extends State<ForumTopicScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 30),
                           child: Column(
                             children: [
-                              const Icon(Icons.forum_outlined, size: 40, color: Colors.grey),
+                              Container(
+                                width: 64,
+                                height: 64,
+                                decoration: BoxDecoration(color: AppColors.blue.withOpacity(0.14), shape: BoxShape.circle),
+                                child: const Icon(Icons.forum_outlined, size: 28, color: AppColors.blueBright),
+                              ),
                               const SizedBox(height: 10),
                               Text(context.t('forum.no_replies_title'), style: const TextStyle(fontWeight: FontWeight.w700)),
                               const SizedBox(height: 4),
@@ -132,14 +183,27 @@ class _ForumTopicScreenState extends State<ForumTopicScreen> {
                       else
                         ...replies.map((r) {
                           final reply = r as Map<String, dynamic>;
-                          return Card(
+                          return Container(
                             margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceDark,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.steel),
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.all(12),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _authorRow(reply['author'] as Map<String, dynamic>?),
+                                  Row(
+                                    children: [
+                                      Expanded(child: _authorRow(reply['author'] as Map<String, dynamic>?)),
+                                      Text(
+                                        _formatTime(reply['created_at']),
+                                        style: const TextStyle(fontSize: 11, color: AppColors.textMutedDark),
+                                      ),
+                                    ],
+                                  ),
                                   const SizedBox(height: 8),
                                   Text(reply['body'] ?? ''),
                                 ],
@@ -161,9 +225,24 @@ class _ForumTopicScreenState extends State<ForumTopicScreen> {
                             controller: _replyController,
                             minLines: 1,
                             maxLines: 4,
+                            style: const TextStyle(color: AppColors.textOnDark),
                             decoration: InputDecoration(
                               hintText: context.t('forum.reply_hint'),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                              hintStyle: const TextStyle(color: AppColors.textMutedDark),
+                              filled: true,
+                              fillColor: AppColors.surfaceDarkAlt,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide(color: AppColors.blue.withOpacity(0.35)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(24),
+                                borderSide: BorderSide(color: AppColors.blue.withOpacity(0.35)),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(24)),
+                                borderSide: BorderSide(color: AppColors.blue, width: 1.6),
+                              ),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             ),
                           ),

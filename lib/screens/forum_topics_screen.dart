@@ -7,6 +7,7 @@ import '../providers/settings_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/image_url.dart';
 import 'forum_create_topic_screen.dart';
 import 'forum_topic_screen.dart';
 
@@ -94,20 +95,30 @@ class _ForumTopicsScreenState extends State<ForumTopicsScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
-            child: Card(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: _pickCountry,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.public, size: 18),
-                      const SizedBox(width: 8),
-                      Text(_country ?? context.t('forum.all_countries')),
-                      const Spacer(),
-                      const Icon(Icons.expand_more),
-                    ],
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Material(
+                color: AppColors.surfaceDarkAlt,
+                borderRadius: BorderRadius.circular(30),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: _pickCountry,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: AppColors.steel),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.public, size: 16, color: AppColors.blue),
+                        const SizedBox(width: 8),
+                        Text(_country ?? context.t('forum.all_countries'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.expand_more, size: 18, color: AppColors.textMutedDark),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -122,8 +133,21 @@ class _ForumTopicsScreenState extends State<ForumTopicsScreen> {
               },
               decoration: InputDecoration(
                 hintText: context.t('forum.search_topics_hint'),
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: const Icon(Icons.search, color: AppColors.textMutedDark),
+                filled: true,
+                fillColor: AppColors.surfaceDarkAlt,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: AppColors.blue.withOpacity(0.35)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: AppColors.blue.withOpacity(0.35)),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(14)),
+                  borderSide: BorderSide(color: AppColors.blue, width: 1.6),
+                ),
               ),
             ),
           ),
@@ -145,27 +169,82 @@ class _ForumTopicsScreenState extends State<ForumTopicsScreen> {
                           itemBuilder: (context, i) {
                             final t = _topics[i] as Map<String, dynamic>;
                             final author = t['author'] as Map<String, dynamic>?;
-                            return Card(
+                            final avatarUrl = author?['avatar_url'] as String?;
+                            final username = (author?['username'] ?? '?').toString();
+                            return Container(
                               margin: const EdgeInsets.only(bottom: 10),
-                              child: ListTile(
-                                title: Text(t['title'] ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
-                                subtitle: Text(
-                                  (author?['username'] ?? '') + ((t['country'] ?? '').toString().isNotEmpty ? ' • ${t['country']}' : ''),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceDark,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: AppColors.steel),
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(16),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => ForumTopicScreen(topicId: t['id'])),
+                                  ).then((_) => _load()),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 20,
+                                          backgroundColor: style.color.withOpacity(0.2),
+                                          backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
+                                              ? NetworkImage(resolveImageUrl(avatarUrl))
+                                              : null,
+                                          child: (avatarUrl == null || avatarUrl.isEmpty)
+                                              ? Text(
+                                                  username.isNotEmpty ? username[0].toUpperCase() : '?',
+                                                  style: TextStyle(color: style.color, fontWeight: FontWeight.w800),
+                                                )
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                t['title'] ?? '',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                                              ),
+                                              const SizedBox(height: 3),
+                                              Text(
+                                                t['body'] ?? '',
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(fontSize: 12.5, color: AppColors.textMutedDark),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    username,
+                                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                                                  ),
+                                                  const Spacer(),
+                                                  const Icon(Icons.forum_outlined, size: 15, color: AppColors.textMutedDark),
+                                                  const SizedBox(width: 4),
+                                                  Text('${t['replies_count'] ?? 0}', style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
+                                                  const SizedBox(width: 4),
+                                                  const Icon(Icons.chevron_right, size: 18, color: AppColors.textMutedDark),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.forum_outlined, size: 16, color: Colors.grey),
-                                    const SizedBox(width: 4),
-                                    Text('${t['replies_count'] ?? 0}'),
-                                  ],
-                                ),
-                                onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => ForumTopicScreen(topicId: t['id'])),
-                                ).then((_) => _load()),
                               ),
                             );
                           },
