@@ -48,6 +48,8 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   'common.edit': {'ru': 'Редактировать', 'en': 'Edit', 'ka': 'რედაქტირება'},
   'common.confirm': {'ru': 'Подтвердить', 'en': 'Confirm', 'ka': 'დადასტურება'},
   'common.ok': {'ru': 'ОК', 'en': 'OK', 'ka': 'კარგი'},
+  'common.distance_m': {'ru': '{value} м', 'en': '{value} m', 'ka': '{value} მ'},
+  'common.distance_km': {'ru': '{value} км', 'en': '{value} km', 'ka': '{value} კმ'},
   'common.yes': {'ru': 'Да', 'en': 'Yes', 'ka': 'დიახ'},
   'common.no': {'ru': 'Нет', 'en': 'No', 'ka': 'არა'},
   'common.close': {'ru': 'Закрыть', 'en': 'Close', 'ka': 'დახურვა'},

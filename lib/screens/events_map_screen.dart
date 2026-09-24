@@ -10,6 +10,7 @@ import '../utils/maps_launcher.dart';
 import 'event_details_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/map_pin_marker.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Карта всех предстоящих сходок. Метки берутся из лёгкого /api/events/map —
@@ -166,7 +167,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
         height: 40,
         child: GestureDetector(
           onTap: () => _showMarkerSheet(m as Map<String, dynamic>),
-          child: Icon(style.icon, color: style.color, size: 36),
+          child: MapPinMarker(icon: style.icon, color: style.color),
         ),
       );
     }).toList();
@@ -189,10 +190,13 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: yandexTileUrlTemplate,
+                urlTemplate: activeTileUrlTemplate,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               MarkerLayer(markers: markers),
+              RichAttributionWidget(
+                attributions: [TextSourceAttribution(osmAttribution)],
+              ),
             ],
           ),
           if (_isLoading) Positioned(top: 12, left: 0, right: 0, child: Center(child: AppLoader())),

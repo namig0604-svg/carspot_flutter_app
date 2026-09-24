@@ -16,6 +16,7 @@ import 'photo_gallery_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/map_pin_marker.dart';
 import '../widgets/comments_section.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
@@ -455,7 +456,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       initialZoom: defaultMapZoom,
                     ),
                     children: [
-                      TileLayer(urlTemplate: yandexTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
+                      TileLayer(urlTemplate: activeTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
                       MarkerLayer(
                         markers: [
                           Marker(
@@ -465,13 +466,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                             ),
                             width: 40,
                             height: 40,
-                            child: Icon(
-                              eventTypeIcon(_event['event_type']),
+                            child: MapPinMarker(
+                              icon: eventTypeIcon(_event['event_type']),
                               color: eventTypeColor(_event['event_type']),
-                              size: 34,
                             ),
                           ),
                         ],
+                      ),
+                      RichAttributionWidget(
+                        attributions: [TextSourceAttribution(osmAttribution)],
                       ),
                     ],
                   ),

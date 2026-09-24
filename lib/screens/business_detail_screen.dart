@@ -7,12 +7,16 @@ import '../services/api_service.dart';
 import '../utils/business_category.dart';
 import '../utils/map_config.dart';
 import '../utils/maps_launcher.dart';
+import '../utils/location_helper.dart';
+import '../utils/distance_format.dart';
+import 'package:geolocator/geolocator.dart';
 import '../widgets/report_dialog.dart';
 import 'business_form_screen.dart';
 import 'premium_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/map_pin_marker.dart';
 import '../widgets/image_url_picker.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
@@ -32,6 +36,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   List<dynamic> _reviews = [];
   bool _isLoadingDetail = true;
   bool _isActionLoading = false;
+  Position? _userPosition;
 
   bool _showReviewForm = false;
   int _myStars = 0;
@@ -46,6 +51,9 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   void initState() {
     super.initState();
     _loadAll();
+    determineCurrentPosition().then((p) {
+      if (mounted && p != null) setState(() => _userPosition = p);
+    });
   }
 
   @override
@@ -385,6 +393,19 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                       )
                     : null,
               ),
+            if (_userPosition != null && b['latitude'] != null && b['longitude'] != null)
+              _infoRow(
+                Icons.directions_walk,
+                formatDistance(
+                  context,
+                  Geolocator.distanceBetween(
+                    _userPosition!.latitude,
+                    _userPosition!.longitude,
+                    (b['latitude'] as num).toDouble(),
+                    (b['longitude'] as num).toDouble(),
+                  ),
+                ),
+              ),
             if (b['latitude'] != null && b['longitude'] != null) ...[
               const SizedBox(height: 8),
               ClipRRect(
@@ -400,7 +421,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                       initialZoom: defaultMapZoom,
                     ),
                     children: [
-                      TileLayer(urlTemplate: yandexTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
+                      TileLayer(urlTemplate: activeTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
                       MarkerLayer(
                         markers: [
                           Marker(
@@ -410,13 +431,16 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                             ),
                             width: 40,
                             height: 40,
-                            child: Icon(
-                              businessCategoryIcon(b['category']),
-                              color: AppColors.blue,
-                              size: 34,
+                            child: MapPinMarker(
+                              icon: businessCategoryIcon(b['category']),
+                              color: businessCategoryColor(b['category']),
+                              square: true,
                             ),
                           ),
                         ],
+                      ),
+                      RichAttributionWidget(
+                        attributions: [TextSourceAttribution(osmAttribution)],
                       ),
                     ],
                   ),

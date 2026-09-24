@@ -49,7 +49,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: yandexTileUrlTemplate,
+                urlTemplate: activeTileUrlTemplate,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               if (_picked != null)
@@ -63,6 +63,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     ),
                   ],
                 ),
+              RichAttributionWidget(
+                attributions: [TextSourceAttribution(osmAttribution)],
+              ),
             ],
           ),
           Positioned(

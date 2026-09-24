@@ -6,10 +6,14 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../utils/business_category.dart';
 import '../utils/map_config.dart';
+import '../utils/location_helper.dart';
+import '../utils/distance_format.dart';
+import 'package:geolocator/geolocator.dart';
 import '../utils/maps_launcher.dart';
 import 'business_detail_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/map_pin_marker.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Карта автосервисов и тюнинг-ателье. Метки — из /api/businesses/map,
@@ -26,11 +30,15 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
   final MapController _mapController = MapController();
   List<dynamic> _markers = [];
   bool _isLoading = true;
+  Position? _userPosition;
 
   @override
   void initState() {
     super.initState();
     _load();
+    determineCurrentPosition().then((p) {
+      if (mounted && p != null) setState(() => _userPosition = p);
+    });
   }
 
   Future<void> _load() async {
@@ -101,6 +109,15 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
                 const Icon(Icons.star, size: 16, color: Colors.orange),
                 const SizedBox(width: 4),
                 Text('${marker['average_rating'] ?? 0}'),
+                if (_userPosition != null && lat != null && lon != null) ...[
+                  const SizedBox(width: 16),
+                  const Icon(Icons.directions_walk, size: 16, color: Colors.grey),
+                  const SizedBox(width: 4),
+                  Text(formatDistance(
+                    context,
+                    Geolocator.distanceBetween(_userPosition!.latitude, _userPosition!.longitude, lat, lon),
+                  )),
+                ],
               ],
             ),
             const SizedBox(height: 16),
@@ -155,7 +172,11 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
         height: 40,
         child: GestureDetector(
           onTap: () => _showMarkerSheet(m as Map<String, dynamic>),
-          child: Icon(businessCategoryIcon(m['category']), color: businessCategoryColor(m['category']), size: 34),
+          child: MapPinMarker(
+            icon: businessCategoryIcon(m['category']),
+            color: businessCategoryColor(m['category']),
+            square: true,
+          ),
         ),
       );
     }).toList();
@@ -178,10 +199,13 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: yandexTileUrlTemplate,
+                urlTemplate: activeTileUrlTemplate,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               MarkerLayer(markers: markers),
+              RichAttributionWidget(
+                attributions: [TextSourceAttribution(osmAttribution)],
+              ),
             ],
           ),
           if (_isLoading) Positioned(top: 12, left: 0, right: 0, child: Center(child: AppLoader())),

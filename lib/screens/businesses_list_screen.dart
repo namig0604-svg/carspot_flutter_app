@@ -16,6 +16,7 @@ import '../widgets/section_background.dart';
 import '../widgets/neon_chip.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/distance_format.dart';
 
 class BusinessesListScreen extends StatefulWidget {
   const BusinessesListScreen({Key? key}) : super(key: key);
@@ -30,6 +31,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
   bool _showFavoritesOnly = false;
   String? _selectedCategory;
   final TextEditingController _searchController = TextEditingController();
+  Position? _userPosition;
 
   @override
   void initState() {
@@ -52,6 +54,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
         setState(() => _businesses = response is List ? response : []);
       } else {
         final Position? position = await determineCurrentPosition();
+        _userPosition = position;
         final q = _searchController.text.trim();
         final params = StringBuffer('limit=100');
         if (q.isNotEmpty) params.write('&q=${Uri.encodeQueryComponent(q)}');
@@ -288,6 +291,16 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                                     [
                                       businessCategoryLabel(business['category']),
                                       if ((business['city'] ?? '').toString().isNotEmpty) business['city'],
+                                      if (_userPosition != null && business['latitude'] != null && business['longitude'] != null)
+                                        formatDistance(
+                                          context,
+                                          Geolocator.distanceBetween(
+                                            _userPosition!.latitude,
+                                            _userPosition!.longitude,
+                                            (business['latitude'] as num).toDouble(),
+                                            (business['longitude'] as num).toDouble(),
+                                          ),
+                                        ),
                                       if (reviewsCount > 0) '⭐ ${rating.toStringAsFixed(1)} ($reviewsCount)',
                                     ].join(' · '),
                                     overflow: TextOverflow.ellipsis,
