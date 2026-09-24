@@ -16,6 +16,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/map_pin_marker.dart';
 import '../widgets/category_filter_bar.dart';
 import '../widgets/map_theme_toggle.dart';
+import '../widgets/map_filters_sheet.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Карта автосервисов и тюнинг-ателье. Метки — из /api/businesses/map,
@@ -227,10 +228,18 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               initialZoom: worldMapZoom,
             ),
             children: [
-              TileLayer(
-                urlTemplate: _effectiveTileUrl(context),
-                subdomains: tileSubdomains,
-                userAgentPackageName: mapUserAgentPackageName,
+              ColorFiltered(
+                colorFilter: const ColorFilter.matrix(<double>[
+                  0.35, 0.35, 0.35, 0, 0,
+                  0.35, 0.35, 0.35, 0, 0,
+                  0.35, 0.35, 0.35, 0, 0,
+                  0,    0,    0,    1, 0,
+                ]),
+                child: TileLayer(
+                  urlTemplate: _effectiveTileUrl(context),
+                  subdomains: tileSubdomains,
+                  userAgentPackageName: mapUserAgentPackageName,
+                ),
               ),
               MarkerLayer(markers: markers),
               RichAttributionWidget(
@@ -246,35 +255,37 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               color: Colors.black.withOpacity(0.35),
               child: SafeArea(
                 bottom: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6, right: 10),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: MapThemeToggle(
-                          value: _mapTheme,
-                          onChanged: (m) => setState(() => _mapTheme = m),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
+                  child: Row(
+                    children: [
+                      MapThemeToggle(
+                        value: _mapTheme,
+                        onChanged: (m) => setState(() => _mapTheme = m),
+                      ),
+                      const Spacer(),
+                      _FilterIconButton(
+                        active: _selectedCategories.isNotEmpty,
+                        onTap: () => showMapFiltersSheet(
+                          context: context,
+                          items: businessCategories
+                              .map((c) => FilterChipData(c.value, c.label, c.icon, c.color))
+                              .toList(),
+                          selected: _selectedCategories,
+                          onToggle: (v) => setState(() => _toggleCategory(v)),
+                          onClear: () => setState(() => _selectedCategories.clear()),
                         ),
                       ),
-                    ),
-                    CategoryFilterBar(
-                  items: businessCategories
-                      .map((c) => FilterChipData(c.value, c.label, c.icon, c.color))
-                      .toList(),
-                  selected: _selectedCategories,
-                  onToggle: _toggleCategory,
-                ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-          if (_isLoading) Positioned(top: 145, left: 0, right: 0, child: Center(child: AppLoader())),
+          if (_isLoading) Positioned(top: 90, left: 0, right: 0, child: Center(child: AppLoader())),
           if (!_isLoading && markers.isEmpty)
             Positioned(
-              top: 145,
+              top: 90,
               left: 12,
               right: 12,
               child: Container(
@@ -284,6 +295,46 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// Кнопка-иконка "фильтры" рядом с переключателем темы карты — открывает
+/// bottom-sheet с категориями (см. map_filters_sheet.dart).
+class _FilterIconButton extends StatelessWidget {
+  final bool active;
+  final VoidCallback onTap;
+  const _FilterIconButton({required this.active, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white24),
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const Center(child: Icon(Icons.tune, size: 18, color: Colors.white)),
+            if (active)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(color: AppColors.blue, shape: BoxShape.circle),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
