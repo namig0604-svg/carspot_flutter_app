@@ -11,6 +11,7 @@ import 'event_details_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/map_pin_marker.dart';
+import '../widgets/category_filter_bar.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Карта всех предстоящих сходок. Метки берутся из лёгкого /api/events/map —
@@ -29,6 +30,17 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
   final MapController _mapController = MapController();
   List<dynamic> _markers = [];
   bool _isLoading = true;
+  final Set<String> _selectedCategories = {};
+
+  void _toggleCategory(String value) {
+    setState(() {
+      if (_selectedCategories.contains(value)) {
+        _selectedCategories.remove(value);
+      } else {
+        _selectedCategories.add(value);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -157,7 +169,10 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final markers = _markers
+    final visibleMarkers = _selectedCategories.isEmpty
+        ? _markers
+        : _markers.where((m) => _selectedCategories.contains(m['event_type'])).toList();
+    final markers = visibleMarkers
         .where((m) => m['latitude'] != null && m['longitude'] != null)
         .map<Marker>((m) {
       final style = eventTypeStyleByValue(m['event_type']);
@@ -191,6 +206,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
             children: [
               TileLayer(
                 urlTemplate: activeTileUrlTemplate,
+                subdomains: tileSubdomains,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               MarkerLayer(markers: markers),
@@ -199,15 +215,33 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
               ),
             ],
           ),
-          if (_isLoading) Positioned(top: 12, left: 0, right: 0, child: Center(child: AppLoader())),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.black.withOpacity(0.35),
+              child: SafeArea(
+                bottom: false,
+                child: CategoryFilterBar(
+                  items: eventTypeStyles
+                      .map((t) => FilterChipData(t.value, t.label, t.icon, t.color))
+                      .toList(),
+                  selected: _selectedCategories,
+                  onToggle: _toggleCategory,
+                ),
+              ),
+            ),
+          ),
+          if (_isLoading) Positioned(top: 90, left: 0, right: 0, child: Center(child: AppLoader())),
           if (!_isLoading && markers.isEmpty)
             Positioned(
-              top: 12,
+              top: 90,
               left: 12,
               right: 12,
               child: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: AppColors.surfaceDarkAlt, borderRadius: BorderRadius.circular(10)),
                 child: Text(context.t('events_map.no_events'), textAlign: TextAlign.center),
               ),
             ),

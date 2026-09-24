@@ -1,29 +1,46 @@
-/// Общие настройки карты.
+/// Obshie nastroyki karty.
 ///
-/// Тайлы — OpenStreetMap (стандартный публичный XYZ-тайл сервер).
+/// Tayly - CartoDB Dark Matter (temnaya tema, postroena na dannyh
+/// OpenStreetMap). Ranshe byl svetlyy standartnyy OSM-tayl-server,
+/// no vizual prilozheniya perevели na temnuyu temu (sm. theme/app_theme.dart),
+/// i svetlaya karta na temnom fone vyglyadela chuzherodno - poetomu tayly
+/// tozhe temnye, edinyy stil kak v prilozheniyah-referensah.
 ///
-/// Раньше здесь были неофициальные тайлы Яндекс.Карт, но выяснилось, что
-/// этот способ отдаёт тайлы НЕ по реальным географическим координатам
-/// (проверено: тайл для координат центра Тбилиси и тайл для координат
-/// Красной площади в Москве по стандартной формуле z/x/y оба раза
-/// показывали случайную непричастную местность) — из-за этого метки на
-/// карте (сходки, автосервисы) оказывались смещены в случайные места,
-/// вплоть до гор. Переключились на OSM, чтобы метки были на своих местах.
+/// CartoDB - besplatnyy publichnyy servis dlya nebolshoy nagruzki, trebuet
+/// atributsiyu OpenStreetMap + CARTO (sm. osmAttribution nizhe).
+/// https://github.com/CartoDB/basemap-styles
 ///
-/// Если понадобится точный фирменный вид Яндекс.Карт — единственный
-/// надёжный путь это официальный yandex_mapkit с API-ключом (потребует
-/// ключ на yandex.ru/dev и нативную настройку под Android/iOS).
+/// Ranshe zdes byli neofitsialnye tayly Yandeks.Kart, no vyyasnilos, chto
+/// etot sposob otdayet tayly NE po realnym geograficheskim koordinatam
+/// (provereno: tayl dlya koordinat tsentra Tbilisi i tayl dlya koordinat
+/// Krasnoy ploshchadi v Moskve po standartnoy formule z/x/y oba raza
+/// pokazyvali sluchaynuyu neprichastnuyu mestnost) - iz-za etogo metki na
+/// karte (skhodki, avtoservisy) okazyvalis smeshcheny v sluchaynye mesta,
+/// vplot do gor.
+///
+/// Esli ponadobitsya tochnyy firmennyy vid Yandeks.Kart - edinstvennyy
+/// nadezhnyy put eto ofitsialnyy yandex_mapkit s API-klyuchom (potrebuet
+/// klyuch na yandex.ru/dev i nativnuyu nastroyku pod Android/iOS).
 import 'package:latlong2/latlong.dart';
 
 const String osmTileUrlTemplate = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-/// Активный источник тайлов карты — используется во всех экранах с картой.
-const String activeTileUrlTemplate = osmTileUrlTemplate;
+/// Temnye tayly CartoDB Dark Matter. {s} - poddomen (balansirovka nagruzki),
+/// podstavlyaetsya flutter_map iz spiska tileSubdomains.
+const String darkTileUrlTemplate =
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 
-const String osmAttribution = '© OpenStreetMap contributors';
+/// Aktivnyy istochnik taylov karty - ispolzuetsya vo vseh ekranah s kartoy.
+const String activeTileUrlTemplate = darkTileUrlTemplate;
+
+/// Poddomeny dlya activeTileUrlTemplate (nuzhny CartoDB, OSM ih ne trebuet
+/// no ignoriruet lishniy parametr bez vreda).
+const List<String> tileSubdomains = ['a', 'b', 'c', 'd'];
+
+const String osmAttribution = '© OpenStreetMap contributors © CARTO';
 const String mapUserAgentPackageName = 'com.carspot.app';
 
-/// Тбилиси — то же значение, что раньше было захардкожено при создании сходки.
+/// Tbilisi - to zhe znachenie, chto ranshe bylo zahardkozheno pri sozdanii skhodki.
 const LatLng defaultMapCenter = LatLng(41.7151, 44.7671);
 
 const double defaultMapZoom = 12.0;

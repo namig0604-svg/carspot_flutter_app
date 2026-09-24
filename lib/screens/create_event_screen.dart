@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../utils/event_duration.dart';
+import '../utils/event_type_style.dart';
+import '../widgets/category_filter_bar.dart' show FilterChipData;
+import '../widgets/category_picker_grid.dart';
 import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
@@ -38,9 +41,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   bool _isPrivate = false;
   String? _errorMessage;
 
-  final List<String> _eventTypes = [
-    'meetup', 'racing', 'drift', 'drag', 'offroad', 'show', 'cruise', 'track_day', 'charity'
-  ];
 
   // Координаты выбираются на карте — без метки создать сходку нельзя,
   // иначе она не попадёт ни в поиск рядом, ни на карту.
@@ -141,18 +141,19 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             const SizedBox(height: 15),
 
-            DropdownButtonFormField<String>(
-              value: _selectedType,
-              decoration: InputDecoration(
-                labelText: context.t('create_event.type_label'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Text(context.t('create_event.type_label'), style: const TextStyle(fontWeight: FontWeight.w600)),
               ),
-              items: _eventTypes.map((type) {
-                return DropdownMenuItem(value: type, child: Text(type));
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _selectedType = value);
-              },
+            ),
+            CategoryPickerGrid(
+              items: eventTypeStyles
+                  .map((t) => FilterChipData(t.value, t.label, t.icon, t.color))
+                  .toList(),
+              selected: _selectedType,
+              onSelect: (value) => setState(() => _selectedType = value),
             ),
             const SizedBox(height: 15),
 

@@ -421,7 +421,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                       initialZoom: defaultMapZoom,
                     ),
                     children: [
-                      TileLayer(urlTemplate: activeTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
+                      TileLayer(urlTemplate: activeTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName, subdomains: tileSubdomains),
                       MarkerLayer(
                         markers: [
                           Marker(

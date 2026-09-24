@@ -50,6 +50,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             children: [
               TileLayer(
                 urlTemplate: activeTileUrlTemplate,
+                subdomains: tileSubdomains,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               if (_picked != null)

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../utils/business_category.dart';
+import '../widgets/category_filter_bar.dart' show FilterChipData;
+import '../widgets/category_picker_grid.dart';
 import 'location_picker_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
@@ -191,18 +193,16 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
           children: [
             _field(_nameController, context.t('business_form.label_name'), required: true),
 
-            DropdownButtonFormField<String>(
-              value: _category,
-              decoration: InputDecoration(
-                labelText: context.t('business_form.label_category'),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(context.t('business_form.label_category'), style: const TextStyle(fontWeight: FontWeight.w600)),
+            ),
+            CategoryPickerGrid(
               items: businessCategories
-                  .map((c) => DropdownMenuItem(value: c.value, child: Text(c.label)))
+                  .map((c) => FilterChipData(c.value, c.label, c.icon, c.color))
                   .toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _category = value);
-              },
+              selected: _category,
+              onSelect: (value) => setState(() => _category = value),
             ),
             const SizedBox(height: 15),
 

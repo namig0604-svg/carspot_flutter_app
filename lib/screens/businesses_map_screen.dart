@@ -14,6 +14,7 @@ import 'business_detail_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/map_pin_marker.dart';
+import '../widgets/category_filter_bar.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Карта автосервисов и тюнинг-ателье. Метки — из /api/businesses/map,
@@ -31,6 +32,17 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
   List<dynamic> _markers = [];
   bool _isLoading = true;
   Position? _userPosition;
+  final Set<String> _selectedCategories = {};
+
+  void _toggleCategory(String value) {
+    setState(() {
+      if (_selectedCategories.contains(value)) {
+        _selectedCategories.remove(value);
+      } else {
+        _selectedCategories.add(value);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -163,7 +175,10 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final markers = _markers
+    final visibleMarkers = _selectedCategories.isEmpty
+        ? _markers
+        : _markers.where((m) => _selectedCategories.contains(m['category'])).toList();
+    final markers = visibleMarkers
         .where((m) => m['latitude'] != null && m['longitude'] != null)
         .map<Marker>((m) {
       return Marker(
@@ -200,6 +215,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
             children: [
               TileLayer(
                 urlTemplate: activeTileUrlTemplate,
+                subdomains: tileSubdomains,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
               MarkerLayer(markers: markers),
@@ -208,15 +224,33 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               ),
             ],
           ),
-          if (_isLoading) Positioned(top: 12, left: 0, right: 0, child: Center(child: AppLoader())),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.black.withOpacity(0.35),
+              child: SafeArea(
+                bottom: false,
+                child: CategoryFilterBar(
+                  items: businessCategories
+                      .map((c) => FilterChipData(c.value, c.label, c.icon, c.color))
+                      .toList(),
+                  selected: _selectedCategories,
+                  onToggle: _toggleCategory,
+                ),
+              ),
+            ),
+          ),
+          if (_isLoading) Positioned(top: 90, left: 0, right: 0, child: Center(child: AppLoader())),
           if (!_isLoading && markers.isEmpty)
             Positioned(
-              top: 12,
+              top: 90,
               left: 12,
               right: 12,
               child: Container(
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: AppColors.surfaceDarkAlt, borderRadius: BorderRadius.circular(10)),
                 child: Text(context.t('businesses_map.no_businesses_with_coords'), textAlign: TextAlign.center),
               ),
             ),

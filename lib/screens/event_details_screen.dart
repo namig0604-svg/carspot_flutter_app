@@ -456,7 +456,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       initialZoom: defaultMapZoom,
                     ),
                     children: [
-                      TileLayer(urlTemplate: activeTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName),
+                      TileLayer(urlTemplate: activeTileUrlTemplate, userAgentPackageName: mapUserAgentPackageName, subdomains: tileSubdomains),
                       MarkerLayer(
                         markers: [
                           Marker(
