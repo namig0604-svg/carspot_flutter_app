@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import 'chat_room_screen.dart';
+import 'forum_categories_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
@@ -86,6 +87,16 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
         title: Text(context.t('chats_list.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
         elevation: 0,
         backgroundColor: AppColors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.forum_outlined),
+            tooltip: context.t('chats_list.forum_tooltip'),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ForumCategoriesScreen()),
+            ),
+          ),
+        ],
       ),
       backgroundColor: AppColors.black,
       body: Stack(

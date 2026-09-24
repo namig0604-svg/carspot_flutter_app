@@ -26,6 +26,7 @@ import 'admin_panel_screen.dart';
 import 'achievements_screen.dart';
 import 'favorites_screen.dart';
 import 'my_points_screen.dart';
+import 'forum_categories_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
@@ -1157,6 +1158,18 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const MyPointsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.forum,
+                  label: context.t('home.menu_forum'),
+                  color: Colors.deepOrange,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ForumCategoriesScreen()),
                   ),
                 ),
               ),
