@@ -15,6 +15,7 @@ import 'garage_screen.dart';
 import 'chats_list_screen.dart';
 import 'clubs_list_screen.dart';
 import 'businesses_list_screen.dart';
+import 'business_form_screen.dart';
 import 'events_map_screen.dart';
 import 'settings_screen.dart';
 import 'edit_profile_screen.dart';
@@ -331,17 +332,6 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         backgroundColor: AppColors.black,
         actions: [
-          if (_selectedIndex == 0)
-            IconButton(
-              icon: const Icon(Icons.map_outlined),
-              tooltip: context.t('home.tooltip_events_map'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EventsMapScreen()),
-                );
-              },
-            ),
           Stack(
             clipBehavior: Clip.none,
             children: [
@@ -373,63 +363,42 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           SectionBackground(
-            accent: _selectedIndex == 3 ? AppColors.blue : AppColors.red,
-            glowAlignment: _selectedIndex == 3 ? Alignment.topLeft : Alignment.topRight,
-            imageAsset: _selectedIndex == 3
+            accent: _selectedIndex == 4 ? AppColors.blue : AppColors.red,
+            glowAlignment: _selectedIndex == 4 ? Alignment.topLeft : Alignment.topRight,
+            imageAsset: _selectedIndex == 4
                 ? 'assets/backgrounds/profile.jpg'
                 : 'assets/backgrounds/events.jpg',
           ),
           Theme(data: AppTheme.dark, child: _buildBody()),
         ],
       ),
-      floatingActionButton: _selectedIndex == 0
-        ? Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(color: AppColors.blue.withOpacity(0.6), blurRadius: 20, spreadRadius: 2),
-              ],
-            ),
-            child: FloatingActionButton(
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CreateEventScreen()),
-                );
-                if (result == true) {
-                  _loadEvents();
-                }
-              },
-              backgroundColor: AppColors.blue,
-              child: const Icon(Icons.add),
-            ),
-          )
-        : null,
-      // Нижняя навигация сведена к 4 самым частым разделам (было 7 — тесно
-      // и терялось на маленьких экранах). Клубы, Настройки и Сервисы
-      // переехали в аккуратную сетку быстрых действий на экране "Профиль",
-      // рядом с "Друзьями" — так внизу остаётся только самое частое,
-      // а остальное — на расстоянии одного тапа с анимацией нажатия.
+      // Нижняя навигация в духе референса: Лента / Карта / Добавить / Чаты /
+      // Профиль — 5 пунктов вместо прежних 4. "Карта" и "Добавить" всегда
+      // открывают отдельный экран/шторку (не меняют текущую вкладку), как
+      // раньше это делали "Гараж" и "Чаты". Гараж переехал в сетку быстрых
+      // действий на экране "Профиль" — там же, где Клубы/Сервисы/Форум и т.д.
       bottomNavigationBar: AnimatedBottomNav(
         currentIndex: _selectedIndex,
         items: [
           NavBarItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: context.t('home.nav_events')),
-          NavBarItem(icon: Icons.directions_car_outlined, activeIcon: Icons.directions_car, label: context.t('home.nav_garage')),
+          NavBarItem(icon: Icons.map_outlined, activeIcon: Icons.map, label: context.t('home.nav_map')),
+          NavBarItem(icon: Icons.add_circle_outline, activeIcon: Icons.add_circle, label: context.t('home.nav_add')),
           NavBarItem(icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble, label: context.t('home.nav_chats')),
           NavBarItem(icon: Icons.person_outline, activeIcon: Icons.person, label: context.t('home.nav_profile')),
         ],
         onTap: (index) {
-          // У "Гаража" и "Чатов" свой AppBar (и своя кнопка "+" у гаража),
-          // поэтому открываем их отдельным экраном, а не как вкладку —
-          // иначе была бы двойная шапка. Подсветка текущей вкладки не меняется.
           if (index == 1) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const GarageScreen()),
-            ).then((_) => _loadMyCars());
+              MaterialPageRoute(builder: (_) => const EventsMapScreen()),
+            );
             return;
           }
           if (index == 2) {
+            _showCreateSheet();
+            return;
+          }
+          if (index == 3) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const ChatsListScreen()),
@@ -445,9 +414,49 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBody() {
     switch (_selectedIndex) {
       case 0: return _buildEventsTab();
-      case 3: return _buildProfileTab();
+      case 4: return _buildProfileTab();
       default: return _buildEventsTab();
     }
+  }
+
+  void _showCreateSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: CircleAvatar(backgroundColor: AppColors.blue, child: const Icon(Icons.calendar_today, color: Colors.white)),
+                title: Text(context.t('home.create_event_option')),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CreateEventScreen()),
+                  );
+                  if (result == true) _loadEvents();
+                },
+              ),
+              ListTile(
+                leading: CircleAvatar(backgroundColor: AppColors.red, child: const Icon(Icons.car_repair, color: Colors.white)),
+                title: Text(context.t('home.create_business_option')),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BusinessFormScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildEventsTab() {
@@ -1070,6 +1079,19 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
             spacing: 10,
             runSpacing: 10,
             children: [
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.directions_car,
+                  label: context.t('home.menu_garage'),
+                  color: Colors.cyan,
+                  badge: _myCars.isNotEmpty ? '${_myCars.length}' : null,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const GarageScreen()),
+                  ).then((_) => _loadMyCars()),
+                ),
+              ),
               SizedBox(
                 width: 78,
                 child: AnimatedMenuTile(

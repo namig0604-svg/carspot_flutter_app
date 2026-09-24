@@ -7,7 +7,7 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static const _radius = 14.0;
+  static const _radius = 16.0;
 
   // Более "живой" переход между экранами вместо стандартного — один и тот же
   // билдер для всех платформ (zoom+fade), задаётся один раз для обеих тем.
@@ -20,6 +20,12 @@ class AppTheme {
       TargetPlatform.linux: ZoomPageTransitionsBuilder(),
       TargetPlatform.fuchsia: ZoomPageTransitionsBuilder(),
     },
+  );
+
+  static const ListTileThemeData _listTileTheme = ListTileThemeData(
+    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    minVerticalPadding: 14,
+    iconColor: null,
   );
 
   static TextTheme _textTheme(Color onSurface) {
@@ -73,6 +79,7 @@ class AppTheme {
           letterSpacing: 0.3,
         ),
       ),
+      listTileTheme: _listTileTheme,
       cardTheme: CardThemeData(
         color: AppColors.surfaceDark,
         elevation: 0,
@@ -172,6 +179,7 @@ class AppTheme {
           letterSpacing: 0.3,
         ),
       ),
+      listTileTheme: _listTileTheme,
       cardTheme: CardThemeData(
         color: AppColors.surfaceLight,
         elevation: 1,

@@ -82,9 +82,10 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
   }
 
   Widget _logoPlaceholder(String? category) {
+    final color = businessCategoryColor(category);
     return CircleAvatar(
-      backgroundColor: AppColors.blue.withOpacity(0.15),
-      child: Icon(businessCategoryIcon(category), color: AppColors.blue),
+      backgroundColor: color,
+      child: Icon(businessCategoryIcon(category), color: Colors.white),
     );
   }
 

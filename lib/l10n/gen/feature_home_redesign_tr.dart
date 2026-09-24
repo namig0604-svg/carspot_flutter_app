@@ -13,4 +13,9 @@ const Map<String, Map<String, String>> kFeatureHomeRedesignTranslations = {
   'home.quick_services': {'ru': 'Сервисы', 'en': 'Services', 'ka': 'სერვისები'},
   'home.quick_clubs': {'ru': 'Клубы', 'en': 'Clubs', 'ka': 'კლუბები'},
   'home.section_soon': {'ru': 'Скоро', 'en': 'Soon', 'ka': 'მალე'},
+  'home.nav_map': {'ru': 'Карта', 'en': 'Map', 'ka': 'რუკა'},
+  'home.nav_add': {'ru': 'Добавить', 'en': 'Add', 'ka': 'დამატება'},
+  'home.menu_garage': {'ru': 'Гараж', 'en': 'Garage', 'ka': 'გარაჟი'},
+  'home.create_event_option': {'ru': 'Новая сходка', 'en': 'New meetup', 'ka': 'ახალი შეხვედრა'},
+  'home.create_business_option': {'ru': 'Новый автосервис', 'en': 'New service', 'ka': 'ახალი სერვისი'},
 };
