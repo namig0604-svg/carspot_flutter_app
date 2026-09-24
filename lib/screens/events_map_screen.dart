@@ -262,10 +262,10 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
               ),
             ),
           ),
-          if (_isLoading) Positioned(top: 130, left: 0, right: 0, child: Center(child: AppLoader())),
+          if (_isLoading) Positioned(top: 145, left: 0, right: 0, child: Center(child: AppLoader())),
           if (!_isLoading && markers.isEmpty)
             Positioned(
-              top: 130,
+              top: 145,
               left: 12,
               right: 12,
               child: Container(

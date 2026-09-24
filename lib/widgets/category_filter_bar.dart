@@ -27,10 +27,10 @@ class CategoryFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 74,
+      height: 84,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         itemCount: items.length,
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, i) {
@@ -63,8 +63,10 @@ class CategoryFilterBar extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   item.label,
+                  maxLines: 1,
                   style: TextStyle(
                     fontSize: 11,
+                    height: 1.1,
                     fontWeight: FontWeight.w600,
                     color: isActive ? Colors.white : Colors.white54,
                   ),
