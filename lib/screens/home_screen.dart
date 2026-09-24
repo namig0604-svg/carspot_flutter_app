@@ -475,10 +475,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 _filterEvents();
               });
             },
+            style: const TextStyle(color: AppColors.textOnDark),
             decoration: InputDecoration(
               hintText: context.t('home.search_hint'),
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(28)),
+              hintStyle: const TextStyle(color: AppColors.textMutedDark),
+              prefixIcon: const Icon(Icons.search, color: AppColors.textMutedDark),
+              filled: true,
+              fillColor: AppColors.surfaceDarkAlt,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28),
+                borderSide: BorderSide(color: AppColors.blue.withOpacity(0.4)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28),
+                borderSide: BorderSide(color: AppColors.blue.withOpacity(0.4)),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(28)),
+                borderSide: BorderSide(color: AppColors.blue, width: 1.6),
+              ),
             ),
           ),
         ),
@@ -521,17 +536,34 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // Заголовок секции списка
-        Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
+        // Заголовок секции списка — янтарная плашка, как анонс-блок в референсе
+        Container(
+          margin: const EdgeInsets.fromLTRB(10, 6, 10, 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.amber.withOpacity(0.10),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.amber.withOpacity(0.35)),
+          ),
           child: Row(
             children: [
-              Text(
-                context.t('home.section_soon'),
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(color: AppColors.amber.withOpacity(0.22), shape: BoxShape.circle),
+                child: const Icon(Icons.campaign, color: AppColors.amber, size: 16),
               ),
-              const SizedBox(width: 8),
-              Text('${_filteredEvents.length}', style: const TextStyle(color: Colors.grey)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.t('home.section_soon'),
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                ),
+              ),
+              Text(
+                '${_filteredEvents.length}',
+                style: const TextStyle(color: AppColors.amber, fontWeight: FontWeight.w800, fontSize: 16),
+              ),
             ],
           ),
         ),
@@ -555,79 +587,142 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
               : RefreshIndicator(
-                  color: AppColors.red,
+                  color: AppColors.blue,
                   backgroundColor: AppColors.surfaceDark,
                   onRefresh: _loadEvents,
                   child: ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 10),
                     itemCount: _filteredEvents.length,
                     itemBuilder: (context, index) {
                       final event = _filteredEvents[index];
-                      return Card(
-                        margin: const EdgeInsets.all(10),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: eventCategoryColor(event['event_type']),
-                            child: Icon(eventCategoryIcon(event['event_type']), color: Colors.white, size: 20),
-                          ),
-                          title: Row(
-                            children: [
-                              if (_isBoosted(event['boosted_until'])) ...[
-                                const Text('🚀', style: TextStyle(fontSize: 13)),
-                                const SizedBox(width: 4),
-                              ],
-                              Expanded(
-                                child: Text(
-                                  event['title'] ?? context.t('home.untitled_event'),
-                                  overflow: TextOverflow.ellipsis,
+                      final catColor = eventCategoryColor(event['event_type']);
+                      final coverUrl = event['cover_url'] as String?;
+                      final joined = event['is_joined'] ?? false;
+                      final favorite = event['is_favorite'] == true;
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceDark,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: AppColors.steel),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(18),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(18),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => EventDetailsScreen(event: event),
                                 ),
-                              ),
-                            ],
-                          ),
-                          subtitle: Text(
-                            '${event['city']}, ${event['event_date']}\n'
-                            '${context.tArgs('home.participants_count', {'count': '${event['participants_count']}'})}',
-                          ),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              InkWell(
-                                borderRadius: BorderRadius.circular(20),
-                                onTap: () => _toggleEventFavorite(event),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4),
-                                  child: Icon(
-                                    event['is_favorite'] == true ? Icons.favorite : Icons.favorite_border,
-                                    color: event['is_favorite'] == true ? AppColors.red : Colors.grey,
-                                    size: 20,
+                              ).then((_) {
+                                _loadEvents();
+                                _loadMyClubs();
+                                _loadMyCars();
+                                _loadReferral();
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(14),
+                                    child: (coverUrl != null && coverUrl.isNotEmpty)
+                                        ? Image.network(
+                                            resolveImageUrl(coverUrl),
+                                            width: 72,
+                                            height: 72,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => _eventThumbFallback(catColor, event['event_type']),
+                                          )
+                                        : _eventThumbFallback(catColor, event['event_type']),
                                   ),
-                                ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            if (_isBoosted(event['boosted_until'])) ...[
+                                              const Text('🚀', style: TextStyle(fontSize: 12)),
+                                              const SizedBox(width: 4),
+                                            ],
+                                            Expanded(
+                                              child: Text(
+                                                event['title'] ?? context.t('home.untitled_event'),
+                                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            InkWell(
+                                              borderRadius: BorderRadius.circular(16),
+                                              onTap: () => _toggleEventFavorite(event),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(4),
+                                                child: Icon(
+                                                  favorite ? Icons.favorite : Icons.favorite_border,
+                                                  color: favorite ? AppColors.red : AppColors.textMutedDark,
+                                                  size: 18,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.place_outlined, size: 13, color: AppColors.textMutedDark),
+                                            const SizedBox(width: 3),
+                                            Expanded(
+                                              child: Text(
+                                                '${event['city']} · ${event['event_date']}',
+                                                style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                              decoration: BoxDecoration(
+                                                color: joined ? AppColors.blue.withOpacity(0.16) : AppColors.surfaceDarkAlt,
+                                                borderRadius: BorderRadius.circular(20),
+                                                border: Border.all(color: joined ? AppColors.blue.withOpacity(0.5) : AppColors.steel),
+                                              ),
+                                              child: Text(
+                                                joined ? context.t('home.status_joined') : context.t('home.status_not_joined'),
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: joined ? AppColors.blue : AppColors.textMutedDark,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            const Icon(Icons.star_rounded, size: 14, color: AppColors.amber),
+                                            const SizedBox(width: 2),
+                                            Text('${event['average_rating']}', style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
+                                            const SizedBox(width: 8),
+                                            const Icon(Icons.people_alt_outlined, size: 13, color: AppColors.textMutedDark),
+                                            const SizedBox(width: 2),
+                                            Text('${event['participants_count']}', style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text('⭐ ${event['average_rating']}'),
-                              Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-(event['is_joined'] ?? false) ? context.t('home.status_joined') : context.t('home.status_not_joined'),                                  style: const TextStyle(color: Colors.white, fontSize: 10),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => EventDetailsScreen(event: event),
-                              ),
-                            ).then((_) {
-                              _loadEvents();
-                              _loadMyClubs();
-                              _loadMyCars();
-                              _loadReferral();
-                            });
-                          },
                         ),
                       );
                     },
@@ -658,13 +753,24 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: selected ? AppColors.blue : AppColors.surfaceDarkAlt,
+                    gradient: selected
+                        ? const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [AppColors.blueBright, AppColors.blue],
+                          )
+                        : null,
+                    color: selected ? null : AppColors.surfaceDarkAlt,
                     borderRadius: BorderRadius.circular(20),
+                    border: selected ? null : Border.all(color: AppColors.steel),
+                    boxShadow: selected
+                        ? [BoxShadow(color: AppColors.blue.withOpacity(0.35), blurRadius: 10, offset: const Offset(0, 3))]
+                        : null,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(m.$3, size: 15, color: selected ? Colors.white : Colors.grey),
+                      Icon(m.$3, size: 15, color: selected ? Colors.white : AppColors.textMutedDark),
                       const SizedBox(width: 5),
                       Flexible(
                         child: Text(
@@ -673,7 +779,7 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: selected ? Colors.white : Colors.grey,
+                            color: selected ? Colors.white : AppColors.textMutedDark,
                           ),
                         ),
                       ),
@@ -688,28 +794,70 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
     );
   }
 
-  Widget _quickStatCard({required IconData icon, required Color color, required String label, required int count, VoidCallback? onTap}) {
+  Widget _quickStatCard({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required int count,
+    VoidCallback? onTap,
+    bool highlight = false,
+  }) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
           decoration: BoxDecoration(
             color: AppColors.surfaceDark,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withOpacity(0.5)),
+            border: Border.all(
+              color: highlight ? AppColors.amber.withOpacity(0.7) : AppColors.steel,
+              width: highlight ? 1.4 : 1,
+            ),
           ),
-          child: Column(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(height: 4),
-              Text('$count', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-              Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey), overflow: TextOverflow.ellipsis),
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(icon, color: color, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text('$count', style: const TextStyle(fontSize: 11, color: AppColors.textMutedDark)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  /// Заглушка превью сходки без обложки — цветной квадрат с иконкой категории.
+  Widget _eventThumbFallback(Color color, String? type) {
+    return Container(
+      width: 72,
+      height: 72,
+      color: color.withOpacity(0.18),
+      child: Icon(eventCategoryIcon(type), color: color, size: 28),
     );
   }
 
@@ -720,9 +868,10 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
         children: [
           _quickStatCard(
             icon: Icons.event_available,
-            color: Colors.amber,
+            color: AppColors.amber,
             label: context.t('home.quick_soon'),
             count: _eventsTotal,
+            highlight: true,
           ),
           _quickStatCard(
             icon: Icons.car_repair,

@@ -7,7 +7,8 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
-  static const _radius = 16.0;
+  static const _radius = 20.0;
+  static const _radiusSmall = 14.0;
 
   // Более "живой" переход между экранами вместо стандартного — один и тот же
   // билдер для всех платформ (zoom+fade), задаётся один раз для обеих тем.
@@ -91,28 +92,34 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceDarkAlt,
         selectedColor: AppColors.blue,
-        labelStyle: const TextStyle(color: AppColors.textOnDark),
+        labelStyle: const TextStyle(color: AppColors.textOnDark, fontWeight: FontWeight.w600),
         secondaryLabelStyle: const TextStyle(color: Colors.white),
         side: const BorderSide(color: AppColors.steel),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceDarkAlt,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(_radiusSmall),
+          borderSide: const BorderSide(color: AppColors.steel),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(_radiusSmall),
           borderSide: const BorderSide(color: AppColors.steel),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(_radiusSmall),
           borderSide: const BorderSide(color: AppColors.blue, width: 1.6),
         ),
+        hintStyle: const TextStyle(color: AppColors.textMutedDark),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.blue,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radiusSmall)),
           textStyle: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.3),
         ),
       ),
@@ -120,18 +127,18 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textOnDark,
           side: const BorderSide(color: AppColors.steel),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radiusSmall)),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.red,
+        backgroundColor: AppColors.blue,
         foregroundColor: Colors.white,
       ),
       iconTheme: const IconThemeData(color: AppColors.textOnDark),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.surfaceDark,
+        backgroundColor: AppColors.black,
         selectedItemColor: AppColors.blue,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: AppColors.textMutedDark,
       ),
       tabBarTheme: const TabBarThemeData(
         labelColor: AppColors.blue,
@@ -199,11 +206,11 @@ class AppTheme {
         filled: true,
         fillColor: const Color(0xFFEFF1F4),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(_radiusSmall),
           borderSide: const BorderSide(color: AppColors.steelLight),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(_radiusSmall),
           borderSide: const BorderSide(color: AppColors.blueDark, width: 1.6),
         ),
       ),
@@ -212,7 +219,7 @@ class AppTheme {
           backgroundColor: AppColors.blue,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radiusSmall)),
           textStyle: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.3),
         ),
       ),
@@ -220,7 +227,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textOnLight,
           side: const BorderSide(color: AppColors.steelLight),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radiusSmall)),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(

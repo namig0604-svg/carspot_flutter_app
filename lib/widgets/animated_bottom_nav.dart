@@ -30,17 +30,14 @@ class AnimatedBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceDark,
-        border: Border(top: BorderSide(color: AppColors.red.withOpacity(0.35), width: 1)),
-        boxShadow: [
-          BoxShadow(color: AppColors.red.withOpacity(0.25), blurRadius: 16, offset: const Offset(0, -3)),
-        ],
+      decoration: const BoxDecoration(
+        color: AppColors.black,
+        border: Border(top: BorderSide(color: AppColors.steel, width: 1)),
       ),
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 60,
+          height: 62,
           child: Row(
             children: List.generate(items.length, (i) {
               return Expanded(
@@ -80,7 +77,7 @@ class _NavBarButtonState extends State<_NavBarButton> {
   @override
   Widget build(BuildContext context) {
     final selected = widget.selected;
-    final color = selected ? AppColors.red : Colors.white38;
+    final color = selected ? AppColors.blue : AppColors.textMutedDark;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) => _setPressed(true),
@@ -98,27 +95,18 @@ class _NavBarButtonState extends State<_NavBarButton> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOut,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: selected ? AppColors.red.withOpacity(0.16) : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                selected ? (widget.item.activeIcon ?? widget.item.icon) : widget.item.icon,
-                color: color,
-                size: 23,
-              ),
+            Icon(
+              selected ? (widget.item.activeIcon ?? widget.item.icon) : widget.item.icon,
+              color: color,
+              size: 24,
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
                 color: color,
                 fontSize: 11,
-                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               ),
               child: Text(widget.item.label),
             ),
