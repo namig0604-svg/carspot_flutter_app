@@ -12,6 +12,7 @@ import 'gen/feature_country_city_tr.dart';
 import 'gen/feature_forgot_password_tr.dart';
 import 'gen/feature_photo_upload_tr.dart';
 import 'gen/feature_my_points_tr.dart';
+import 'gen/feature_home_redesign_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -90,6 +91,7 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeatureCarDropdownsTranslations,
   ...kFeaturePhotoUploadTranslations,
   ...kFeatureMyPointsTranslations,
+  ...kFeatureHomeRedesignTranslations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из

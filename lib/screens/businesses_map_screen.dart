@@ -15,6 +15,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/map_pin_marker.dart';
 import '../widgets/category_filter_bar.dart';
+import '../widgets/map_theme_toggle.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Карта автосервисов и тюнинг-ателье. Метки — из /api/businesses/map,
@@ -33,6 +34,8 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
   bool _isLoading = true;
   Position? _userPosition;
   final Set<String> _selectedCategories = {};
+
+  MapThemeMode _mapTheme = MapThemeMode.auto;
 
   void _toggleCategory(String value) {
     setState(() {
@@ -173,6 +176,17 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
     );
   }
 
+  String _effectiveTileUrl(BuildContext context) {
+    switch (_mapTheme) {
+      case MapThemeMode.dark:
+        return darkTileUrlTemplate;
+      case MapThemeMode.light:
+        return lightTileUrlTemplate;
+      case MapThemeMode.auto:
+        return Theme.of(context).brightness == Brightness.dark ? darkTileUrlTemplate : lightTileUrlTemplate;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final visibleMarkers = _selectedCategories.isEmpty
@@ -214,7 +228,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate: activeTileUrlTemplate,
+                urlTemplate: _effectiveTileUrl(context),
                 subdomains: tileSubdomains,
                 userAgentPackageName: mapUserAgentPackageName,
               ),
@@ -232,20 +246,35 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               color: Colors.black.withOpacity(0.35),
               child: SafeArea(
                 bottom: false,
-                child: CategoryFilterBar(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, right: 10),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: MapThemeToggle(
+                          value: _mapTheme,
+                          onChanged: (m) => setState(() => _mapTheme = m),
+                        ),
+                      ),
+                    ),
+                    CategoryFilterBar(
                   items: businessCategories
                       .map((c) => FilterChipData(c.value, c.label, c.icon, c.color))
                       .toList(),
                   selected: _selectedCategories,
                   onToggle: _toggleCategory,
                 ),
+                  ],
+                ),
               ),
             ),
           ),
-          if (_isLoading) Positioned(top: 90, left: 0, right: 0, child: Center(child: AppLoader())),
+          if (_isLoading) Positioned(top: 130, left: 0, right: 0, child: Center(child: AppLoader())),
           if (!_isLoading && markers.isEmpty)
             Positioned(
-              top: 90,
+              top: 130,
               left: 12,
               right: 12,
               child: Container(

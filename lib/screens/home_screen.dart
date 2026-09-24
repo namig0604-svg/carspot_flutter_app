@@ -57,6 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _notificationsTimer;
   String _searchQuery = '';
   String _selectedType = 'all';
+  String _sortMode = 'recommended';
+  int _eventsTotal = 0;
+  int _businessesTotal = 0;
 
   final List<String> _eventTypes = [
     'all', 'meetup', 'racing', 'drift', 'drag', 'offroad', 'show', 'cruise', 'track_day', 'charity'
@@ -71,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadEvents();
     _loadMyCars();
+    _loadBusinessesTotal();
     Future.wait([_loadMyClubs(), _loadReferral()]).then((_) => _checkGamificationProgress());
     _loadUnreadNotifications();
     _notificationsTimer = Timer.periodic(const Duration(seconds: 30), (_) => _loadUnreadNotifications());
@@ -246,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final Position? position = await determineCurrentPosition();
-      var endpoint = '/api/events/?limit=100&sort=recommended';
+      var endpoint = '/api/events/?limit=100&sort=$_sortMode';
       if (position != null) {
         endpoint += '&latitude=${position.latitude}&longitude=${position.longitude}';
       }
@@ -256,6 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       setState(() {
         _events = response['items'] ?? [];
+        _eventsTotal = (response['total'] as num?)?.toInt() ?? _events.length;
         _filterEvents();
       });
     } catch (e) {
@@ -265,12 +270,29 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _loadBusinessesTotal() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final response = await ApiService.get('/api/businesses/?limit=1', token: authProvider.accessToken);
+      if (mounted) setState(() => _businessesTotal = (response['total'] as num?)?.toInt() ?? 0);
+    } catch (_) {
+      // Счётчик не критичен для работы экрана — тихо оставляем 0.
+    }
+  }
+
   void _filterEvents() {
     _filteredEvents = _events.where((event) {
       bool matchesSearch = event['title'].toString().toLowerCase().contains(_searchQuery.toLowerCase());
       bool matchesType = _selectedType == 'all' || event['event_type'] == _selectedType;
       return matchesSearch && matchesType;
     }).toList();
+  }
+
+  void _setSortMode(String mode) {
+    if (_sortMode == mode) return;
+    HapticFeedback.selectionClick();
+    setState(() => _sortMode = mode);
+    _loadEvents();
   }
 
   Future<void> _toggleEventFavorite(Map event) async {
@@ -433,9 +455,9 @@ class _HomeScreenState extends State<HomeScreen> {
         // Истории (24ч)
         const StoriesBar(),
 
-        // Поиск
+        // Поиск — пилюля, как на карточках-референсах
         Padding(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: TextField(
             onChanged: (value) {
               setState(() {
@@ -446,10 +468,19 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: InputDecoration(
               hintText: context.t('home.search_hint'),
               prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(28)),
             ),
           ),
         ),
+
+        // Вкладки сортировки (Популярные / Новые / Ближайшие) — отражают
+        // sort=popular|new|recommended на бэкенде (GET /api/events/).
+        _buildSortTabs(),
+        const SizedBox(height: 10),
+
+        // Карточки-счётчики быстрого перехода — сходки/сервисы/клубы.
+        _buildQuickStats(),
+        const SizedBox(height: 6),
 
         // Фильтр по типу
         SizedBox(
@@ -477,6 +508,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
+          ),
+        ),
+
+        // Заголовок секции списка
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 4),
+          child: Row(
+            children: [
+              Text(
+                context.t('home.section_soon'),
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+              ),
+              const SizedBox(width: 8),
+              Text('${_filteredEvents.length}', style: const TextStyle(color: Colors.grey)),
+            ],
           ),
         ),
 
@@ -510,11 +556,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         margin: const EdgeInsets.all(10),
                         child: ListTile(
                           leading: CircleAvatar(
-                            child: Text(
-                              ((event['event_type'] as String?) ?? '').isNotEmpty
-                                  ? (event['event_type'] as String)[0].toUpperCase()
-                                  : '?',
-                            ),
+                            backgroundColor: eventCategoryColor(event['event_type']),
+                            child: Icon(eventCategoryIcon(event['event_type']), color: Colors.white, size: 20),
                           ),
                           title: Row(
                             children: [
@@ -582,6 +625,111 @@ color: (event['is_joined'] ?? false) ? Colors.green : Colors.grey,              
                 ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSortTabs() {
+    final modes = [
+      ('recommended', context.t('home.sort_nearest'), Icons.near_me),
+      ('popular', context.t('home.sort_popular'), Icons.trending_up),
+      ('new', context.t('home.sort_new'), Icons.auto_awesome),
+    ];
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        children: modes.map((m) {
+          final selected = _sortMode == m.$1;
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: GestureDetector(
+                onTap: () => _setSortMode(m.$1),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: selected ? AppColors.blue : AppColors.surfaceDarkAlt,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(m.$3, size: 15, color: selected ? Colors.white : Colors.grey),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          m.$2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: selected ? Colors.white : Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _quickStatCard({required IconData icon, required Color color, required String label, required int count, VoidCallback? onTap}) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceDark,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: color.withOpacity(0.5)),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(height: 4),
+              Text('$count', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+              Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey), overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickStats() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Row(
+        children: [
+          _quickStatCard(
+            icon: Icons.event_available,
+            color: Colors.amber,
+            label: context.t('home.quick_soon'),
+            count: _eventsTotal,
+          ),
+          _quickStatCard(
+            icon: Icons.car_repair,
+            color: AppColors.red,
+            label: context.t('home.quick_services'),
+            count: _businessesTotal,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BusinessesListScreen())),
+          ),
+          _quickStatCard(
+            icon: Icons.groups,
+            color: AppColors.blue,
+            label: context.t('home.quick_clubs'),
+            count: _myClubs.length,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClubsListScreen())).then((_) => _loadMyClubs()),
+          ),
+        ],
+      ),
     );
   }
 

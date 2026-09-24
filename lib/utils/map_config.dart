@@ -30,6 +30,11 @@ const String osmTileUrlTemplate = 'https://tile.openstreetmap.org/{z}/{x}/{y}.pn
 const String darkTileUrlTemplate =
     'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 
+/// Svetlye minimalistichnye tayly CartoDB Positron - dlya perekluchatelya
+/// temy karty (Temnaya/Svetlaya/Avto) na ekranah karty.
+const String lightTileUrlTemplate =
+    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+
 /// Aktivnyy istochnik taylov karty - ispolzuetsya vo vseh ekranah s kartoy.
 const String activeTileUrlTemplate = darkTileUrlTemplate;
 
