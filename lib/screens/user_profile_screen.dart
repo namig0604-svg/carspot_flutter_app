@@ -17,6 +17,7 @@ import '../widgets/app_loader.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/admin_ranks.dart';
 
 /// Публичный профиль пользователя (не свой): машины, клубы, статистика.
 class UserProfileScreen extends StatefulWidget {
@@ -41,6 +42,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   String? get _myId => Provider.of<AuthProvider>(context, listen: false).user?['id'];
   bool get _isMe => widget.userId == _myId;
+  int get _myAdminLevel => adminRankLevel(
+      Provider.of<AuthProvider>(context, listen: false).user?['admin_rank'] as String?);
 
   @override
   void initState() {
@@ -77,6 +80,62 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('user_profile.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _grantCoins() async {
+    final user = _user;
+    if (user == null) return;
+    final amountController = TextEditingController();
+    final reasonController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceDark,
+        title: Text(context.tArgs('admin_ranks.grant_coins_title', {'username': '@${user['username']}'}),
+            style: const TextStyle(color: AppColors.textOnDark)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: AppColors.textOnDark),
+              decoration: InputDecoration(labelText: context.t('admin_ranks.amount_label')),
+              autofocus: true,
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: reasonController,
+              style: const TextStyle(color: AppColors.textOnDark),
+              decoration: InputDecoration(labelText: context.t('admin_ranks.reason_label_optional')),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(context.t('common.confirm'))),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final amount = int.tryParse(amountController.text.trim());
+    if (amount == null || amount <= 0) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('admin_ranks.invalid_amount'))));
+      return;
+    }
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final body = <String, dynamic>{'amount': amount};
+      if (reasonController.text.trim().isNotEmpty) body['reason'] = reasonController.text.trim();
+      final response = await ApiService.post('/api/admin/coins/grant/${widget.userId}', body, token: authProvider.accessToken);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tArgs('admin_ranks.grant_coins_success', {'amount': '$amount', 'balance': '${response['balance']}'}))),
+        );
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
     }
   }
 
@@ -448,6 +507,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               icon: const Icon(Icons.flag_outlined),
               tooltip: context.t('user_profile.report_tooltip'),
               onPressed: () => showReportDialog(context, targetType: 'user', targetId: widget.userId),
+            ),
+          if (!_isMe && _myAdminLevel >= kTechAdminLevel)
+            IconButton(
+              icon: const Icon(Icons.monetization_on_outlined, color: AppColors.amber),
+              tooltip: context.t('admin_ranks.grant_coins_tooltip'),
+              onPressed: _grantCoins,
             ),
         ],
       ),

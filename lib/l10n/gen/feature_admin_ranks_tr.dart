@@ -25,6 +25,11 @@ const Map<String, Map<String, String>> kFeatureAdminRanksTranslations = {
     'en': 'Search by username',
     'ka': 'ძებნა მომხმარებლის სახელით',
   },
+  'admin_ranks.grant_coins_tooltip': {
+    'ru': 'Выдать монеты',
+    'en': 'Grant coins',
+    'ka': 'მონეტების გაცემა',
+  },
   'admin_ranks.grant_coins_title': {
     'ru': 'Выдать монеты {username}',
     'en': 'Grant coins to {username}',
