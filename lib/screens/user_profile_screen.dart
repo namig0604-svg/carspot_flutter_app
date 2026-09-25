@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../utils/gamification.dart';
+import '../utils/cosmetics.dart';
+import '../widgets/equipped_avatar.dart';
+import 'profile_boost_screen.dart';
 import '../widgets/report_dialog.dart';
 import 'car_detail_screen.dart';
 import 'chat_room_screen.dart';
@@ -409,6 +412,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         likesCount: (_user!['likes_count'] ?? 0) as int,
         isVerified: isVerified,
         isPremium: isPremium,
+        bonusXp: (_user!['xp'] ?? 0) as int,
       );
       stats = computeStats(xp);
       achievements = buildAchievements(
@@ -433,6 +437,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         backgroundColor: AppColors.black,
         elevation: 0,
         actions: [
+          if (_isMe)
+            IconButton(
+              icon: const Icon(Icons.bolt, color: Colors.amber),
+              tooltip: context.t('profile_boost.title'),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileBoostScreen())),
+            ),
           if (!_isMe)
             IconButton(
               icon: const Icon(Icons.flag_outlined),
@@ -457,40 +467,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         Center(
                           child: Column(
                             children: [
-                              Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 45,
-                                    backgroundImage: (_user!['avatar_url'] != null &&
-                                            (_user!['avatar_url'] as String).isNotEmpty)
-                                        ? NetworkImage(resolveImageUrl(_user!['avatar_url']))
-                                        : null,
-                                    child: (_user!['avatar_url'] == null ||
-                                            (_user!['avatar_url'] as String).isEmpty)
-                                        ? Text(
-                                            (_user!['username'] as String).isNotEmpty
-                                                ? _user!['username'][0].toUpperCase()
-                                                : 'U',
-                                            style: const TextStyle(fontSize: 32),
-                                          )
-                                        : null,
-                                  ),
-                                  if (_user!['is_online'] == true)
-                                    Positioned(
-                                      right: 0,
-                                      bottom: 0,
-                                      child: Container(
-                                        width: 16,
-                                        height: 16,
-                                        decoration: BoxDecoration(
-                                          color: Colors.green,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.white, width: 3),
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                              EquippedAvatar(
+                                avatarUrl: _user!['avatar_url'] as String?,
+                                fallbackLetter: (_user!['username'] as String).isNotEmpty
+                                    ? _user!['username'][0].toUpperCase()
+                                    : 'U',
+                                radius: 45,
+                                equippedFrame: _user!['equipped_frame'] as String?,
+                                equippedBadge: _user!['equipped_badge'] as String?,
+                                isOnline: _user!['is_online'] == true,
                               ),
                               const SizedBox(height: 12),
                               Row(
@@ -499,7 +484,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   Flexible(
                                     child: Text(
                                       _user!['full_name'] ?? _user!['username'],
-                                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: nameColorFor(_user!['equipped_name_color'] as String?),
+                                      ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),

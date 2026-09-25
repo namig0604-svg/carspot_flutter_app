@@ -65,6 +65,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
           likesCount: (user['likes_count'] ?? 0) as int,
           isVerified: user['is_verified'] == true,
           isPremium: user['is_premium'] == true,
+          bonusXp: (user['xp'] ?? 0) as int,
         );
         final stats = computeStats(xp);
         return {'user': user, 'stats': stats};

@@ -105,6 +105,11 @@ int computeXp({
   int likesCount = 0,
   bool isVerified = false,
   bool isPremium = false,
+  // Бонусный XP, купленный за монеты CarSpot Coins (поле `xp` в ответе
+  // API у пользователя) — прибавляется поверх честно посчитанной статистики,
+  // а не подменяет её, поэтому уровень не может "разъехаться": без покупок
+  // bonusXp = 0 и ничего не меняется.
+  int bonusXp = 0,
 }) {
   int xp = eventsAttended * 20 +
       eventsCreated * 40 +
@@ -117,7 +122,7 @@ int computeXp({
   if (averageRating >= 5.0 && ratingsCount >= 10) xp += 50;
   if (isVerified) xp += 50;
   if (isPremium) xp += 100;
-  return xp;
+  return xp + bonusXp;
 }
 
 GamificationStats computeStats(int xp) {

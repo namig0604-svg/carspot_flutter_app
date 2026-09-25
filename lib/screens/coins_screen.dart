@@ -6,6 +6,7 @@ import '../l10n/l10n_extensions.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/coin_billing_service.dart';
+import 'profile_boost_screen.dart';
 import '../theme/app_colors.dart';
 import '../utils/sound_player.dart';
 
@@ -179,6 +180,16 @@ class _CoinsScreenState extends State<CoinsScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileBoostScreen())),
+                icon: const Icon(Icons.bolt, color: Colors.amber),
+                label: Text(context.t('coins.open_profile_boost')),
+                style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
               ),
             ),
             const SizedBox(height: 20),

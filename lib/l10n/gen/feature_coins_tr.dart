@@ -60,4 +60,61 @@ const Map<String, Map<String, String>> kFeatureCoinsTranslations = {
   'coins.tx_purchase': {'ru': 'Покупка монет', 'en': 'Coin purchase', 'ka': 'მონეტების შესყიდვა'},
   'coins.tx_boost_event': {'ru': 'Буст сходки', 'en': 'Event boost', 'ka': 'შეხვედრის დაწინაურება'},
   'coins.tx_boost_business': {'ru': 'Буст автосервиса', 'en': 'Business boost', 'ka': 'ავტოსერვისის დაწინაურება'},
+
+  'coins.open_profile_boost': {
+    'ru': 'Прокачать профиль',
+    'en': 'Boost your profile',
+    'ka': 'პროფილის გაუმჯობესება',
+  },
+
+  'profile_boost.title': {'ru': 'Прокачка профиля', 'en': 'Profile boost', 'ka': 'პროფილის გაუმჯობესება'},
+  'profile_boost.xp_title': {'ru': 'Бонусный опыт', 'en': 'Bonus XP', 'ka': 'ბონუს გამოცდილება'},
+  'profile_boost.xp_body': {
+    'ru': 'Сейчас бонуса: {bonus} XP. Он прибавляется поверх обычного уровня, который считается по вашей активности в приложении.',
+    'en': 'Current bonus: {bonus} XP. It is added on top of your normal level, which is based on your activity in the app.',
+    'ka': 'ამჟამინდელი ბონუსი: {bonus} XP. ის ემატება ჩვეულებრივ დონეს, რომელიც გამოითვლება აპში თქვენი აქტივობის მიხედვით.',
+  },
+  'profile_boost.xp_buy_button': {
+    'ru': 'Купить +{grant} XP за {cost} монет',
+    'en': 'Buy +{grant} XP for {cost} coins',
+    'ka': 'იყიდეთ +{grant} XP {cost} მონეტად',
+  },
+  'profile_boost.xp_bought_snackbar': {
+    'ru': 'Бонусный опыт начислен! 🎉',
+    'en': 'Bonus XP credited! 🎉',
+    'ka': 'ბონუს გამოცდილება ჩაირიცხა! 🎉',
+  },
+
+  'profile_boost.search_title': {'ru': 'Буст в поиске', 'en': 'Search boost', 'ka': 'ძებნის დაწინაურება'},
+  'profile_boost.search_body': {
+    'ru': 'Поднимите свой профиль в топ результатов поиска пользователей на {hours} ч.',
+    'en': 'Boost your profile to the top of user search results for {hours} h.',
+    'ka': 'აწიეთ თქვენი პროფილი მომხმარებელთა ძებნის შედეგების თავში {hours} სთ-ით.',
+  },
+  'profile_boost.search_buy_button': {
+    'ru': 'Поднять профиль за {cost} монет',
+    'en': 'Boost profile for {cost} coins',
+    'ka': 'პროფილის აწევა {cost} მონეტად',
+  },
+  'profile_boost.search_active': {
+    'ru': 'Буст уже активен',
+    'en': 'Boost already active',
+    'ka': 'დაწინაურება უკვე აქტიურია',
+  },
+  'profile_boost.search_boost_bought_snackbar': {
+    'ru': 'Профиль поднят в топ поиска! 🎉',
+    'en': 'Profile boosted to the top of search! 🎉',
+    'ka': 'პროფილი აიწია ძებნის თავში! 🎉',
+  },
+
+  'profile_boost.frames_title': {'ru': 'Рамки аватара', 'en': 'Avatar frames', 'ka': 'ავატარის ჩარჩოები'},
+  'profile_boost.badges_title': {'ru': 'Значки', 'en': 'Badges', 'ka': 'ნიშნები'},
+  'profile_boost.colors_title': {'ru': 'Цвет имени', 'en': 'Name color', 'ka': 'სახელის ფერი'},
+  'profile_boost.cosmetic_buy': {
+    'ru': 'Купить за {cost}',
+    'en': 'Buy for {cost}',
+    'ka': 'ყიდვა {cost}-ად',
+  },
+  'profile_boost.cosmetic_equip': {'ru': 'Надеть', 'en': 'Equip', 'ka': 'ატარება'},
+  'profile_boost.cosmetic_unequip': {'ru': 'Снять', 'en': 'Unequip', 'ka': 'მოხსნა'},
 };

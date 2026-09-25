@@ -160,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
       likesCount: (user['likes_count'] ?? 0) as int,
       isVerified: user['is_verified'] == true,
       isPremium: user['is_premium'] == true,
+      bonusXp: (user['xp'] ?? 0) as int,
     );
     final stats = computeStats(xp);
     final achievements = buildAchievements(
@@ -1020,6 +1021,7 @@ class _HomeScreenState extends State<HomeScreen> {
       likesCount: (user['likes_count'] ?? 0) as int,
       isVerified: isVerified,
       isPremium: isPremium,
+      bonusXp: (user['xp'] ?? 0) as int,
     );
     final stats = computeStats(xp);
     final achievements = buildAchievements(
