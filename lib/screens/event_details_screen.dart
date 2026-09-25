@@ -438,7 +438,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             _buildInfoCard(
               icon: Icons.calendar_today,
               title: context.t('event_details.date_time_label'),
-              value: formatEventDateTime(_event['event_date'], _event['event_time'] as String?)
+              value: formatEventDateTime(_event['event_date'], _event['event_time'] as String?) +
                   '${_event['duration_minutes'] != null ? " · ${formatEventDuration(_event['duration_minutes'] as int)}" : ""}',
             ),
             const SizedBox(height: 10),
