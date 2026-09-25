@@ -1,5 +1,5 @@
 [build]
-  command = "git clone https://github.com/flutter/flutter.git -b stable --depth 1 _flutter && export PATH=\"$PWD/_flutter/bin:$PATH\" && flutter config --no-analytics && flutter pub get && flutter build web --release --base-href /"
+  command = "if [ -d _flutter ]; then (cd _flutter && git pull --ff-only || (cd .. && rm -rf _flutter && git clone https://github.com/flutter/flutter.git -b stable --depth 1 _flutter)); else git clone https://github.com/flutter/flutter.git -b stable --depth 1 _flutter; fi && export PATH=\"$PWD/_flutter/bin:$PATH\" && flutter config --no-analytics && flutter pub get && flutter build web --release --base-href /"
   publish = "build/web"
 
 [[redirects]]
