@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../services/billing_service.dart';
 import 'people_list_screen.dart';
 import '../theme/app_colors.dart';
 import '../utils/sound_player.dart';
@@ -33,17 +36,64 @@ class _PremiumScreenState extends State<PremiumScreen> {
   int _pollAttempts = 0;
   bool _isCheckingOut = false;
 
+  bool _isBuyingGooglePlay = false;
+
   @override
   void initState() {
     super.initState();
     _loadReferral();
     _loadPlans();
+    _initGooglePlayBilling();
   }
 
   @override
   void dispose() {
     _paymentPollTimer?.cancel();
+    BillingService.instance.onPurchaseVerified = null;
+    BillingService.instance.onPurchaseError = null;
     super.dispose();
+  }
+
+  /// Google Play Billing — если товары ещё не заведены в Play Console (или
+  /// мы не на Android), просто ничего не покажется в интерфейсе, оплата
+  /// через Trybit ниже продолжит работать как раньше.
+  Future<void> _initGooglePlayBilling() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    BillingService.instance.onPurchaseVerified = (productId) async {
+      await authProvider.getCurrentUser();
+      if (!mounted) return;
+      setState(() => _isBuyingGooglePlay = false);
+      SoundPlayer.play(context, AppSound.success);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.t('premium.payment_confirmed_snackbar'))),
+      );
+    };
+    BillingService.instance.onPurchaseError = (message) {
+      if (!mounted) return;
+      setState(() => _isBuyingGooglePlay = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.tArgs('premium.generic_error', {'error': message}))),
+      );
+    };
+    await BillingService.instance.initialize(() => authProvider.accessToken ?? '');
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _buyGooglePlay(ProductDetails product) async {
+    if (_isBuyingGooglePlay) return;
+    setState(() => _isBuyingGooglePlay = true);
+    try {
+      await BillingService.instance.buy(product);
+      // Дальше подхватит покупку purchaseStream -> onPurchaseVerified/onPurchaseError
+      // (см. _initGooglePlayBilling) — результат придёт асинхронно, не сразу.
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isBuyingGooglePlay = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tArgs('premium.generic_error', {'error': '$e'}))),
+        );
+      }
+    }
   }
 
   Future<void> _loadReferral() async {
@@ -233,6 +283,76 @@ class _PremiumScreenState extends State<PremiumScreen> {
     }
   }
 
+  /// Кнопки оплаты через Google Play Billing. Пока в Play Console не
+  /// заведены товары carspot_premium_month/carspot_premium_year (см.
+  /// lib/services/billing_service.dart), список products пуст — секция
+  /// просто не рисует ничего, и остаётся привычная оплата через Trybit
+  /// ниже. Ничего не ломается до тех пор, пока приложение не попадёт в
+  /// Google Play.
+  Widget _buildGooglePlaySection(Color cardSurface, Color cardText) {
+    final products = BillingService.instance.products;
+    if (!BillingService.instance.isAvailable || products.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Color.alphaBlend(Colors.green.withOpacity(0.10), cardSurface),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.green.withOpacity(0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.shop, color: Colors.green, size: 18),
+                const SizedBox(width: 6),
+                Text('Google Play', style: TextStyle(fontWeight: FontWeight.bold, color: cardText, fontSize: 13)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            for (final product in products)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isBuyingGooglePlay ? null : () => _buyGooglePlay(product),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: _isBuyingGooglePlay
+                        ? const SizedBox(
+                            width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                child: Text(product.title, overflow: TextOverflow.ellipsis),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(product.price, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+            TextButton(
+              onPressed: () => BillingService.instance.restorePurchases(),
+              child: const Text('Восстановить покупки'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _perkTile(IconData icon, String title, String subtitle) {
     return ListTile(
       leading: CircleAvatar(
@@ -357,6 +477,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 10),
+
+            _buildGooglePlaySection(cardSurface, cardText),
 
             if (_isLoadingPlans)
               const Padding(
