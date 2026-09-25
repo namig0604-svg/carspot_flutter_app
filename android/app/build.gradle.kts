@@ -30,10 +30,23 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        // Фиксированный debug-ключ, закоммиченный в репозиторий (не секрет,
+        // используется только для sideload-сборок вне Google Play). Без
+        // этого каждая сборка на GitHub Actions подписывалась бы новым
+        // случайным ключом раннера, и телефон отказывался бы ставить новую
+        // версию поверх старой ("App not installed") — пришлось бы каждый
+        // раз сначала удалять приложение.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
