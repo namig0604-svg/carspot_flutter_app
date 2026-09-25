@@ -114,7 +114,7 @@ class LiveLocationController extends ChangeNotifier {
 
   /// Маркеры чужих живых меток — с ником над точкой.
   List<Marker> buildPeerMarkers({required void Function(Map<String, dynamic> peer) onTap}) {
-    return peers.whereType<Map>().map<Marker>((raw) {
+    return peers.whereType<Map>().map<Marker?>((raw) {
       final peer = raw.cast<String, dynamic>();
       final lat = (peer['lat'] as num?)?.toDouble();
       final lng = (peer['lng'] as num?)?.toDouble();
