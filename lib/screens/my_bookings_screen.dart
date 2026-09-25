@@ -64,6 +64,68 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     }
   }
 
+  Future<void> _leaveReview(String businessId) async {
+    int rating = 5;
+    final textController = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: const Text('Оставить отзыв'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (i) {
+                  final starIndex = i + 1;
+                  return IconButton(
+                    icon: Icon(
+                      starIndex <= rating ? Icons.star : Icons.star_border,
+                      color: Colors.amber,
+                    ),
+                    onPressed: () => setDialogState(() => rating = starIndex),
+                  );
+                }),
+              ),
+              TextField(
+                controller: textController,
+                maxLines: 3,
+                maxLength: 500,
+                decoration: const InputDecoration(hintText: 'Как всё прошло? (необязательно)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Отмена')),
+            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Отправить')),
+          ],
+        ),
+      ),
+    );
+
+    if (result != true) return;
+
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await ApiService.post(
+        '/api/businesses/$businessId/reviews',
+        {
+          'rating': rating,
+          if (textController.text.trim().isNotEmpty) 'text': textController.text.trim(),
+        },
+        token: authProvider.accessToken,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Спасибо за отзыв!')));
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+    }
+  }
+
   String _formatWhen(String iso) {
     try {
       final dt = DateTime.parse(iso).toLocal();
@@ -91,12 +153,12 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
               onRefresh: _load,
               child: _items.isEmpty
                   ? ListView(
-                      children: [
+                    children: [
                         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                         const Icon(Icons.event_available, size: 64, color: Colors.grey),
                         const SizedBox(height: 16),
                         const Center(
-                          child: Text('У вас пока нет записей', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                        child: Text('Увас пока нет записей', style: TextStyle(fontSize: 16, color: Colors.grey)),
                         ),
                       ],
                     )
@@ -108,6 +170,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                         final business = b['business'] as Map<String, dynamic>?;
                         final status = (b['status'] as String?) ?? 'pending';
                         final canCancel = status == 'pending' || status == 'confirmed';
+                        final canReview = status == 'completed' && business != null;
                         return Container(
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
@@ -119,70 +182,86 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                            Row(
                                 children: [
-                                  Expanded(
+                                Expanded(
                                     child: GestureDetector(
                                       onTap: business == null
                                           ? null
                                           : () => Navigator.push(
-                                              context,
+                                                context,
                                               MaterialPageRoute(builder: (_) => BusinessDetailScreen(businessId: business['id'])),
                                             ),
                                       child: Text(
                                         business?['name'] ?? 'Заведение',
                                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
+                                    ),
+                                ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: (_statusColors[status] ?? Colors.grey).withOpacity(0.16),
                                       borderRadius: BorderRadius.circular(8),
-                                    ),
+                                ),
                                     child: Text(
                                       _statusLabels[status] ?? status,
                                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: _statusColors[status] ?? Colors.grey),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              if ((b['service'] ?? '').toString().isNotEmpty)
-                                Text(b['service'], style: const TextStyle(fontSize: 13, color: AppColors.textMutedDark)),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(Icons.schedule, size: 14, color: AppColors.textMutedDark),
-                                  const SizedBox(width: 4),
-                                  Text(_formatWhen(b['requested_at'] as String? ?? ''), style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
-                                ],
-                              ),
-                              if (status == 'declined' && (b['decline_reason'] ?? '').toString().isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text('Причина: ${b['decline_reason']}', style: const TextStyle(fontSize: 12, color: AppColors.red)),
-                              ],
-                              if (canCancel) ...[
-                                const SizedBox(height: 8),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: OutlinedButton(
-                                    onPressed: () => _cancel(b['id'] as String),
-                                    style: OutlinedButton.styleFrom(
-                                      minimumSize: const Size(0, 34),
-                                      side: const BorderSide(color: AppColors.steel),
-                                    ),
-                                    child: const Text('Отменить'),
                                   ),
                                 ),
-                              ],
-                            ],
+                        ],
+                        ),
+                        const SizedBox(height: 6),
+                        if ((b['service'] ?? '').toString().isNotEmpty)
+                            Text(b['service'], style: const TextStyle(fontSize: 13, color: AppColors.textMutedDark)),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(Icons.schedule, size: 14, color: AppColors.textMutedDark),
+                              const SizedBox(width: 4),
+                              Text(_formatWhen(b['requested_at'] as String? ?? ''), style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
+                          ],
+                        ),
+                        if (status == 'declined' && (b['decline_reason'] ?? '').toString().isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text('Причина: ${b['decline_reason']}', style: const TextStyle(fontSize: 12, color: AppColors.red)),
+                        ],
+                        if (canCancel) ...[
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: OutlinedButton(
+                              onPressed: () => _cancel(b['id'] as String),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(0, 34),
+                                side: const BorderSide(color: AppColors.steel),
+                              ),
+                              child: const Text('Отменить'),
+                            ),
                           ),
-                        );
-                      },
+                        ],
+                        if (canReview) ...[
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: OutlinedButton.icon(
+                              onPressed: () => _leaveReview(business!['id'] as String),
+                              icon: const Icon(Icons.star_border, size: 18),
+                              label: const Text('Оставить отзыв'),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(0, 34),
+                                side: const BorderSide(color: Colors.amber),
+                                foregroundColor: Colors.amber,
+                            ),
+                            ),
+                          ),
+                        ],
+                        ],
                     ),
+                    );
+                  },
+                ),
             ),
     );
   }

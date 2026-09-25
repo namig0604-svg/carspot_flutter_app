@@ -29,6 +29,13 @@ import 'favorites_screen.dart';
 import 'my_points_screen.dart';
 import 'forum_categories_screen.dart';
 import 'my_bookings_screen.dart';
+import 'parking_screen.dart';
+import 'maintenance_screen.dart';
+import 'car_documents_screen.dart';
+import 'car_expenses_screen.dart';
+import 'sos_screen.dart';
+import 'vin_decoder_screen.dart';
+import 'hazards_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
@@ -38,6 +45,7 @@ import '../widgets/neon_chip.dart';
 import '../widgets/animated_counter.dart';
 import '../widgets/stories_bar.dart';
 import '../widgets/animated_menu_tile.dart';
+import '../widgets/weather_alert_banner.dart';
 import '../widgets/animated_bottom_nav.dart';
 import '../utils/sound_player.dart';
 import '../utils/event_category.dart';
@@ -1215,6 +1223,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
 
+          const SizedBox(height: 20),
+          const WeatherAlertBanner(),
+
           // Сетка быстрых действий — сюда переехали "Друзья" (раньше жили
           // в Настройках), "Клубы", "Лидеры", "Сервисы" и "Настройки" из
           // прежней тесной нижней навигации. Каждая плитка — с тактильной
@@ -1354,6 +1365,90 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.local_parking,
+                  label: 'Парковка',
+                  color: Colors.indigo,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ParkingScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.build,
+                  label: 'Сервисный дневник',
+                  color: Colors.brown,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MaintenanceScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.description,
+                  label: 'Документы',
+                  color: Colors.blueGrey,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CarDocumentsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.attach_money,
+                  label: 'Расходы',
+                  color: Colors.green,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CarExpensesScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.sos,
+                  label: 'SOS',
+                  color: Colors.red,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SosScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.qr_code_scanner,
+                  label: 'Проверка VIN',
+                  color: Colors.purple,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const VinDecoderScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.warning_amber_rounded,
+                  label: 'Опасности на дороге',
+                  color: Colors.orange,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HazardsScreen()),
                   ),
                 ),
               ),
