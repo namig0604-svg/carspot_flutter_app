@@ -27,11 +27,15 @@ class BillingService {
   static const String yearlyProductId = 'carspot_premium_year';
   static const String basicMonthlyProductId = 'carspot_basic_month';
   static const String basicYearlyProductId = 'carspot_basic_year';
+  static const String maxMonthlyProductId = 'carspot_max_month';
+  static const String maxYearlyProductId = 'carspot_max_year';
   static const Set<String> _productIds = {
     monthlyProductId,
     yearlyProductId,
     basicMonthlyProductId,
     basicYearlyProductId,
+    maxMonthlyProductId,
+    maxYearlyProductId,
   };
 
   final InAppPurchase _iap = InAppPurchase.instance;

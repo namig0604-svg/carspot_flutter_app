@@ -361,8 +361,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
       final tier = (plan['tier'] as String?) ?? 'pro';
       byTier.putIfAbsent(tier, () => []).add(plan);
     }
-    // Pro сверху — это флагманский план с максимумом плюшек.
-    final order = ['pro', 'basic'];
+    // Max сверху — самый жирный план, Pro — золотая середина.
+    final order = ['max', 'pro', 'basic'];
+    final tierTitles = {'max': 'CarSpot Max', 'pro': 'CarSpot Pro', 'basic': 'CarSpot Basic'};
+    final tierBadgeColors = {'max': Colors.purple.shade700, 'pro': Colors.amber.shade700};
+    final tierBadgeKeys = {'max': 'premium.top_tier_badge', 'pro': 'premium.best_value_badge'};
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -374,19 +377,19 @@ class _PremiumScreenState extends State<PremiumScreen> {
               child: Row(
                 children: [
                   Text(
-                    tier == 'pro' ? 'CarSpot Pro' : 'CarSpot Basic',
+                    tierTitles[tier] ?? tier,
                     style: TextStyle(fontWeight: FontWeight.bold, color: cardText, fontSize: 14),
                   ),
-                  if (tier == 'pro') ...[
+                  if (tierBadgeKeys.containsKey(tier)) ...[
                     const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.amber.shade700,
+                        color: tierBadgeColors[tier],
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        context.t('premium.best_value_badge'),
+                        context.t(tierBadgeKeys[tier]!),
                         style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -429,7 +432,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _tierCompareRow(String label, {required bool basic, required bool pro, String? basicNote, String? proNote}) {
+  Widget _tierCompareRow(
+    String label, {
+    required bool basic,
+    required bool pro,
+    required bool max,
+    String? basicNote,
+    String? proNote,
+    String? maxNote,
+  }) {
     Widget cell(bool has, String? note) {
       return Expanded(
         child: Column(
@@ -450,6 +461,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           Expanded(flex: 3, child: Text(label, style: const TextStyle(fontSize: 13))),
           cell(basic, basicNote),
           cell(pro, proNote),
+          cell(max, maxNote),
         ],
       ),
     );
@@ -533,7 +545,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                           isPremium
                               ? (premiumTier == 'basic'
                                   ? context.t('premium.status_active_basic')
-                                  : context.t('premium.status_active_pro'))
+                                  : premiumTier == 'max'
+                                      ? context.t('premium.status_active_max')
+                                      : context.t('premium.status_active_pro'))
                               : context.t('premium.status_inactive'),
                           style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
@@ -776,15 +790,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         const Expanded(flex: 3, child: SizedBox()),
                         Expanded(child: Text('Basic', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: cardText))),
                         Expanded(child: Text('Pro', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: cardText))),
+                        Expanded(child: Text('Max', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: cardText))),
                       ],
                     ),
                   ),
                   const Divider(height: 1),
-                  _tierCompareRow(context.t('premium.compare_garage'), basic: true, pro: true, basicNote: '15', proNote: '25'),
-                  _tierCompareRow(context.t('premium.compare_insights'), basic: true, pro: true, basicNote: '15', proNote: '50'),
-                  _tierCompareRow(context.t('premium.compare_business'), basic: true, pro: true, basicNote: '1', proNote: '5'),
-                  _tierCompareRow(context.t('premium.compare_free_boost'), basic: false, pro: true),
-                  _tierCompareRow(context.t('premium.compare_pinned_photos'), basic: false, pro: true),
+                  _tierCompareRow(context.t('premium.compare_garage'), basic: true, pro: true, max: true, basicNote: '15', proNote: '30', maxNote: '60'),
+                  _tierCompareRow(context.t('premium.compare_insights'), basic: true, pro: true, max: true, basicNote: '15', proNote: '75', maxNote: '300'),
+                  _tierCompareRow(context.t('premium.compare_business'), basic: true, pro: true, max: true, basicNote: '1', proNote: '8', maxNote: '25'),
+                  _tierCompareRow(context.t('premium.compare_free_boost'), basic: false, pro: true, max: true, proNote: '24h', maxNote: '48h'),
+                  _tierCompareRow(context.t('premium.compare_pinned_photos'), basic: false, pro: true, max: true),
+                  _tierCompareRow(context.t('premium.compare_bonus_xp'), basic: false, pro: false, max: true),
                 ],
               ),
             ),

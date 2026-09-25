@@ -22,9 +22,24 @@ const Map<String, Map<String, String>> kFeaturePremiumTiersTranslations = {
     'ka': 'გამოწერის მართვა',
   },
   'premium.best_value_badge': {
-    'ru': 'Максимум плюшек',
-    'en': 'Best value',
-    'ka': 'საუკეთესო',
+    'ru': 'Выбор большинства',
+    'en': 'Most popular',
+    'ka': 'ყველაზე პოპულარული',
+  },
+  'premium.top_tier_badge': {
+    'ru': 'Топ-уровень',
+    'en': 'Top tier',
+    'ka': 'უმაღლესი დონე',
+  },
+  'premium.status_active_max': {
+    'ru': 'CarSpot Max активен',
+    'en': 'CarSpot Max active',
+    'ka': 'CarSpot Max აქტიურია',
+  },
+  'premium.compare_bonus_xp': {
+    'ru': 'Бонус XP за покупку',
+    'en': 'Bonus XP on purchase',
+    'ka': 'ბონუს XP შეძენისას',
   },
   'premium.compare_title': {
     'ru': 'Сравнение уровней',

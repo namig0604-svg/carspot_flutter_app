@@ -125,7 +125,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                 children: [
                   Text(
                     isPremium
-                        ? (tier == 'basic' ? 'CarSpot Basic' : 'CarSpot Pro')
+                        ? (tier == 'basic' ? 'CarSpot Basic' : tier == 'max' ? 'CarSpot Max' : 'CarSpot Pro')
                         : context.t('subscription_mgmt.no_active_plan'),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText),
                   ),
@@ -172,7 +172,8 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
                       Builder(builder: (context) {
                         final item = _history[i] as Map<String, dynamic>;
                         final status = item['status'] as String? ?? 'pending';
-                        final tierLabel = (item['tier'] as String?) == 'basic' ? 'Basic' : 'Pro';
+                        final rawTier = item['tier'] as String?;
+                        final tierLabel = rawTier == 'basic' ? 'Basic' : rawTier == 'max' ? 'Max' : 'Pro';
                         return ListTile(
                           leading: CircleAvatar(
                             backgroundColor: _statusColor(status).withOpacity(0.15),

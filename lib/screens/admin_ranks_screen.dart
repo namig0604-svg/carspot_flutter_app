@@ -151,6 +151,12 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
                 title: const Text('CarSpot Pro'),
                 onChanged: (v) => setDialogState(() => selectedTier = v ?? selectedTier),
               ),
+              RadioListTile<String>(
+                value: 'max',
+                groupValue: selectedTier,
+                title: const Text('CarSpot Max'),
+                onChanged: (v) => setDialogState(() => selectedTier = v ?? selectedTier),
+              ),
             ],
           ),
           actions: [
