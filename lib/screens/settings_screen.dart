@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/theme_provider.dart';
 import 'admin_panel_screen.dart';
+import 'admin_ranks_screen.dart';
 import 'premium_screen.dart';
 import 'coins_screen.dart';
 import '../theme/app_colors.dart';
@@ -72,6 +73,7 @@ class SettingsScreen extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
     final settings = context.watch<SettingsProvider>();
     final isAdmin = context.watch<AuthProvider>().user?['is_admin'] == true;
+    final hasAdminRank = context.watch<AuthProvider>().user?['admin_rank'] != null;
 
     return Scaffold(
       appBar: AppBar(
@@ -136,6 +138,17 @@ class SettingsScreen extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => const AdminPanelScreen()),
                   ),
                 ),
+                if (hasAdminRank)
+                  ListTile(
+                    leading: const Icon(Icons.military_tech, color: AppColors.blue),
+                    title: Text(context.t('settings.admin_ranks_link')),
+                    subtitle: Text(context.t('settings.admin_ranks_subtitle')),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AdminRanksScreen()),
+                    ),
+                  ),
               ],
             ),
           _sectionCard(
