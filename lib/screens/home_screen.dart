@@ -53,6 +53,8 @@ import '../utils/sound_player.dart';
 import '../utils/event_category.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/cosmetics.dart';
+import '../widgets/equipped_avatar.dart';
 import '../utils/event_date.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -1043,17 +1045,12 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          CircleAvatar(
+          EquippedAvatar(
+            avatarUrl: user['avatar_url'] as String?,
+            fallbackLetter: (user['full_name'] as String?)?.substring(0, 1) ?? 'U',
             radius: 50,
-            backgroundImage: (user['avatar_url'] != null && (user['avatar_url'] as String).isNotEmpty)
-                ? NetworkImage(resolveImageUrl(user['avatar_url']))
-                : null,
-            child: (user['avatar_url'] == null || (user['avatar_url'] as String).isEmpty)
-                ? Text(
-                    (user['full_name'] as String?)?.substring(0, 1) ?? 'U',
-                    style: const TextStyle(fontSize: 40),
-                  )
-                : null,
+            equippedFrame: user['equipped_frame'] as String?,
+            equippedBadge: user['equipped_badge'] as String?,
           ),
           const SizedBox(height: 20),
           Row(
@@ -1062,7 +1059,11 @@ class _HomeScreenState extends State<HomeScreen> {
               Flexible(
                 child: Text(
                   user['full_name'] ?? context.t('home.unknown_user'),
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: nameColorFor(user['equipped_name_color'] as String?),
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

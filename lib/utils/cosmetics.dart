@@ -10,6 +10,12 @@ const Map<String, Color> kCosmeticFrameColors = {
   'frame_silver': Color(0xFFC0C0C0),
   'frame_gold': Color(0xFFFFD700),
   'frame_neon': Color(0xFF39FF14),
+  'frame_emerald': Color(0xFF10B981),
+  'frame_sapphire': Color(0xFF2563EB),
+  'frame_ruby': Color(0xFFDC2626),
+  'frame_carbon': Color(0xFF3F3F46),
+  'frame_chrome': Color(0xFFE5E7EB),
+  'frame_diamond': Color(0xFFB9F2FF),
 };
 
 const Map<String, IconData> kCosmeticBadgeIcons = {
@@ -17,6 +23,12 @@ const Map<String, IconData> kCosmeticBadgeIcons = {
   'badge_flame': Icons.local_fire_department,
   'badge_star': Icons.star,
   'badge_crown': Icons.military_tech,
+  'badge_bolt': Icons.bolt,
+  'badge_heart': Icons.favorite,
+  'badge_trophy': Icons.emoji_events,
+  'badge_target': Icons.gps_fixed,
+  'badge_rocket': Icons.rocket_launch,
+  'badge_diamond': Icons.diamond,
 };
 
 const Map<String, Color> kCosmeticNameColors = {
@@ -24,6 +36,12 @@ const Map<String, Color> kCosmeticNameColors = {
   'color_blue': Color(0xFF3B82F6),
   'color_purple': Color(0xFF9B59B6),
   'color_gold': Color(0xFFFFB020),
+  'color_green': Color(0xFF22C55E),
+  'color_cyan': Color(0xFF06B6D4),
+  'color_pink': Color(0xFFEC4899),
+  'color_orange': Color(0xFFF97316),
+  'color_teal': Color(0xFF14B8A6),
+  'color_lime': Color(0xFFA3E635),
 };
 
 Color? frameColorFor(String? cosmeticId) => cosmeticId == null ? null : kCosmeticFrameColors[cosmeticId];

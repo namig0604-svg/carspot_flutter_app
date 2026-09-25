@@ -11,6 +11,8 @@ import 'club_detail_screen.dart';
 import 'user_profile_screen.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/cosmetics.dart';
+import '../widgets/equipped_avatar.dart';
 
 /// Таблица лидеров: два таба — рейтинг пользователей по опыту (XP, считается
 /// на клиенте, как и раньше) и рейтинг клубов по активности (считается на
@@ -171,14 +173,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                           leading: Stack(
                             clipBehavior: Clip.none,
                             children: [
-                              CircleAvatar(
-                                backgroundColor: AppColors.blue.withOpacity(0.15),
-                                backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
-                                    ? NetworkImage(resolveImageUrl(avatarUrl))
-                                    : null,
-                                child: (avatarUrl == null || avatarUrl.isEmpty)
-                                    ? Text(username.isNotEmpty ? username[0].toUpperCase() : '?')
-                                    : null,
+                              EquippedAvatar(
+                                avatarUrl: avatarUrl,
+                                fallbackLetter: username.isNotEmpty ? username[0].toUpperCase() : '?',
+                                radius: 20,
+                                equippedFrame: user['equipped_frame'] as String?,
+                                equippedBadge: user['equipped_badge'] as String?,
                               ),
                               Positioned(left: -4, top: -4, child: _rankBadge(rank)),
                             ],
@@ -189,7 +189,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                                 child: Text(
                                   user['full_name'] ?? username,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: nameColorFor(user['equipped_name_color'] as String?),
+                                  ),
                                 ),
                               ),
                               if (isMe) ...[

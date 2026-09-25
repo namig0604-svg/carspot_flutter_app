@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'user_profile_screen.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/cosmetics.dart';
+import '../widgets/equipped_avatar.dart';
 
 /// Общий список людей — используется для "кто лайкнул" и "кто смотрел профиль" (Premium).
 /// Каждый элемент people — карта пользователя, опционально с ключом 'subtitle_override'
@@ -33,13 +35,17 @@ class PeopleListScreen extends StatelessWidget {
                 final avatarUrl = person['avatar_url'] as String?;
                 final subtitle = person['subtitle_override'] as String? ?? '@${person['username'] ?? ''}';
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty) ? NetworkImage(resolveImageUrl(avatarUrl)) : null,
-                    child: (avatarUrl == null || avatarUrl.isEmpty)
-                        ? Text(((person['full_name'] ?? person['username'] ?? 'U') as String).substring(0, 1).toUpperCase())
-                        : null,
+                  leading: EquippedAvatar(
+                    avatarUrl: avatarUrl,
+                    fallbackLetter: ((person['full_name'] ?? person['username'] ?? 'U') as String).substring(0, 1).toUpperCase(),
+                    radius: 20,
+                    equippedFrame: person['equipped_frame'] as String?,
+                    equippedBadge: person['equipped_badge'] as String?,
                   ),
-                  title: Text(person['full_name'] ?? person['username'] ?? ''),
+                  title: Text(
+                    person['full_name'] ?? person['username'] ?? '',
+                    style: TextStyle(color: nameColorFor(person['equipped_name_color'] as String?)),
+                  ),
                   subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
                   trailing: person['is_premium'] == true
                       ? const Icon(Icons.workspace_premium, color: Colors.amber, size: 18)
