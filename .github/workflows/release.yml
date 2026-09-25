@@ -1,0 +1,55 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: Собрать APK и опубликовать релиз
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Установить Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Установить зависимости
+        run: flutter pub get
+
+      - name: Собрать release APK
+        run: flutter build apk --release
+
+      - name: Подготовить артефакт
+        id: prep
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/CarSpot-latest.apk"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Опубликовать GitHub Release (latest)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "CarSpot — автосборка (${{ steps.prep.outputs.version }})"
+          body: |
+            Автоматическая сборка из ветки `main`.
+            Версия из pubspec.yaml: `${{ steps.prep.outputs.version }}`
+            Коммит: ${{ github.sha }}
+
+            Скачайте `CarSpot-latest.apk` ниже и установите на Android
+            (разрешите установку из неизвестных источников при первом запросе).
+          make_latest: true
+          files: |
+            dist/CarSpot-latest.apk
