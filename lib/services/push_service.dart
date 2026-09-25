@@ -25,7 +25,8 @@ class PushService {
   // Ключ Web Push сертификата (VAPID) из Firebase Console → Project settings →
   // Cloud Messaging → Web configuration. Нужен только для веб-версии — на
   // Android/iOS getToken() работает и без него.
-  static const String _webVapidKey = '';
+  static const String _webVapidKey =
+      'BASI5HlXWR4TZOM9BR9oU9SfKzV_pVre7xnM8Ajv2ubXwSlvVdriUciOPT6GpSZqSDo8nql8Ec58LbJBnoqjt_E';
 
   bool _available = false;
   String? _lastToken;
