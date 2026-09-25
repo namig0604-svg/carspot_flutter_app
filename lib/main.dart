@@ -11,9 +11,6 @@ import 'services/push_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Пока не добавлен android/app/google-services.json — tryInitialize()
-  // просто тихо ничего не делает, весь остальной запуск это не затрагивает.
-  await PushService.instance.tryInitialize();
 
   // Создаём AuthProvider здесь и сразу запускаем восстановление сессии по
   // сохранённому токену ("запомнить меня") — SplashGate ниже дождётся
@@ -22,7 +19,18 @@ void main() async {
   final authProvider = AuthProvider();
   final autoLoginFuture = authProvider.tryAutoLogin();
 
-  runApp(CarSpotApp(authProvider: authProvider, autoLoginFuture: autoLoginFuture));
+  // Инициализация Firebase (push-уведомления) запускается параллельно и
+  // НЕ блокирует первый кадр приложения — раньше здесь стоял await перед
+  // runApp(), из-за чего пользователь видел пустой экран, пока Firebase не
+  // достучится до сети (особенно заметно в вебе). Заставка (SplashGate)
+  // всё равно подождёт её завершения вместе с автовходом, просто не ценой
+  // задержки самого первого кадра.
+  final pushInitFuture = PushService.instance.tryInitialize();
+
+  runApp(CarSpotApp(
+    authProvider: authProvider,
+    autoLoginFuture: Future.wait([autoLoginFuture, pushInitFuture]).then((_) {}),
+  ));
 }
 
 class CarSpotApp extends StatelessWidget {
