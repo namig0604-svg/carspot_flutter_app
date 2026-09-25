@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../firebase_options.dart';
 import '../screens/notifications_screen.dart';
 import 'api_service.dart';
 
@@ -21,6 +22,11 @@ class PushService {
   PushService._();
   static final PushService instance = PushService._();
 
+  // Ключ Web Push сертификата (VAPID) из Firebase Console → Project settings →
+  // Cloud Messaging → Web configuration. Нужен только для веб-версии — на
+  // Android/iOS getToken() работает и без него.
+  static const String _webVapidKey = '';
+
   bool _available = false;
   String? _lastToken;
 
@@ -29,7 +35,7 @@ class PushService {
   /// Вызывается один раз при старте приложения, до runApp().
   Future<void> tryInitialize() async {
     try {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
       _available = true;
 
       FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
@@ -82,7 +88,9 @@ class PushService {
         return;
       }
 
-      final token = await FirebaseMessaging.instance.getToken();
+      final token = kIsWeb
+          ? await FirebaseMessaging.instance.getToken(vapidKey: _webVapidKey.isEmpty ? null : _webVapidKey)
+          : await FirebaseMessaging.instance.getToken();
       if (token == null) return;
       _lastToken = token;
       await _sendTokenToBackend(token, accessToken);
@@ -104,7 +112,7 @@ class PushService {
         '/api/notifications/device-token',
         {
           'token': token,
-          'platform': defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
+          'platform': kIsWeb ? 'web' : (defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android'),
         },
         token: accessToken,
       );
