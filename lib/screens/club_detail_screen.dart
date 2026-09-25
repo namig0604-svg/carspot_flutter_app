@@ -36,7 +36,27 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
   bool get _isPending => _club?['my_status'] == 'pending';
   bool get _isAdmin => _club?['my_role'] == 'owner' || _club?['my_role'] == 'admin';
   bool get _isOwner => _club?['my_role'] == 'owner';
+  bool get _isModerator => _club?['my_role'] == 'moderator';
   bool get _isFavorite => _club?['is_favorite'] == true;
+
+  bool _canKick(String role, String? memberUserId) {
+    if (memberUserId == null || memberUserId == _myId || role == 'owner') return false;
+    if (_isAdmin) return true;
+    return _isModerator && role == 'member';
+  }
+
+  String _roleLabel(String role) {
+    switch (role) {
+      case 'owner':
+        return context.t('club_detail.owner');
+      case 'admin':
+        return context.t('club_detail.admin');
+      case 'moderator':
+        return context.t('club_detail.moderator');
+      default:
+        return '';
+    }
+  }
 
   @override
   void initState() {
@@ -218,6 +238,81 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       _refreshMembersCountLocal();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
+    }
+  }
+
+  Future<void> _changeRole(String userId, String username, String currentRole) async {
+    String selected = currentRole == 'owner' ? 'admin' : currentRole;
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(context.tArgs('club_detail.role_picker_title', {'username': username})),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final role in ['admin', 'moderator', 'member'])
+                RadioListTile<String>(
+                  value: role,
+                  groupValue: selected,
+                  title: Text(_roleLabel(role) == '' ? context.t('club_detail.member_role_label') : _roleLabel(role)),
+                  onChanged: (v) => setDialogState(() => selected = v ?? selected),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(context.t('common.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(ctx, selected), child: Text(context.t('common.confirm'))),
+          ],
+        ),
+      ),
+    );
+    if (result == null) return;
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await ApiService.patch(
+        '/api/clubs/${widget.clubId}/members/$userId/role',
+        {'role': result},
+        token: authProvider.accessToken,
+      );
+      await _loadMembers();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('club_detail.role_updated'))));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
+    }
+  }
+
+  Future<void> _setTitle(String userId, String username, String? currentTitle) async {
+    final controller = TextEditingController(text: currentTitle ?? '');
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(context.tArgs('club_detail.title_dialog_title', {'username': username})),
+        content: TextField(
+          controller: controller,
+          maxLength: 40,
+          decoration: InputDecoration(labelText: context.t('club_detail.title_label')),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(context.t('common.confirm'))),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final title = controller.text.trim();
+      await ApiService.patch(
+        '/api/clubs/${widget.clubId}/members/$userId/title',
+        {'title': title.isEmpty ? null : title},
+        token: authProvider.accessToken,
+      );
+      await _loadMembers();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('club_detail.title_updated'))));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('club_detail.error_with_message', {'error': '$e'}))));
     }
   }
 
@@ -533,7 +628,16 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                         final avatarUrl = user?['avatar_url'] as String?;
                         final role = m['role'] as String? ?? 'member';
                         final memberUserId = m['user_id'] as String?;
-                        final canKick = _isAdmin && role != 'owner' && memberUserId != _myId;
+                        final customTitle = m['custom_title'] as String?;
+                        final canKick = _canKick(role, memberUserId);
+                        final canManage = _isAdmin && memberUserId != null && memberUserId != _myId && role != 'owner';
+                        final roleLabel = _roleLabel(role);
+                        final roleColor = role == 'owner'
+                            ? Colors.orange
+                            : role == 'moderator'
+                                ? Colors.teal
+                                : AppColors.blue;
+                        final hasMenu = canKick || canManage;
 
                         return ListTile(
                           leading: CircleAvatar(
@@ -543,19 +647,40 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                                 : null,
                           ),
                           title: Text(username),
-                          subtitle: role != 'member'
-                              ? Text(
-                                  role == 'owner' ? context.t('club_detail.owner') : context.t('club_detail.admin'),
-                                  style: TextStyle(color: role == 'owner' ? Colors.orange : AppColors.blue, fontSize: 12),
+                          subtitle: (roleLabel.isNotEmpty || (customTitle != null && customTitle.isNotEmpty))
+                              ? Wrap(
+                                  spacing: 6,
+                                  children: [
+                                    if (roleLabel.isNotEmpty)
+                                      Text(roleLabel, style: TextStyle(color: roleColor, fontSize: 12, fontWeight: FontWeight.w600)),
+                                    if (customTitle != null && customTitle.isNotEmpty)
+                                      Text(customTitle, style: const TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic)),
+                                  ],
                                 )
                               : null,
-                          trailing: canKick
-                              ? IconButton(
-                                  icon: const Icon(Icons.person_remove, color: AppColors.red),
-                                  tooltip: context.t('club_detail.kick_action'),
-                                  onPressed: () => _kick(memberUserId!, username),
-                                )
-                              : null,
+                          trailing: !hasMenu
+                              ? null
+                              : PopupMenuButton<String>(
+                                  icon: const Icon(Icons.more_vert),
+                                  onSelected: (action) {
+                                    if (action == 'kick') {
+                                      _kick(memberUserId!, username);
+                                    } else if (action == 'role') {
+                                      _changeRole(memberUserId!, username, role);
+                                    } else if (action == 'title') {
+                                      _setTitle(memberUserId!, username, customTitle);
+                                    }
+                                  },
+                                  itemBuilder: (ctx) => [
+                                    if (canManage) PopupMenuItem(value: 'role', child: Text(context.t('club_detail.change_role_action'))),
+                                    if (canManage) PopupMenuItem(value: 'title', child: Text(context.t('club_detail.set_title_action'))),
+                                    if (canKick)
+                                      PopupMenuItem(
+                                        value: 'kick',
+                                        child: Text(context.t('club_detail.kick_action'), style: const TextStyle(color: AppColors.red)),
+                                      ),
+                                  ],
+                                ),
                           onTap: memberUserId == null
                               ? null
                               : () {

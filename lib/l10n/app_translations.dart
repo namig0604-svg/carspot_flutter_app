@@ -16,6 +16,7 @@ import 'gen/feature_home_redesign_tr.dart';
 import 'gen/feature_forum_tr.dart';
 import 'gen/feature_coins_tr.dart';
 import 'gen/feature_admin_ranks_tr.dart';
+import 'gen/feature_club_ranks_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -98,6 +99,7 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeatureForumTranslations,
   ...kFeatureCoinsTranslations,
   ...kFeatureAdminRanksTranslations,
+  ...kFeatureClubRanksTranslations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из
