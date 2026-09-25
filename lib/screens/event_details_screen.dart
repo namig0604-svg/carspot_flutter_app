@@ -297,6 +297,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t('event_details.title'), overflow: TextOverflow.ellipsis, maxLines: 1),
@@ -771,6 +772,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               child: CommentsSection(
                 targetType: 'event',
                 targetId: widget.event['id'].toString(),
+                dark: isDark,
               ),
             ),
           ],
