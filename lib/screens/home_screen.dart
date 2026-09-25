@@ -36,6 +36,7 @@ import 'car_expenses_screen.dart';
 import 'sos_screen.dart';
 import 'vin_decoder_screen.dart';
 import 'hazards_screen.dart';
+import 'part_listings_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
@@ -1449,6 +1450,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const HazardsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.storefront,
+                  label: 'Барахолка',
+                  color: Colors.deepPurple,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PartListingsScreen()),
                   ),
                 ),
               ),
