@@ -10,6 +10,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/billing_service.dart';
 import 'people_list_screen.dart';
+import 'subscription_management_screen.dart';
 import '../theme/app_colors.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
@@ -353,7 +354,108 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _perkTile(IconData icon, String title, String subtitle) {
+  Widget _buildPlansByTier(Color cardText) {
+    final byTier = <String, List<Map<String, dynamic>>>{};
+    for (final p in _plans) {
+      final plan = p as Map<String, dynamic>;
+      final tier = (plan['tier'] as String?) ?? 'pro';
+      byTier.putIfAbsent(tier, () => []).add(plan);
+    }
+    // Pro сверху — это флагманский план с максимумом плюшек.
+    final order = ['pro', 'basic'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final tier in order)
+          if (byTier.containsKey(tier)) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6, top: 4),
+              child: Row(
+                children: [
+                  Text(
+                    tier == 'pro' ? 'CarSpot Pro' : 'CarSpot Basic',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: cardText, fontSize: 14),
+                  ),
+                  if (tier == 'pro') ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade700,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        context.t('premium.best_value_badge'),
+                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            for (final plan in byTier[tier]!)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _isCheckingOut ? null : () => _startCheckout(plan['id'] as String),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      side: BorderSide(color: Colors.amber.shade700),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(plan['title'] as String,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '\$${plan['amount_usd']}',
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber.shade800),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 8),
+          ],
+      ],
+    );
+  }
+
+  Widget _tierCompareRow(String label, {required bool basic, required bool pro, String? basicNote, String? proNote}) {
+    Widget cell(bool has, String? note) {
+      return Expanded(
+        child: Column(
+          children: [
+            Icon(has ? Icons.check_circle : Icons.remove_circle_outline,
+                color: has ? Colors.green : Colors.grey, size: 18),
+            if (note != null)
+              Text(note, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: Row(
+        children: [
+          Expanded(flex: 3, child: Text(label, style: const TextStyle(fontSize: 13))),
+          cell(basic, basicNote),
+          cell(pro, proNote),
+        ],
+      ),
+    );
+  }
+
+    Widget _perkTile(IconData icon, String title, String subtitle) {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Colors.amber.withOpacity(0.15),
@@ -369,6 +471,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
     final isPremium = user?['is_premium'] == true;
+    final premiumTier = user?['premium_tier'] as String?;
     final trialUsed = user?['premium_trial_used'] == true;
     final premiumUntil = user?['premium_until'] as String?;
 
@@ -386,6 +489,16 @@ class _PremiumScreenState extends State<PremiumScreen> {
         title: const Text('CarSpot Premium', overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: Colors.amber.shade800,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.receipt_long),
+            tooltip: context.t('premium.subscription_management_tooltip'),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SubscriptionManagementScreen()),
+            ),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         color: AppColors.red,
@@ -415,9 +528,16 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     children: [
                       const Icon(Icons.workspace_premium, color: Colors.white, size: 32),
                       const SizedBox(width: 10),
-                      Text(
-                        isPremium ? context.t('premium.status_active') : context.t('premium.status_inactive'),
-                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                      Expanded(
+                        child: Text(
+                          isPremium
+                              ? (premiumTier == 'basic'
+                                  ? context.t('premium.status_active_basic')
+                                  : context.t('premium.status_active_pro'))
+                              : context.t('premium.status_inactive'),
+                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),
@@ -524,37 +644,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 ),
               )
             else
-              ..._plans.map<Widget>((p) {
-                final plan = p as Map<String, dynamic>;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: _isCheckingOut ? null : () => _startCheckout(plan['id'] as String),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: BorderSide(color: Colors.amber.shade700),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Text(plan['title'] as String,
-                              style: const TextStyle(fontWeight: FontWeight.w600),
-                              overflow: TextOverflow.ellipsis),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '\$${plan['amount_usd']}',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber.shade800),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
+              _buildPlansByTier(cardText),
 
             const SizedBox(height: 24),
 
@@ -669,6 +759,32 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     trailing: Icon(isPremium ? Icons.chevron_right : Icons.lock_outline, color: Colors.grey),
                     onTap: _openProfileViews,
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(context.t('premium.compare_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 4),
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    child: Row(
+                      children: [
+                        const Expanded(flex: 3, child: SizedBox()),
+                        Expanded(child: Text('Basic', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: cardText))),
+                        Expanded(child: Text('Pro', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: cardText))),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  _tierCompareRow(context.t('premium.compare_garage'), basic: true, pro: true, basicNote: '15', proNote: '25'),
+                  _tierCompareRow(context.t('premium.compare_insights'), basic: true, pro: true, basicNote: '15', proNote: '50'),
+                  _tierCompareRow(context.t('premium.compare_business'), basic: true, pro: true, basicNote: '1', proNote: '5'),
+                  _tierCompareRow(context.t('premium.compare_free_boost'), basic: false, pro: true),
+                  _tierCompareRow(context.t('premium.compare_pinned_photos'), basic: false, pro: true),
                 ],
               ),
             ),

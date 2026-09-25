@@ -25,7 +25,14 @@ class BillingService {
 
   static const String monthlyProductId = 'carspot_premium_month';
   static const String yearlyProductId = 'carspot_premium_year';
-  static const Set<String> _productIds = {monthlyProductId, yearlyProductId};
+  static const String basicMonthlyProductId = 'carspot_basic_month';
+  static const String basicYearlyProductId = 'carspot_basic_year';
+  static const Set<String> _productIds = {
+    monthlyProductId,
+    yearlyProductId,
+    basicMonthlyProductId,
+    basicYearlyProductId,
+  };
 
   final InAppPurchase _iap = InAppPurchase.instance;
   StreamSubscription<List<PurchaseDetails>>? _subscription;

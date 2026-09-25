@@ -120,6 +120,68 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
     }
   }
 
+  Future<void> _grantPremium(Map<String, dynamic> user) async {
+    final daysController = TextEditingController(text: '30');
+    String selectedTier = 'pro';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(context.tArgs('admin_ranks.grant_premium_title', {'username': '@${user['username']}'})),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: daysController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: context.t('admin_ranks.days_label')),
+                autofocus: true,
+              ),
+              const SizedBox(height: 8),
+              RadioListTile<String>(
+                value: 'basic',
+                groupValue: selectedTier,
+                title: const Text('CarSpot Basic'),
+                onChanged: (v) => setDialogState(() => selectedTier = v ?? selectedTier),
+              ),
+              RadioListTile<String>(
+                value: 'pro',
+                groupValue: selectedTier,
+                title: const Text('CarSpot Pro'),
+                onChanged: (v) => setDialogState(() => selectedTier = v ?? selectedTier),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.t('common.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(context.t('common.confirm'))),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true) return;
+    final days = int.tryParse(daysController.text.trim());
+    if (days == null || days <= 0) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('admin_ranks.invalid_days'))));
+      return;
+    }
+    try {
+      final response = await ApiService.post(
+        '/api/admin/premium/grant/${user['id']}',
+        {'days': days, 'tier': selectedTier},
+        token: _token,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tArgs('admin_ranks.grant_premium_success', {'tier': '${response['premium_tier']}'}))),
+        );
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+    }
+  }
+
   Future<void> _setRank(Map<String, dynamic> user) async {
     String? selected = user['admin_rank'] as String?;
     final result = await showDialog<String?>(
@@ -195,6 +257,15 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
                 onTap: () {
                   Navigator.pop(ctx);
                   _grantCoins(user);
+                },
+              ),
+            if (_myLevel >= kTechAdminLevel)
+              ListTile(
+                leading: const Icon(Icons.workspace_premium, color: Colors.amber),
+                title: Text(context.t('admin_ranks.grant_premium_action')),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _grantPremium(user);
                 },
               ),
             if (_myLevel >= kDeveloperLevel)
