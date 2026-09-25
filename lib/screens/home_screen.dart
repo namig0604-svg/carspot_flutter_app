@@ -48,6 +48,7 @@ import '../widgets/stories_bar.dart';
 import '../widgets/animated_menu_tile.dart';
 import '../widgets/weather_alert_banner.dart';
 import '../widgets/animated_bottom_nav.dart';
+import 'faq_screen.dart';
 import '../utils/sound_player.dart';
 import '../utils/event_category.dart';
 import '../l10n/l10n_extensions.dart';
@@ -343,6 +344,18 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         backgroundColor: AppColors.black,
         actions: [
+          // Быстрый доступ к настройкам прямо из AppBar вкладки "Профиль" —
+          // раньше настройки было видно только проскроллив весь список меню
+          // до конца, теперь так их видно сразу.
+          if (_selectedIndex == 4)
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: context.t('home.menu_settings'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              ),
+            ),
           Stack(
             clipBehavior: Clip.none,
             children: [
@@ -1228,16 +1241,21 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 20),
           const WeatherAlertBanner(),
 
-          // Сетка быстрых действий — сюда переехали "Друзья" (раньше жили
-          // в Настройках), "Клубы", "Лидеры", "Сервисы" и "Настройки" из
-          // прежней тесной нижней навигации. Каждая плитка — с тактильной
-          // анимацией нажатия (см. AnimatedMenuTile).
+          // Меню разложено по смысловым разделам (раньше все ~19 пунктов
+          // лежали одним плоским списком, и "Настройки" было тяжело найти).
+          // Быстрый доступ к настройкам также вынесен в AppBar этой вкладки
+          // (иконка-шестерёнка рядом с колокольчиком уведомлений).
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(context.t('home.menu_title'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 14),
+
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text('Моё авто', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+          ),
           Wrap(
             spacing: 10,
             runSpacing: 10,
@@ -1253,121 +1271,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(builder: (_) => const GarageScreen()),
                   ).then((_) => _loadMyCars()),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.people,
-                  label: context.t('home.menu_friends'),
-                  color: AppColors.blue,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FriendsListScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.groups,
-                  label: context.t('home.menu_clubs'),
-                  color: AppColors.blue,
-                  badge: _myClubs.isNotEmpty ? '${_myClubs.length}' : null,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ClubsListScreen()),
-                  ).then((_) => _loadMyClubs()),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.emoji_events,
-                  label: context.t('home.menu_leaders'),
-                  color: Colors.amber,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.bookmark,
-                  label: context.t('home.menu_favorites'),
-                  color: AppColors.red,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.military_tech,
-                  label: context.t('home.menu_achievements'),
-                  color: Colors.amber,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AchievementsScreen(
-                        achievements: achievements,
-                        level: stats.level,
-                        levelTitle: stats.levelTitle,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.car_repair,
-                  label: context.t('home.menu_services'),
-                  color: AppColors.red,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const BusinessesListScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.pin_drop,
-                  label: context.t('home.menu_my_points'),
-                  color: Colors.teal,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyPointsScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.forum,
-                  label: context.t('home.menu_forum'),
-                  color: Colors.deepOrange,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ForumCategoriesScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.event_available,
-                  label: 'Мои записи',
-                  color: Colors.tealAccent,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
-                  ),
                 ),
               ),
               SizedBox(
@@ -1421,18 +1324,6 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 width: 78,
                 child: AnimatedMenuTile(
-                  icon: Icons.sos,
-                  label: 'SOS',
-                  color: Colors.red,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SosScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
                   icon: Icons.qr_code_scanner,
                   label: 'Проверка VIN',
                   color: Colors.purple,
@@ -1442,15 +1333,52 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text('Сообщество', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+          ),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
               SizedBox(
                 width: 78,
                 child: AnimatedMenuTile(
-                  icon: Icons.warning_amber_rounded,
-                  label: 'Опасности на дороге',
-                  color: Colors.orange,
+                  icon: Icons.people,
+                  label: context.t('home.menu_friends'),
+                  color: AppColors.blue,
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const HazardsScreen()),
+                    MaterialPageRoute(builder: (_) => const FriendsListScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.groups,
+                  label: context.t('home.menu_clubs'),
+                  color: AppColors.blue,
+                  badge: _myClubs.isNotEmpty ? '${_myClubs.length}' : null,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ClubsListScreen()),
+                  ).then((_) => _loadMyClubs()),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.forum,
+                  label: context.t('home.menu_forum'),
+                  color: Colors.deepOrange,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ForumCategoriesScreen()),
                   ),
                 ),
               ),
@@ -1469,12 +1397,162 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 width: 78,
                 child: AnimatedMenuTile(
+                  icon: Icons.emoji_events,
+                  label: context.t('home.menu_leaders'),
+                  color: Colors.amber,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text('Моя активность', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+          ),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.event_available,
+                  label: 'Мои записи',
+                  color: Colors.tealAccent,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.bookmark,
+                  label: context.t('home.menu_favorites'),
+                  color: AppColors.red,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.military_tech,
+                  label: context.t('home.menu_achievements'),
+                  color: Colors.amber,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AchievementsScreen(
+                        achievements: achievements,
+                        level: stats.level,
+                        levelTitle: stats.levelTitle,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text('Безопасность и сервисы', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+          ),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.sos,
+                  label: 'SOS',
+                  color: Colors.red,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SosScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.warning_amber_rounded,
+                  label: 'Опасности на дороге',
+                  color: Colors.orange,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HazardsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.car_repair,
+                  label: context.t('home.menu_services'),
+                  color: AppColors.red,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BusinessesListScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.pin_drop,
+                  label: context.t('home.menu_my_points'),
+                  color: Colors.teal,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MyPointsScreen()),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text('Прочее', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+          ),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
                   icon: Icons.settings,
                   label: context.t('home.menu_settings'),
                   color: Colors.grey,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.help_outline,
+                  label: 'Помощь',
+                  color: Colors.blueGrey,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FaqScreen()),
                   ),
                 ),
               ),

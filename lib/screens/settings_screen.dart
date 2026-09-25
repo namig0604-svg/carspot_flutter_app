@@ -8,6 +8,8 @@ import 'premium_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/section_background.dart';
+import 'faq_screen.dart';
+import 'app_guide_screen.dart';
 import '../l10n/l10n_extensions.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -216,6 +218,28 @@ class SettingsScreen extends StatelessWidget {
                         ),
                       )
                       .toList(),
+                ),
+              ),
+            ],
+          ),
+          _sectionCard(
+            title: 'Помощь',
+            children: [
+              ListTile(
+                leading: const Icon(Icons.menu_book_outlined, color: AppColors.blue),
+                title: const Text('Как пользоваться CarSpot'),
+                subtitle: const Text('Короткий гид по разделам приложения'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AppGuideScreen()),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.help_outline, color: AppColors.blue),
+                title: const Text('Частые вопросы (FAQ)'),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FaqScreen()),
                 ),
               ),
             ],
