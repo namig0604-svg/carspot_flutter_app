@@ -10,6 +10,7 @@ import '../utils/map_config.dart';
 import '../utils/maps_launcher.dart';
 import '../widgets/report_dialog.dart';
 import 'chat_room_screen.dart';
+import 'carpool_screen.dart';
 import 'edit_event_screen.dart';
 import 'premium_screen.dart';
 import 'photo_gallery_screen.dart';
@@ -322,6 +323,22 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     builder: (_) => ChatRoomScreen(
                       roomId: _event['chat_room_id'],
                       title: context.tArgs('event_details.chat_room_title', {'title': '${_event['title'] ?? context.t('event_details.default_event_name')}'}),
+                    ),
+                  ),
+                );
+              },
+            ),
+          if (_isJoined)
+            IconButton(
+              icon: const Icon(Icons.directions_car_filled),
+              tooltip: 'Карпулинг',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CarpoolScreen(
+                      eventId: _event['id'],
+                      eventTitle: '${_event['title'] ?? context.t('event_details.default_event_name')}',
                     ),
                   ),
                 );
