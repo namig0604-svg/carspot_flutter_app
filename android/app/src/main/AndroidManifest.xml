@@ -4,9 +4,11 @@
     <!-- Для показа ближайших сходок и автосервисов (sort=recommended, моя геопозиция на карте) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Обязательно на Android 13+, иначе системные push-уведомления не показываются -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:label="carspot_project"
+        android:label="CarSpot"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
