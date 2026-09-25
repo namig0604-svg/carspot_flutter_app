@@ -52,6 +52,7 @@ import '../utils/sound_player.dart';
 import '../utils/event_category.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/event_date.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -690,7 +691,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             const SizedBox(width: 3),
                                             Expanded(
                                               child: Text(
-                                                '${event['city']} · ${event['event_date']}',
+                                                '${event['city']} · ${formatEventDateTime(event['event_date'], event['event_time'] as String?)}',
                                                 style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
                                                 overflow: TextOverflow.ellipsis,
                                               ),

@@ -16,6 +16,7 @@ import 'premium_screen.dart';
 import 'photo_gallery_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
+import '../utils/event_date.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/map_pin_marker.dart';
 import '../widgets/comments_section.dart';
@@ -437,7 +438,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             _buildInfoCard(
               icon: Icons.calendar_today,
               title: context.t('event_details.date_time_label'),
-              value: '${_event['event_date']} ${_event['event_time']}'
+              value: formatEventDateTime(_event['event_date'], _event['event_time'] as String?)
                   '${_event['duration_minutes'] != null ? " · ${formatEventDuration(_event['duration_minutes'] as int)}" : ""}',
             ),
             const SizedBox(height: 10),

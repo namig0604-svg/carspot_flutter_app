@@ -11,6 +11,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/event_date.dart';
 
 /// Единый экран "Избранное" — сохранённые сходки, клубы и автосервисы
 /// на трёх вкладках. Каждый тип избранного уже умеет тогглиться со своего
@@ -153,7 +154,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
             child: ListTile(
               leading: CircleAvatar(child: Text((event['event_type'] ?? '?')[0].toUpperCase())),
               title: Text(event['title'] ?? context.t('favorites.untitled_event'), overflow: TextOverflow.ellipsis),
-              subtitle: Text('${event['city'] ?? ''}, ${event['event_date'] ?? ''}', overflow: TextOverflow.ellipsis),
+              subtitle: Text('${event['city'] ?? ''}, ${formatEventDateTime(event['event_date'], event['event_time'] as String?)}', overflow: TextOverflow.ellipsis),
               trailing: IconButton(
                 icon: const Icon(Icons.favorite, color: AppColors.red),
                 tooltip: context.t('favorites.remove_favorite_tooltip'),

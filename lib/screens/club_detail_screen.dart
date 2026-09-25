@@ -12,6 +12,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/event_date.dart';
 
 class ClubDetailScreen extends StatefulWidget {
   final String clubId;
@@ -595,7 +596,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                                 ],
                               ],
                             ),
-                            subtitle: Text('${e['city'] ?? ''} · ${e['event_date'] ?? ''}'),
+                            subtitle: Text('${e['city'] ?? ''} · ${formatEventDateTime(e['event_date'], e['event_time'] as String?)}'),
                             onTap: () {
                               Navigator.push(
                                 context,
