@@ -1,18 +1,62 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
 import '../services/push_service.dart';
 
 class AuthProvider extends ChangeNotifier {
+  static const String _tokenPrefsKey = 'carspot_access_token';
+
   String? _accessToken;
   Map<String, dynamic>? _user;
   bool _isLoading = false;
+  bool _isInitializing = true;
   String? _errorMessage;
 
   String? get accessToken => _accessToken;
   Map<String, dynamic>? get user => _user;
   bool get isLoading => _isLoading;
+  bool get isInitializing => _isInitializing;
   String? get errorMessage => _errorMessage;
   bool get isLoggedIn => _accessToken != null;
+
+  /// Восстанавливает сессию из сохранённого токена при старте приложения
+  /// (важно для веба, где перезагрузка страницы иначе разлогинивала бы
+  /// пользователя — токен раньше жил только в памяти).
+  Future<void> tryAutoLogin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedToken = prefs.getString(_tokenPrefsKey);
+      if (savedToken != null && savedToken.isNotEmpty) {
+        _accessToken = savedToken;
+        notifyListeners();
+        await getCurrentUser();
+      }
+    } catch (_) {
+      // Сохранённого токена нет либо он недействителен — просто останемся
+      // разлогиненными, показав обычный экран входа.
+    } finally {
+      _isInitializing = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _persistToken(String token) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenPrefsKey, token);
+    } catch (_) {
+      // Не критично: сессия просто не переживёт перезагрузку страницы.
+    }
+  }
+
+  Future<void> _clearPersistedToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenPrefsKey);
+    } catch (_) {}
+  }
 
   Future<void> register({
     required String username,
@@ -45,6 +89,7 @@ class AuthProvider extends ChangeNotifier {
       _user = response['user'];
       _isLoading = false;
       notifyListeners();
+      unawaited(_persistToken(_accessToken!));
       PushService.instance.registerWithBackend(_accessToken!);
     } catch (e) {
       _errorMessage = e.toString();
@@ -72,6 +117,7 @@ class AuthProvider extends ChangeNotifier {
       _user = response['user'];
       _isLoading = false;
       notifyListeners();
+      unawaited(_persistToken(_accessToken!));
       PushService.instance.registerWithBackend(_accessToken!);
     } catch (e) {
       _errorMessage = e.toString();
@@ -100,5 +146,6 @@ class AuthProvider extends ChangeNotifier {
     _accessToken = null;
     _user = null;
     notifyListeners();
+    unawaited(_clearPersistedToken());
   }
 }

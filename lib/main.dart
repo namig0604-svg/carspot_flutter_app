@@ -14,17 +14,28 @@ void main() async {
   // Пока не добавлен android/app/google-services.json — tryInitialize()
   // просто тихо ничего не делает, весь остальной запуск это не затрагивает.
   await PushService.instance.tryInitialize();
-  runApp(const CarSpotApp());
+
+  // Создаём AuthProvider здесь и сразу запускаем восстановление сессии по
+  // сохранённому токену ("запомнить меня") — SplashGate ниже дождётся
+  // этого будущего, прежде чем показать экран входа или домашний экран,
+  // чтобы не мелькал логин перед автовходом.
+  final authProvider = AuthProvider();
+  final autoLoginFuture = authProvider.tryAutoLogin();
+
+  runApp(CarSpotApp(authProvider: authProvider, autoLoginFuture: autoLoginFuture));
 }
 
 class CarSpotApp extends StatelessWidget {
-  const CarSpotApp({Key? key}) : super(key: key);
+  final AuthProvider authProvider;
+  final Future<void> autoLoginFuture;
+
+  const CarSpotApp({Key? key, required this.authProvider, required this.autoLoginFuture}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
@@ -38,6 +49,7 @@ class CarSpotApp extends StatelessWidget {
             darkTheme: AppTheme.dark,
             themeMode: themeProvider.themeMode,
             home: SplashGate(
+              waitFor: autoLoginFuture,
               child: Consumer<AuthProvider>(
                 builder: (context, authProvider, _) {
                   return authProvider.isLoggedIn

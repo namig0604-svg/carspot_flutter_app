@@ -7,8 +7,12 @@ import '../widgets/whats_new_dialog.dart';
 /// плавно (кросс-фейдом) переключается на переданный экран (логин/домашний).
 class SplashGate extends StatefulWidget {
   final Widget child;
+  /// Если задано, заставка не исчезнет, пока это будущее не завершится —
+  /// используется, чтобы дождаться автовхода по сохранённому токену и не
+  /// показывать мелькание экрана логина перед домашним экраном.
+  final Future<void>? waitFor;
 
-  const SplashGate({Key? key, required this.child}) : super(key: key);
+  const SplashGate({Key? key, required this.child, this.waitFor}) : super(key: key);
 
   @override
   State<SplashGate> createState() => _SplashGateState();
@@ -20,14 +24,19 @@ class _SplashGateState extends State<SplashGate> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(milliseconds: 1400), () {
-      if (!mounted) return;
-      setState(() => _showSplash = false);
-      // Диалог "Что нового" показываем после первого кадра с реальным
-      // экраном (логин/домашний) — там уже точно есть Navigator/Overlay.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) checkAndShowWhatsNew(context);
-      });
+    _waitThenReveal();
+  }
+
+  Future<void> _waitThenReveal() async {
+    final minDelay = Future<void>.delayed(const Duration(milliseconds: 1400));
+    final waitFor = widget.waitFor ?? Future<void>.value();
+    await Future.wait<void>([minDelay, waitFor]);
+    if (!mounted) return;
+    setState(() => _showSplash = false);
+    // Диалог "Что нового" показываем после первого кадра с реальным
+    // экраном (логин/домашний) — там уже точно есть Navigator/Overlay.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) checkAndShowWhatsNew(context);
     });
   }
 
