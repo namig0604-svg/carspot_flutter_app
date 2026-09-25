@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../utils/business_category.dart';
+import '../utils/coin_boost_helper.dart';
 import '../utils/map_config.dart';
 import '../utils/maps_launcher.dart';
 import '../utils/location_helper.dart';
@@ -14,7 +15,6 @@ import '../widgets/report_dialog.dart';
 import 'business_form_screen.dart';
 import 'create_booking_screen.dart';
 import 'business_bookings_screen.dart';
-import 'premium_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
@@ -165,20 +165,18 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final isPremium = authProvider.user?['is_premium'] == true;
     if (!isPremium) {
-      final goPremium = await showDialog<bool>(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text(context.t('business_detail.premium_only_title')),
-          content: Text(context.t('business_detail.boost_premium_only_desc')),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('common.cancel'))),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(context.t('business_detail.learn_more'))),
-          ],
-        ),
+      await showBoostChoiceAndExecute(
+        context,
+        authProvider: authProvider,
+        coinsBoostEndpoint: '/api/businesses/${widget.businessId}/boost-with-coins',
+        costField: 'boost_cost_business',
+        premiumOnlyTitleKey: 'business_detail.premium_only_title',
+        premiumOnlyBodyKey: 'business_detail.boost_premium_only_desc',
+        boostedSuccessKey: 'business_detail.boosted_success',
+        onBoosted: (response) {
+          if (mounted) setState(() => _business = response);
+        },
       );
-      if (goPremium == true && mounted) {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumScreen()));
-      }
       return;
     }
     try {

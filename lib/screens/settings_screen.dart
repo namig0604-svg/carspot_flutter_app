@@ -5,6 +5,7 @@ import '../providers/settings_provider.dart';
 import '../providers/theme_provider.dart';
 import 'admin_panel_screen.dart';
 import 'premium_screen.dart';
+import 'coins_screen.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../widgets/section_background.dart';
@@ -100,6 +101,20 @@ class SettingsScreen extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const PremiumScreen()),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.monetization_on, color: Colors.amber),
+                title: Text(context.t('settings.coins_title')),
+                subtitle: Text(
+                  context.tArgs('settings.coins_balance', {
+                    'balance': '${context.watch<AuthProvider>().user?['coin_balance'] ?? 0}',
+                  }),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CoinsScreen()),
                 ),
               ),
             ],

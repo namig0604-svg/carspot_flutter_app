@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../utils/event_duration.dart';
+import '../utils/coin_boost_helper.dart';
 import '../utils/event_type_style.dart';
 import '../utils/map_config.dart';
 import '../utils/maps_launcher.dart';
@@ -12,7 +13,6 @@ import '../widgets/report_dialog.dart';
 import 'chat_room_screen.dart';
 import 'carpool_screen.dart';
 import 'edit_event_screen.dart';
-import 'premium_screen.dart';
 import 'photo_gallery_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
@@ -145,20 +145,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final isPremium = authProvider.user?['is_premium'] == true;
     if (!isPremium) {
-      final goPremium = await showDialog<bool>(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text(context.t('event_details.premium_only_title')),
-          content: Text(context.t('event_details.premium_only_body')),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.t('event_details.cancel'))),
-            ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text(context.t('event_details.learn_more'))),
-          ],
-        ),
+      await showBoostChoiceAndExecute(
+        context,
+        authProvider: authProvider,
+        coinsBoostEndpoint: '/api/events/${widget.event['id']}/boost-with-coins',
+        costField: 'boost_cost_event',
+        premiumOnlyTitleKey: 'event_details.premium_only_title',
+        premiumOnlyBodyKey: 'event_details.premium_only_body',
+        boostedSuccessKey: 'event_details.boosted_success',
+        onBoosted: (response) {
+          if (mounted) setState(() => _event = response);
+        },
       );
-      if (goPremium == true && mounted) {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const PremiumScreen()));
-      }
       return;
     }
     try {
