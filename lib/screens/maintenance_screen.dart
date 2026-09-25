@@ -174,7 +174,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Сервисныщ дневник'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: const Text('Сервисный дневник'), backgroundColor: AppColors.black),
       floatingActionButton: _selectedCar == null
           ? null
           : FloatingActionButton(onPressed: _addRecord, backgroundColor: AppColors.blue, child: const Icon(Icons.add)),
