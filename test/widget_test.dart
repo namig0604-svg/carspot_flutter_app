@@ -1,30 +1,28 @@
-// This is a basic Flutter widget test.
+// Базовый smoke-test CarSpot: проверяем, что корневой виджет приложения
+// (CarSpotApp) строится без ошибок и на первом кадре показывает заставку —
+// без реального автовхода/сети (autoLoginFuture готов сразу, поэтому
+// SharedPreferences/API не задействуются).
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Старый шаблонный тест ссылался на несуществующий пакет 'carspot_project'
+// и класс 'MyApp' (дефолтная заглушка `flutter create`, доставшаяся от
+// самого первого коммита) — реальный пакет называется 'carspot', а
+// корневой виджет — CarSpotApp (см. lib/main.dart).
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:carspot_project/main.dart';
+import 'package:carspot/main.dart';
+import 'package:carspot/providers/auth_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('CarSpotApp builds and shows splash on first frame', (WidgetTester tester) async {
+    await tester.pumpWidget(CarSpotApp(
+      authProvider: AuthProvider(),
+      autoLoginFuture: Future<void>.value(),
+    ));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.text('CARSPOT'), findsOneWidget);
   });
 }

@@ -1257,7 +1257,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text('Моё авто', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+            child: Text(context.t('home.section_my_car'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
           ),
           Wrap(
             spacing: 10,
@@ -1280,7 +1280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.local_parking,
-                  label: 'Парковка',
+                  label: context.t('home.menu_parking'),
                   color: Colors.indigo,
                   onTap: () => Navigator.push(
                     context,
@@ -1292,7 +1292,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.build,
-                  label: 'Сервисный дневник',
+                  label: context.t('home.menu_service_log'),
                   color: Colors.brown,
                   onTap: () => Navigator.push(
                     context,
@@ -1304,7 +1304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.description,
-                  label: 'Документы',
+                  label: context.t('home.menu_documents'),
                   color: Colors.blueGrey,
                   onTap: () => Navigator.push(
                     context,
@@ -1316,7 +1316,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.attach_money,
-                  label: 'Расходы',
+                  label: context.t('home.menu_expenses'),
                   color: Colors.green,
                   onTap: () => Navigator.push(
                     context,
@@ -1328,7 +1328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.qr_code_scanner,
-                  label: 'Проверка VIN',
+                  label: context.t('home.menu_vin_check'),
                   color: Colors.purple,
                   onTap: () => Navigator.push(
                     context,
@@ -1342,7 +1342,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text('Сообщество', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+            child: Text(context.t('home.section_community'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
           ),
           Wrap(
             spacing: 10,
@@ -1389,7 +1389,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.storefront,
-                  label: 'Барахолка',
+                  label: context.t('home.menu_marketplace'),
                   color: Colors.deepPurple,
                   onTap: () => Navigator.push(
                     context,
@@ -1415,7 +1415,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text('Моя активность', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+            child: Text(context.t('home.section_my_activity'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
           ),
           Wrap(
             spacing: 10,
@@ -1425,7 +1425,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.event_available,
-                  label: 'Мои записи',
+                  label: context.t('home.menu_my_bookings'),
                   color: Colors.tealAccent,
                   onTap: () => Navigator.push(
                     context,
@@ -1469,7 +1469,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text('Безопасность и сервисы', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+            child: Text(context.t('home.section_safety'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
           ),
           Wrap(
             spacing: 10,
@@ -1491,7 +1491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.warning_amber_rounded,
-                  label: 'Опасности на дороге',
+                  label: context.t('home.menu_road_hazards'),
                   color: Colors.orange,
                   onTap: () => Navigator.push(
                     context,
@@ -1529,7 +1529,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text('Прочее', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+            child: Text(context.t('home.section_other'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
           ),
           Wrap(
             spacing: 10,
@@ -1551,7 +1551,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 78,
                 child: AnimatedMenuTile(
                   icon: Icons.help_outline,
-                  label: 'Помощь',
+                  label: context.t('home.menu_help'),
                   color: Colors.blueGrey,
                   onTap: () => Navigator.push(
                     context,
