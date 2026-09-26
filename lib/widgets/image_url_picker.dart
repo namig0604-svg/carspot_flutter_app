@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
 import '../utils/image_url.dart';
 import '../theme/app_colors.dart';
+import 'app_loader.dart';
 
 /// Компактный виджет выбора фото вместо ручного ввода URL: показывает
 /// превью (текущий URL, либо локально выбранный файл пока идёт загрузка),
@@ -159,11 +160,7 @@ class _ImageUrlPickerFieldState extends State<ImageUrlPickerField> {
                 Container(
                   color: Colors.black38,
                   child: const Center(
-                    child: SizedBox(
-                      width: 28,
-                      height: 28,
-                      child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-                    ),
+                    child: AppLoader(size: 28, color: Colors.white),
                   ),
                 )
               else

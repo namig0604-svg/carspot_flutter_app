@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/whats_new_dialog.dart';
+import '../widgets/car_loaders.dart';
 
 /// Показывает анимированную заставку CarSpot при старте приложения, затем
 /// плавно (кросс-фейдом) переключается на переданный экран (логин/домашний).
@@ -137,16 +138,9 @@ class _SplashContentState extends State<_SplashContent> with SingleTickerProvide
                 child: Container(width: 50, height: 3, color: AppColors.blue),
               ),
               const SizedBox(height: 40),
-              SizedBox(
-                width: 120,
-                child: FadeTransition(
-                  opacity: _fade,
-                  child: const LinearProgressIndicator(
-                    minHeight: 3,
-                    backgroundColor: AppColors.surfaceDarkAlt,
-                    valueColor: AlwaysStoppedAnimation(AppColors.blue),
-                  ),
-                ),
+              FadeTransition(
+                opacity: _fade,
+                child: const RoadProgressBar(width: 120, height: 3),
               ),
             ],
           ),

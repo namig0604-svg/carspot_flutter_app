@@ -7,6 +7,8 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/cosmetics.dart';
 import 'coins_screen.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 
 /// "Прокачка профиля" — куда уходят монеты CarSpot Coins сверх бустов
 /// сходок/автосервисов: разовая покупка бонусного XP (плюсуется к уровню,
@@ -200,7 +202,7 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
         child: Column(
           children: [
             if (busy)
-              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+              const AppLoader(size: 24)
             else
               _cosmeticPreview(item),
             const SizedBox(height: 6),
@@ -258,7 +260,7 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
         backgroundColor: AppColors.surfaceDark,
         onRefresh: _loadAll,
         child: _isLoading && _status == null
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: AppFullLoader())
             : ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
@@ -313,7 +315,7 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
                             onPressed: _busyAction == null ? _buyXpBoost : null,
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade800, foregroundColor: Colors.white),
                             child: _busyAction == 'xp_boost'
-                                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                ? const AppLoader(size: 18, color: Colors.white)
                                 : Text(context.tArgs('profile_boost.xp_buy_button', {'grant': '$xpBoostGrant', 'cost': '$xpBoostCost'})),
                           ),
                         ),
@@ -353,7 +355,7 @@ class _ProfileBoostScreenState extends State<ProfileBoostScreen> {
                             onPressed: (_busyAction == null && !isBoosted) ? _buySearchBoost : null,
                             style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue, foregroundColor: Colors.white),
                             child: _busyAction == 'search_boost'
-                                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                ? const AppLoader(size: 18, color: Colors.white)
                                 : Text(
                                     isBoosted
                                         ? context.t('profile_boost.search_active')

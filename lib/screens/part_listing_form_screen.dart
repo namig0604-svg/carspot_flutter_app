@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/image_url_picker.dart' show ImageUrlPickerField;
+import '../widgets/app_loader.dart';
 import 'part_listings_screen.dart' show partCategoryLabels;
 
 class PartListingFormScreen extends StatefulWidget {
@@ -124,7 +125,7 @@ class _PartListingFormScreenState extends State<PartListingFormScreen> {
               onPressed: _isSaving ? null : _save,
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue, padding: const EdgeInsets.symmetric(vertical: 14)),
               child: _isSaving
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const AppLoader(size: 20, color: Colors.white)
                   : const Text('Опубликовать'),
             ),
           ),

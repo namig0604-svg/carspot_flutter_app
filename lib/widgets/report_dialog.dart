@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../l10n/l10n_extensions.dart';
+import 'app_loader.dart';
 
 /// Причины жалобы — ключ уходит на бэкенд, подпись показывается пользователю.
 const Map<String, String> reportReasonLabels = {
@@ -102,11 +103,7 @@ Future<void> showReportDialog(
                               }
                             },
                       child: isSending
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                            )
+                          ? const AppLoader(size: 20, color: Colors.white)
                           : Text(context.t('report_dialog.submit_button')),
                     ),
                   ),

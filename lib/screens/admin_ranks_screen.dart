@@ -7,6 +7,8 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/admin_ranks.dart';
 import '../utils/image_url.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 
 /// Выдача монет вручную и назначение рангов администрации — доступно только
 /// пользователям с назначенным admin_rank (см. app/ranks.py на бэкенде).
@@ -323,7 +325,7 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
             decoration: InputDecoration(
               hintText: context.t('admin_ranks.search_hint'),
               prefixIcon: const Icon(Icons.search),
-              suffixIcon: _isSearching ? const Padding(padding: EdgeInsets.all(12), child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))) : null,
+              suffixIcon: _isSearching ? const Padding(padding: EdgeInsets.all(12), child: AppLoader(size: 16)) : null,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onSubmitted: (_) => _search(),
@@ -340,7 +342,7 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
             Text(context.t('admin_ranks.current_admins_title'), style: TextStyle(fontWeight: FontWeight.bold, color: cardText, fontSize: 15)),
             const SizedBox(height: 8),
             if (_isLoadingAdmins)
-              const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Center(child: CircularProgressIndicator()))
+              const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Center(child: AppFullLoader(size: 48)))
             else if (_currentAdmins.isEmpty)
               Text(context.t('admin_ranks.no_admins'), style: TextStyle(color: cardText.withOpacity(0.6)))
             else

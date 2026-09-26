@@ -1760,7 +1760,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ] else if (_referral == null) ...[
                   Row(
                     children: [
-                      const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                      const AppLoader(size: 14),
                       const SizedBox(width: 8),
                       Text(context.t('home.loading_code'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                     ],

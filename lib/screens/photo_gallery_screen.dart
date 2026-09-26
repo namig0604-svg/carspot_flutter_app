@@ -235,11 +235,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
         onPressed: _upload,
         backgroundColor: AppColors.red,
         child: _isUploading
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              )
+            ? const AppLoader(size: 22, color: Colors.white)
             : const Icon(Icons.add_a_photo),
       ),
       body: _isLoading

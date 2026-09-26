@@ -273,7 +273,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (_friendActionLoading) {
       return const SizedBox(
         height: 46,
-        child: Center(child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+        child: Center(child: AppLoader(size: 22)),
       );
     }
     switch (_friendStatus) {

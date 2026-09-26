@@ -9,6 +9,8 @@ import '../services/coin_billing_service.dart';
 import 'profile_boost_screen.dart';
 import '../theme/app_colors.dart';
 import '../utils/sound_player.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 
 /// Экран CarSpot Coins — внутренняя валюта: баланс, покупка пакетов монет
 /// через Google Play Billing и история операций (покупки и списания на
@@ -170,8 +172,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                         Text(context.t('coins.balance_label'), style: const TextStyle(color: Colors.white70, fontSize: 13)),
                         const SizedBox(height: 4),
                         _isLoadingBalance && _balance == null
-                            ? const SizedBox(
-                                width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            ? const AppLoader(size: 18, color: Colors.white)
                             : Text(
                                 '${_balance ?? 0}',
                                 style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
@@ -230,8 +231,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                       ),
                       child: _isBuying
-                          ? const SizedBox(
-                              width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const AppLoader(size: 18, color: Colors.white)
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -249,7 +249,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
             if (_isLoadingTransactions && _transactions.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: AppFullLoader(size: 48)),
               )
             else if (_transactions.isEmpty)
               Padding(

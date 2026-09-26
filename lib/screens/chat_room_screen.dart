@@ -405,11 +405,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   _isUploadingImage
                       ? const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
+                          child: AppLoader(size: 22),
                         )
                       : IconButton(
                           icon: const Icon(Icons.image_outlined, color: AppColors.blue),
@@ -434,11 +430,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   CircleAvatar(
                     backgroundColor: AppColors.blue,
                     child: _isSending
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                          )
+                        ? const AppLoader(size: 18, color: Colors.white)
                         : IconButton(
                             icon: const Icon(Icons.send, color: Colors.white, size: 20),
                             onPressed: _send,

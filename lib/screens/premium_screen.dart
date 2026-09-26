@@ -10,6 +10,8 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../services/billing_service.dart';
 import 'people_list_screen.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import 'subscription_management_screen.dart';
 import '../theme/app_colors.dart';
 import '../utils/sound_player.dart';
@@ -329,8 +331,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: _isBuyingGooglePlay
-                        ? const SizedBox(
-                            width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        ? const AppLoader(size: 18, color: Colors.white)
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -578,8 +579,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _isActivatingTrial ? null : _activateTrial,
                   icon: _isActivatingTrial
-                      ? const SizedBox(
-                          width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const AppLoader(size: 16, color: Colors.white)
                       : const Icon(Icons.card_giftcard),
                   label: Text(context.t('premium.trial_button')),
                   style: ElevatedButton.styleFrom(
@@ -622,7 +622,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
             if (_isLoadingPlans)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 12),
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(child: AppFullLoader(size: 48)),
               )
             else if (_activePaymentId != null)
               Container(
@@ -636,7 +636,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   children: [
                     Row(
                       children: [
-                        const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                        const AppLoader(size: 18),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(context.t('premium.awaiting_payment'), style: TextStyle(color: cardText)),
@@ -732,7 +732,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   else if (_isLoadingReferral)
                     Row(
                       children: [
-                        const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                        const AppLoader(size: 14),
                         const SizedBox(width: 8),
                         Text(context.t('premium.loading_code'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                       ],

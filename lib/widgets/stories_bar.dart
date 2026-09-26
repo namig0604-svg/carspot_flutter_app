@@ -7,6 +7,7 @@ import '../theme/app_colors.dart';
 import '../screens/story_viewer_screen.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import 'app_loader.dart';
 
 /// Лента историй сверху главного экрана: своя история/кнопка добавить + кольца
 /// друзей (градиент — есть непросмотренные, серая рамка — уже всё видел).
@@ -211,7 +212,7 @@ class _StoriesBarState extends State<StoriesBar> {
                             child: _isUploading
                                 ? const Padding(
                                     padding: EdgeInsets.all(3),
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    child: AppLoader(size: 14, color: Colors.white),
                                   )
                                 : const Icon(Icons.add, size: 14, color: Colors.white),
                           ),
