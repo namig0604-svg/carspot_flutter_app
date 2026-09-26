@@ -606,10 +606,15 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
             Text(isPremium ? context.t('premium.renew_title') : context.t('premium.buy_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 4),
-            Text(
-              context.t('premium.payment_method_note'),
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
+            // Google Play запрещает предлагать в Android-приложении оплату цифровых
+            // товаров в обход Google Play Billing — поэтому упоминание Trybit и сами
+            // кнопки оплаты через Trybit показываем только в веб-версии (kIsWeb).
+            // На Android/iOS остаётся только секция Google Play ниже.
+            if (kIsWeb)
+              Text(
+                context.t('premium.payment_method_note'),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
             const SizedBox(height: 10),
 
             _buildGooglePlaySection(cardSurface, cardText),
@@ -657,8 +662,21 @@ class _PremiumScreenState extends State<PremiumScreen> {
                   ],
                 ),
               )
-            else
-              _buildPlansByTier(cardText),
+            else if (kIsWeb)
+              _buildPlansByTier(cardText)
+            else if (!BillingService.instance.isAvailable || BillingService.instance.products.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  context.t('premium.google_play_setup_notice'),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ),
 
             const SizedBox(height: 24),
 

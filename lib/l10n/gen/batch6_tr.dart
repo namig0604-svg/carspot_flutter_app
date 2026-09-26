@@ -115,6 +115,11 @@ const Map<String, Map<String, String>> kBatch6Translations = {
     'en': 'Pay via Trybit — by card or crypto, works in any CIS country',
     'ka': 'გადახდა Trybit-ით — ბარათით ან კრიპტოვალუტით, მუშაობს დსთ-ის ნებისმიერ ქვეყანაში',
   },
+  'premium.google_play_setup_notice': {
+    'ru': 'Оплата подключается — совсем скоро здесь появится покупка через Google Play',
+    'en': 'Payment is being set up — Google Play purchase will appear here shortly',
+    'ka': 'გადახდა ემზადება — მალე აქ გამოჩნდება შესყიდვა Google Play-ს მეშვეობით',
+  },
   'premium.awaiting_payment': {
     'ru': 'Ждём подтверждения оплаты...',
     'en': 'Waiting for payment confirmation...',
