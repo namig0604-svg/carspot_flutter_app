@@ -16,6 +16,10 @@ const Map<String, Color> kCosmeticFrameColors = {
   'frame_carbon': Color(0xFF3F3F46),
   'frame_chrome': Color(0xFFE5E7EB),
   'frame_diamond': Color(0xFFB9F2FF),
+  // Эксклюзив CarSpot Premium (не покупается за монеты — см.
+  // app/api/coins.py::COSMETICS_CATALOG, premium_tier_required).
+  'frame_pro_exclusive': Color(0xFF90A4AE),
+  'frame_max_exclusive': Color(0xFF7C4DFF),
 };
 
 const Map<String, IconData> kCosmeticBadgeIcons = {
@@ -29,6 +33,9 @@ const Map<String, IconData> kCosmeticBadgeIcons = {
   'badge_target': Icons.gps_fixed,
   'badge_rocket': Icons.rocket_launch,
   'badge_diamond': Icons.diamond,
+  // Эксклюзив CarSpot Premium.
+  'badge_pro_exclusive': Icons.shield,
+  'badge_max_exclusive': Icons.workspace_premium,
 };
 
 const Map<String, Color> kCosmeticNameColors = {
@@ -42,6 +49,8 @@ const Map<String, Color> kCosmeticNameColors = {
   'color_orange': Color(0xFFF97316),
   'color_teal': Color(0xFF14B8A6),
   'color_lime': Color(0xFFA3E635),
+  // Эксклюзив CarSpot Premium.
+  'color_max_exclusive': Color(0xFFFF3D9A),
 };
 
 Color? frameColorFor(String? cosmeticId) => cosmeticId == null ? null : kCosmeticFrameColors[cosmeticId];
