@@ -270,6 +270,36 @@ const Map<String, Map<String, String>> kBatch6Translations = {
     'en': 'A dedicated "Premium" achievement in your profile\'s badge list',
     'ka': 'ცალკე „Premium" მიღწევა შენი პროფილის ჯილდოების სიაში',
   },
+  'premium.perk_money_title': {
+    'ru': 'Монеты и опыт за подписку',
+    'en': 'Coins and XP on subscription',
+    'ka': 'მონეტები და XP გამოწერაზე',
+  },
+  'premium.perk_money_subtitle': {
+    'ru': 'CarSpot Coin и XP на баланс при каждой оплате и продлении — суммы растут по тарифу',
+    'en': 'CarSpot Coin and XP added to your balance on every payment and renewal — amounts grow with your tier',
+    'ka': 'CarSpot Coin და XP ემატება ბალანსს ყოველ გადახდასა და განახლებაზე — თანხა იზრდება დონის მიხედვით',
+  },
+  'premium.perk_status_name_title': {
+    'ru': 'Статусный цвет ника',
+    'en': 'Status name color',
+    'ka': 'სტატუსური ფერის ნიკი',
+  },
+  'premium.perk_status_name_subtitle': {
+    'ru': 'Твоё имя выделяется цветом тарифа в чатах, каталоге и списках участников',
+    'en': "Your name is highlighted in your tier's color in chats, the catalog and participant lists",
+    'ka': 'შენი სახელი გამოირჩევა დონის ფერით ჩატებში, კატალოგში და მონაწილეთა სიებში',
+  },
+  'premium.perk_priority_title': {
+    'ru': 'Приоритет в списке участников',
+    'en': 'Priority in participant lists',
+    'ka': 'პრიორიტეტი მონაწილეთა სიაში',
+  },
+  'premium.perk_priority_subtitle': {
+    'ru': 'Поднимаешься в начало списка участников сходки, когда бы ни записался',
+    'en': "You move to the top of a meetup's participant list, no matter when you joined",
+    'ka': 'შეხვედრის მონაწილეთა სიის თავში ხვდები, მიუხედავად იმისა, როდის შეუერთდი',
+  },
 
   // ─────────────────────────── car_detail_screen.dart ───────────────────────────
   'car_detail.generic_error': {

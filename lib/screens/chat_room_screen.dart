@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/premium_status.dart';
 
 /// Экран одного чата (личный / чат сходки / чат клуба).
 /// Обновляется по таймеру каждые несколько секунд — без WebSocket,
@@ -264,6 +265,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     final isMe = msg['user_id'] == _myId;
     final user = msg['user'] as Map<String, dynamic>?;
     final username = user?['username'] as String? ?? context.t('chat_room.default_username');
+    final nameColor = premiumNameColor(user?['premium_tier'] as String?);
     final avatarUrl = user?['avatar_url'] as String?;
     final text = msg['text'] as String? ?? '';
     final imageUrl = msg['image_url'] as String?;
@@ -320,7 +322,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         padding: const EdgeInsets.only(bottom: 2, left: 6, top: 2),
                         child: Text(
                           username,
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: nameColor ?? Colors.blueGrey),
                         ),
                       ),
                     if (hasImage)

@@ -41,6 +41,21 @@ const Map<String, Map<String, String>> kFeaturePremiumTiersTranslations = {
     'en': 'Bonus XP on purchase',
     'ka': 'ბონუს XP შეძენისას',
   },
+  'premium.compare_bonus_coins': {
+    'ru': 'Бонус монет за покупку',
+    'en': 'Bonus coins on purchase',
+    'ka': 'ბონუს მონეტები შეძენისას',
+  },
+  'premium.compare_status_name': {
+    'ru': 'Статусный цвет ника',
+    'en': 'Status name color',
+    'ka': 'სტატუსური ფერის ნიკი',
+  },
+  'premium.compare_priority': {
+    'ru': 'Приоритет в участниках',
+    'en': 'Priority in participants',
+    'ka': 'პრიორიტეტი მონაწილეებში',
+  },
   'premium.compare_title': {
     'ru': 'Сравнение уровней',
     'en': 'Compare tiers',

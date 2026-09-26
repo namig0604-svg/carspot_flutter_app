@@ -813,12 +813,19 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     ),
                   ),
                   const Divider(height: 1),
-                  _tierCompareRow(context.t('premium.compare_garage'), basic: true, pro: true, max: true, basicNote: '15', proNote: '30', maxNote: '60'),
-                  _tierCompareRow(context.t('premium.compare_insights'), basic: true, pro: true, max: true, basicNote: '15', proNote: '75', maxNote: '300'),
-                  _tierCompareRow(context.t('premium.compare_business'), basic: true, pro: true, max: true, basicNote: '1', proNote: '8', maxNote: '25'),
+                  // Монетные/статусные/практичные плюшки — это то, что реально
+                  // интересно большинству, показываем их первыми. "Голые"
+                  // числовые лимиты (гараж/автосервисы) — ниже, они больше
+                  // подстраховка от злоупотреблений, чем витрина тарифа.
+                  _tierCompareRow(context.t('premium.compare_bonus_coins'), basic: true, pro: true, max: true, basicNote: '+50', proNote: '+150', maxNote: '+400'),
+                  _tierCompareRow(context.t('premium.compare_bonus_xp'), basic: true, pro: true, max: true, basicNote: '+50', proNote: '+100', maxNote: '+200'),
+                  _tierCompareRow(context.t('premium.compare_status_name'), basic: true, pro: true, max: true),
+                  _tierCompareRow(context.t('premium.compare_priority'), basic: true, pro: true, max: true),
                   _tierCompareRow(context.t('premium.compare_free_boost'), basic: false, pro: true, max: true, proNote: '24h', maxNote: '48h'),
                   _tierCompareRow(context.t('premium.compare_pinned_photos'), basic: false, pro: true, max: true),
-                  _tierCompareRow(context.t('premium.compare_bonus_xp'), basic: false, pro: false, max: true),
+                  _tierCompareRow(context.t('premium.compare_insights'), basic: true, pro: true, max: true, basicNote: '15', proNote: '75', maxNote: '300'),
+                  _tierCompareRow(context.t('premium.compare_garage'), basic: true, pro: true, max: true, basicNote: '12', proNote: '18', maxNote: '25'),
+                  _tierCompareRow(context.t('premium.compare_business'), basic: true, pro: true, max: true, basicNote: '1', proNote: '2', maxNote: '3'),
                 ],
               ),
             ),
@@ -829,17 +836,23 @@ class _PremiumScreenState extends State<PremiumScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Column(
                 children: [
+                  // Практичные/статусные/монетные плюшки — то, что реально
+                  // хотят иметь, а не голые цифры лимитов (машины/автосервисы
+                  // и так остаются в сравнительной таблице выше).
+                  _perkTile(Icons.monetization_on, context.t('premium.perk_money_title'),
+                      context.t('premium.perk_money_subtitle')),
+                  const Divider(height: 1),
+                  _perkTile(Icons.badge, context.t('premium.perk_status_name_title'),
+                      context.t('premium.perk_status_name_subtitle')),
+                  const Divider(height: 1),
+                  _perkTile(Icons.arrow_upward, context.t('premium.perk_priority_title'),
+                      context.t('premium.perk_priority_subtitle')),
+                  const Divider(height: 1),
                   _perkTile(Icons.favorite, context.t('premium.perk_likers_title'),
                       context.t('premium.perk_likers_subtitle')),
                   const Divider(height: 1),
                   _perkTile(Icons.rocket_launch, context.t('premium.perk_boost_title'),
                       context.t('premium.perk_boost_subtitle')),
-                  const Divider(height: 1),
-                  _perkTile(Icons.storefront, context.t('premium.perk_services_title'),
-                      context.t('premium.perk_services_subtitle')),
-                  const Divider(height: 1),
-                  _perkTile(Icons.directions_car, context.t('premium.perk_garage_title'),
-                      context.t('premium.perk_garage_subtitle')),
                   const Divider(height: 1),
                   _perkTile(Icons.push_pin, context.t('premium.perk_pinned_photos_title'),
                       context.t('premium.perk_pinned_photos_subtitle')),

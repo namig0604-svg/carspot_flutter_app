@@ -23,6 +23,7 @@ import '../widgets/comments_section.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
+import '../utils/premium_status.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> event;
@@ -558,6 +559,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     final user = p['user'] as Map<String, dynamic>?;
                     final avatarUrl = user?['avatar_url'] as String?;
                     final username = user?['username'] as String? ?? context.t('event_details.unknown_user');
+                    final premiumTier = user?['premium_tier'] as String?;
+                    final nameColor = premiumNameColor(premiumTier);
                     final isVerified = user?['is_verified'] == true;
                     final isOnline = user?['is_online'] == true;
                     final rating = user?['average_rating'] ?? 0;
@@ -596,7 +599,15 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                       title: Row(
                         children: [
-                          Flexible(child: Text(username, overflow: TextOverflow.ellipsis)),
+                          Flexible(
+                            child: Text(
+                              username,
+                              overflow: TextOverflow.ellipsis,
+                              style: nameColor != null
+                                  ? TextStyle(color: nameColor, fontWeight: FontWeight.w600)
+                                  : null,
+                            ),
+                          ),
                           if (isVerified) ...[
                             const SizedBox(width: 4),
                             const Icon(Icons.verified, color: AppColors.blue, size: 16),
