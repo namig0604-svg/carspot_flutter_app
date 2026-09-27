@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
 import 'app_guide_screen.dart';
@@ -75,13 +74,11 @@ class FaqScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/settings.jpg'),
-          Theme(
-            data: AppTheme.dark,
-            child: ListView(
+          ListView(
               padding: const EdgeInsets.all(16),
               children: [
                 Card(
@@ -123,7 +120,7 @@ class FaqScreen extends StatelessWidget {
                                 children: [
                                   Text(context.t(item.questionKey), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                   const SizedBox(height: 4),
-                                  Text(context.t(item.answerKey), style: const TextStyle(fontSize: 13, color: AppColors.textMutedDark, height: 1.4)),
+                                  Text(context.t(item.answerKey), style: TextStyle(fontSize: 13, color: AppColors.textMuted(context), height: 1.4)),
                                 ],
                               ),
                             ),
@@ -133,7 +130,6 @@ class FaqScreen extends StatelessWidget {
                   ),
                 ],
               ],
-            ),
           ),
         ],
       ),

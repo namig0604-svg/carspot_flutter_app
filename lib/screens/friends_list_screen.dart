@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import 'user_profile_screen.dart';
@@ -239,17 +238,15 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
           ],
         ),
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/chats.jpg'),
-          Theme(
-            data: AppTheme.dark,
-            child: _isLoading
+          _isLoading
                 ? Center(child: AppLoader())
                 : RefreshIndicator(
                     color: AppColors.red,
-                    backgroundColor: AppColors.surfaceDark,
+                    backgroundColor: AppColors.surface(context),
                     onRefresh: _loadAll,
                     child: TabBarView(
                       controller: _tabController,
@@ -259,7 +256,6 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
                       ],
                     ),
                   ),
-          ),
         ],
       ),
     );

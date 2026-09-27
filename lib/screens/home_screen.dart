@@ -38,7 +38,6 @@ import 'vin_decoder_screen.dart';
 import 'hazards_screen.dart';
 import 'part_listings_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/celebration_overlay.dart';
 import '../widgets/section_background.dart';
@@ -386,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           SectionBackground(
@@ -396,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? 'assets/backgrounds/profile.jpg'
                 : 'assets/backgrounds/events.jpg',
           ),
-          Theme(data: AppTheme.dark, child: _buildBody()),
+          _buildBody(),
         ],
       ),
       // Нижняя навигация в духе референса: Лента / Карта / Добавить / Чаты /
@@ -502,13 +501,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 _filterEvents();
               });
             },
-            style: const TextStyle(color: AppColors.textOnDark),
+            style: TextStyle(color: AppColors.onSurface(context)),
             decoration: InputDecoration(
               hintText: context.t('home.search_hint'),
-              hintStyle: const TextStyle(color: AppColors.textMutedDark),
-              prefixIcon: const Icon(Icons.search, color: AppColors.textMutedDark),
+              hintStyle: TextStyle(color: AppColors.textMuted(context)),
+              prefixIcon: Icon(Icons.search, color: AppColors.textMuted(context)),
               filled: true,
-              fillColor: AppColors.surfaceDarkAlt,
+              fillColor: AppColors.surfaceAlt(context),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(28),
                 borderSide: BorderSide(color: AppColors.blue.withOpacity(0.4)),
@@ -615,7 +614,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : RefreshIndicator(
                   color: AppColors.blue,
-                  backgroundColor: AppColors.surfaceDark,
+                  backgroundColor: AppColors.surface(context),
                   onRefresh: _loadEvents,
                   child: ListView.builder(
                     padding: const EdgeInsets.only(bottom: 10),
@@ -629,9 +628,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceDark,
+                          color: AppColors.surface(context),
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: AppColors.steel),
+                          border: Border.all(color: AppColors.border(context)),
                         ),
                         child: Material(
                           color: Colors.transparent,
@@ -693,7 +692,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 padding: const EdgeInsets.all(4),
                                                 child: Icon(
                                                   favorite ? Icons.favorite : Icons.favorite_border,
-                                                  color: favorite ? AppColors.red : AppColors.textMutedDark,
+                                                  color: favorite ? AppColors.red : AppColors.textMuted(context),
                                                   size: 18,
                                                 ),
                                               ),
@@ -703,12 +702,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
-                                            const Icon(Icons.place_outlined, size: 13, color: AppColors.textMutedDark),
+                                            Icon(Icons.place_outlined, size: 13, color: AppColors.textMuted(context)),
                                             const SizedBox(width: 3),
                                             Expanded(
                                               child: Text(
                                                 '${event['city']} · ${formatEventDateTime(event['event_date'], event['event_time'] as String?)}',
-                                                style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                                                style: TextStyle(fontSize: 12, color: AppColors.textMuted(context)),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
@@ -720,27 +719,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                               decoration: BoxDecoration(
-                                                color: joined ? AppColors.blue.withOpacity(0.16) : AppColors.surfaceDarkAlt,
+                                                color: joined ? AppColors.blue.withOpacity(0.16) : AppColors.surfaceAlt(context),
                                                 borderRadius: BorderRadius.circular(20),
-                                                border: Border.all(color: joined ? AppColors.blue.withOpacity(0.5) : AppColors.steel),
+                                                border: Border.all(color: joined ? AppColors.blue.withOpacity(0.5) : AppColors.border(context)),
                                               ),
                                               child: Text(
                                                 joined ? context.t('home.status_joined') : context.t('home.status_not_joined'),
                                                 style: TextStyle(
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.w700,
-                                                  color: joined ? AppColors.blue : AppColors.textMutedDark,
+                                                  color: joined ? AppColors.blue : AppColors.textMuted(context),
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(width: 8),
                                             const Icon(Icons.star_rounded, size: 14, color: AppColors.amber),
                                             const SizedBox(width: 2),
-                                            Text('${event['average_rating']}', style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
+                                            Text('${event['average_rating']}', style: TextStyle(fontSize: 12, color: AppColors.textMuted(context))),
                                             const SizedBox(width: 8),
-                                            const Icon(Icons.people_alt_outlined, size: 13, color: AppColors.textMutedDark),
+                                            Icon(Icons.people_alt_outlined, size: 13, color: AppColors.textMuted(context)),
                                             const SizedBox(width: 2),
-                                            Text('${event['participants_count']}', style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
+                                            Text('${event['participants_count']}', style: TextStyle(fontSize: 12, color: AppColors.textMuted(context))),
                                           ],
                                         ),
                                       ],
@@ -787,9 +786,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             colors: [AppColors.blueBright, AppColors.blue],
                           )
                         : null,
-                    color: selected ? null : AppColors.surfaceDarkAlt,
+                    color: selected ? null : AppColors.surfaceAlt(context),
                     borderRadius: BorderRadius.circular(20),
-                    border: selected ? null : Border.all(color: AppColors.steel),
+                    border: selected ? null : Border.all(color: AppColors.border(context)),
                     boxShadow: selected
                         ? [BoxShadow(color: AppColors.blue.withOpacity(0.35), blurRadius: 10, offset: const Offset(0, 3))]
                         : null,
@@ -797,7 +796,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(m.$3, size: 15, color: selected ? Colors.white : AppColors.textMutedDark),
+                      Icon(m.$3, size: 15, color: selected ? Colors.white : AppColors.textMuted(context)),
                       const SizedBox(width: 5),
                       Flexible(
                         child: Text(
@@ -806,7 +805,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: selected ? Colors.white : AppColors.textMutedDark,
+                            color: selected ? Colors.white : AppColors.textMuted(context),
                           ),
                         ),
                       ),
@@ -836,10 +835,10 @@ class _HomeScreenState extends State<HomeScreen> {
           margin: const EdgeInsets.symmetric(horizontal: 4),
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
           decoration: BoxDecoration(
-            color: AppColors.surfaceDark,
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: highlight ? AppColors.amber.withOpacity(0.7) : AppColors.steel,
+              color: highlight ? AppColors.amber.withOpacity(0.7) : AppColors.border(context),
               width: highlight ? 1.4 : 1,
             ),
           ),
@@ -867,7 +866,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    Text('$count', style: const TextStyle(fontSize: 11, color: AppColors.textMutedDark)),
+                    Text('$count', style: TextStyle(fontSize: 11, color: AppColors.textMuted(context))),
                   ],
                 ),
               ),
@@ -1099,17 +1098,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Text(
             '@${user['username'] ?? ''}',
-            style: const TextStyle(color: AppColors.textMutedDark, fontSize: 14),
+            style: TextStyle(color: AppColors.textMuted(context), fontSize: 14),
           ),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.location_on, size: 14, color: AppColors.textMutedDark),
+              Icon(Icons.location_on, size: 14, color: AppColors.textMuted(context)),
               const SizedBox(width: 4),
               Text(
                 '${user['city'] ?? ''}, ${user['country'] ?? ''}',
-                style: const TextStyle(color: AppColors.textMutedDark),
+                style: TextStyle(color: AppColors.textMuted(context)),
               ),
             ],
           ),
@@ -1177,7 +1176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           AnimatedCountText(
                             end: stats.xp,
                             formatter: (v) => context.tArgs('home.xp_total', {'xp': '${v.round()}'}),
-                            style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                            style: TextStyle(fontSize: 12, color: AppColors.textMuted(context)),
                           ),
                         ],
                       ),
@@ -1198,7 +1197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 AnimatedCountText(
                   end: stats.xpIntoLevel,
                   formatter: (v) => context.tArgs('home.xp_to_next_level', {'current': '${v.round()}', 'next': '${stats.xpForNextLevel}'}),
-                  style: const TextStyle(fontSize: 11, color: AppColors.textMutedDark),
+                  style: TextStyle(fontSize: 11, color: AppColors.textMuted(context)),
                 ),
               ],
             ),
@@ -1582,7 +1581,7 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               color: cardSurface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.steel),
+              border: Border.all(color: AppColors.border(context)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

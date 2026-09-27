@@ -5,7 +5,6 @@ import '../services/api_service.dart';
 import 'chat_room_screen.dart';
 import 'forum_categories_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
@@ -98,15 +97,15 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
           ),
         ],
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/chats.jpg'),
-          Theme(data: AppTheme.dark, child: _isLoading
+          _isLoading
           ? Center(child: AppLoader())
           : RefreshIndicator(
               color: AppColors.red,
-              backgroundColor: AppColors.surfaceDark,
+              backgroundColor: AppColors.surface(context),
               onRefresh: _loadRooms,
               child: _rooms.isEmpty
                   ? ListView(
@@ -172,7 +171,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontWeight: hasUnread ? FontWeight.w600 : FontWeight.normal,
-                              color: hasUnread ? AppColors.textOnDark : Colors.grey,
+                              color: hasUnread ? AppColors.onSurface(context) : Colors.grey,
                             ),
                           ),
                           trailing: Column(
@@ -213,7 +212,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
                         );
                       },
                     ),
-            )),
+            ),
         ],
       ),
     );

@@ -10,7 +10,6 @@ import 'business_form_screen.dart';
 import 'premium_screen.dart';
 import 'businesses_map_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../widgets/neon_chip.dart';
@@ -150,11 +149,11 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
         child: const Icon(Icons.add),
         ),
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.red, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/services.jpg'),
-          Theme(data: AppTheme.dark, child: Column(
+          Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
@@ -190,14 +189,14 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
               child: TextField(
                 controller: _searchController,
                 onSubmitted: (_) => _load(),
-                style: const TextStyle(color: AppColors.textOnDark),
+                style: TextStyle(color: AppColors.onSurface(context)),
                 decoration: InputDecoration(
                   hintText: context.t('businesses_list.search_hint'),
-                  hintStyle: const TextStyle(color: AppColors.textMutedDark),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.textMutedDark),
+                  hintStyle: TextStyle(color: AppColors.textMuted(context)),
+                  prefixIcon: Icon(Icons.search, color: AppColors.textMuted(context)),
                   suffixIcon: IconButton(icon: const Icon(Icons.arrow_forward, color: AppColors.blue), onPressed: _load),
                   filled: true,
-                  fillColor: AppColors.surfaceDarkAlt,
+                  fillColor: AppColors.surfaceAlt(context),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(color: AppColors.blue.withOpacity(0.35)),
@@ -256,18 +255,18 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                 ? Center(child: AppLoader())
                 : RefreshIndicator(
                     color: AppColors.red,
-                    backgroundColor: AppColors.surfaceDark,
+                    backgroundColor: AppColors.surface(context),
                     onRefresh: _load,
                     child: _businesses.isEmpty
                         ? ListView(
                             children: [
                               SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-                              const Icon(Icons.car_repair, size: 64, color: AppColors.textMutedDark),
+                              Icon(Icons.car_repair, size: 64, color: AppColors.textMuted(context)),
                               const SizedBox(height: 16),
                               Center(
                                 child: Text(
                                   _showFavoritesOnly ? context.t('businesses_list.no_favorites_empty') : context.t('businesses_list.nothing_found'),
-                                  style: const TextStyle(fontSize: 16, color: AppColors.textMutedDark),
+                                  style: TextStyle(fontSize: 16, color: AppColors.textMuted(context)),
                                 ),
                               ),
                             ],
@@ -295,9 +294,9 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 10),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceDark,
+                                  color: AppColors.surface(context),
                                   borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(color: AppColors.steel),
+                                  border: Border.all(color: AppColors.border(context)),
                                 ),
                                 child: Material(
                                   color: Colors.transparent,
@@ -368,7 +367,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                                                           if ((business['city'] ?? '').toString().isNotEmpty) business['city'],
                                                           if (distanceText != null) distanceText,
                                                         ].join(' · '),
-                                                        style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                                                        style: TextStyle(fontSize: 12, color: AppColors.textMuted(context)),
                                                         overflow: TextOverflow.ellipsis,
                                                       ),
                                                     ),
@@ -382,11 +381,11 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                                                       const SizedBox(width: 2),
                                                       Text(
                                                         '${rating.toStringAsFixed(1)} ($reviewsCount)',
-                                                        style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                                                        style: TextStyle(fontSize: 12, color: AppColors.textMuted(context)),
                                                       ),
                                                     ],
                                                     const Spacer(),
-                                                    const Icon(Icons.chevron_right, size: 18, color: AppColors.textMutedDark),
+                                                    Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted(context)),
                                                   ],
                                                 ),
                                               ],
@@ -403,7 +402,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                   ),
           ),
         ],
-      )),
+      ),
         ],
       ),
     );

@@ -5,7 +5,6 @@ import '../services/api_service.dart';
 import 'club_detail_screen.dart';
 import 'club_form_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
@@ -108,11 +107,11 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
           child: const Icon(Icons.add),
         ),
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.red, glowAlignment: Alignment.topLeft, imageAsset: 'assets/backgrounds/clubs.jpg'),
-          Theme(data: AppTheme.dark, child: Column(
+          Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
@@ -158,7 +157,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                 ? Center(child: AppLoader())
                 : RefreshIndicator(
                     color: AppColors.red,
-                    backgroundColor: AppColors.surfaceDark,
+                    backgroundColor: AppColors.surface(context),
                     onRefresh: _load,
                     child: _clubs.isEmpty
                         ? ListView(
@@ -232,7 +231,7 @@ class _ClubsListScreenState extends State<ClubsListScreen> {
                   ),
           ),
         ],
-      )),
+      ),
         ],
       ),
     );

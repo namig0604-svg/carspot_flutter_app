@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../utils/gamification.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
@@ -133,7 +132,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
         ? Center(child: AppLoader())
         : RefreshIndicator(
             color: AppColors.red,
-            backgroundColor: AppColors.surfaceDark,
+            backgroundColor: AppColors.surface(context),
             onRefresh: _load,
             child: _rows.isEmpty
                 ? ListView(
@@ -162,10 +161,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
                           color: isMe
-                              ? Color.alphaBlend(AppColors.blue.withOpacity(0.22), AppColors.surfaceDark)
+                              ? Color.alphaBlend(AppColors.blue.withOpacity(0.22), AppColors.surface(context))
                               : (topThree
-                                  ? Color.alphaBlend(_rankColor(rank).withOpacity(0.15), AppColors.surfaceDark)
-                                  : AppColors.surfaceDark),
+                                  ? Color.alphaBlend(_rankColor(rank).withOpacity(0.15), AppColors.surface(context))
+                                  : AppColors.surface(context)),
                           borderRadius: BorderRadius.circular(12),
                           border: topThree ? Border.all(color: _rankColor(rank).withOpacity(0.6)) : null,
                         ),
@@ -231,7 +230,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
         ? Center(child: AppLoader())
         : RefreshIndicator(
             color: AppColors.red,
-            backgroundColor: AppColors.surfaceDark,
+            backgroundColor: AppColors.surface(context),
             onRefresh: _loadClubs,
             child: _clubRows.isEmpty
                 ? ListView(
@@ -261,8 +260,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         decoration: BoxDecoration(
                           color: topThree
-                              ? Color.alphaBlend(_rankColor(rank).withOpacity(0.15), AppColors.surfaceDark)
-                              : AppColors.surfaceDark,
+                              ? Color.alphaBlend(_rankColor(rank).withOpacity(0.15), AppColors.surface(context))
+                              : AppColors.surface(context),
                           borderRadius: BorderRadius.circular(12),
                           border: topThree ? Border.all(color: _rankColor(rank).withOpacity(0.6)) : null,
                         ),
@@ -341,19 +340,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
           ],
         ),
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.red, glowAlignment: Alignment.topLeft, imageAsset: 'assets/backgrounds/events.jpg'),
-          Theme(
-            data: AppTheme.dark,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildUsersTab(),
-                _buildClubsTab(),
-              ],
-            ),
+          TabBarView(
+            controller: _tabController,
+            children: [
+              _buildUsersTab(),
+              _buildClubsTab(),
+            ],
           ),
         ],
       ),

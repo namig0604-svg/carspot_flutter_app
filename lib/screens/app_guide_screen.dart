@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
 
@@ -69,21 +68,19 @@ class AppGuideScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.red, glowAlignment: Alignment.topLeft, imageAsset: 'assets/backgrounds/events.jpg'),
-          Theme(
-            data: AppTheme.dark,
-            child: ListView(
+          ListView(
               padding: const EdgeInsets.all(16),
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceDarkAlt,
+                    color: AppColors.surfaceAlt(context),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.steel),
+                    border: Border.all(color: AppColors.border(context)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +89,7 @@ class AppGuideScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         context.t('guide.intro_body'),
-                        style: const TextStyle(fontSize: 14, color: AppColors.textMutedDark, height: 1.5),
+                        style: TextStyle(fontSize: 14, color: AppColors.textMuted(context), height: 1.5),
                       ),
                     ],
                   ),
@@ -106,9 +103,9 @@ class AppGuideScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceDarkAlt,
+                        color: AppColors.surfaceAlt(context),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.steel),
+                        border: Border.all(color: AppColors.border(context)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +124,7 @@ class AppGuideScreen extends StatelessWidget {
                               children: [
                                 Text(context.t(item.titleKey), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                                 const SizedBox(height: 3),
-                                Text(context.t(item.descriptionKey), style: const TextStyle(fontSize: 12.5, color: AppColors.textMutedDark, height: 1.4)),
+                                Text(context.t(item.descriptionKey), style: TextStyle(fontSize: 12.5, color: AppColors.textMuted(context), height: 1.4)),
                               ],
                             ),
                           ),
@@ -137,7 +134,6 @@ class AppGuideScreen extends StatelessWidget {
                 ],
                 const SizedBox(height: 10),
               ],
-            ),
           ),
         ],
       ),

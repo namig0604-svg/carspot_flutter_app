@@ -8,7 +8,6 @@ import 'admin_ranks_screen.dart';
 import 'premium_screen.dart';
 import 'coins_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/section_background.dart';
 import 'faq_screen.dart';
 import 'app_guide_screen.dart';
@@ -81,11 +80,11 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/settings.jpg'),
-          Theme(data: AppTheme.dark, child: ListView(
+          ListView(
         padding: const EdgeInsets.all(16),
         children: [
           _sectionCard(
@@ -273,7 +272,7 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
         ],
-      )),
+      ),
         ],
       ),
     );

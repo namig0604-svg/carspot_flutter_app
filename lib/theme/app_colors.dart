@@ -35,4 +35,41 @@ class AppColors {
   static const Color textMutedDark = Color(0xFF8A93A6); // серый подзаголовок на тёмном, как в CCS
   static const Color textOnLight = Color(0xFF0A0C10);
   static const Color textMutedLight = Color(0xFF6B7280);
+
+  // --- Светлые аналоги "тёмных" поверхностей/границ ---
+  // Нужны экранам, которые раньше были жёстко завёрнуты в Theme(data: AppTheme.dark)
+  // (см. lib/theme/app_theme.dart) и использовали surfaceDark*/steel*/textOnDark
+  // напрямую — теперь эти экраны следуют системной/пользовательской теме, а эти
+  // константы и хелперы ниже дают им светлый эквивалент того же слоя.
+  static const Color surfaceAltLight = Color(0xFFEFF1F4); // как fillColor/chipTheme в AppTheme.light
+  static const Color surfaceRaisedLight = Color(0xFFE7E9ED);
+
+  /// true, если сейчас действует тёмная тема (см. Theme.of(context).brightness).
+  static bool isDark(BuildContext context) => Theme.of(context).brightness == Brightness.dark;
+
+  /// Фон экрана — то же самое, что Theme.of(context).scaffoldBackgroundColor,
+  /// но короче в местах, где раньше стоял литерал AppColors.black.
+  static Color scaffoldBg(BuildContext context) => Theme.of(context).scaffoldBackgroundColor;
+
+  /// Была AppColors.surfaceDark — карточки/поверхности первого уровня.
+  static Color surface(BuildContext context) => isDark(context) ? surfaceDark : surfaceLight;
+
+  /// Была AppColors.surfaceDarkAlt — поля поиска, пилюли, второй слой поверх фона.
+  static Color surfaceAlt(BuildContext context) => isDark(context) ? surfaceDarkAlt : surfaceAltLight;
+
+  /// Была AppColors.surfaceDarkRaised — приподнятые элементы (активные пилюли, модалки).
+  static Color surfaceRaised(BuildContext context) => isDark(context) ? surfaceDarkRaised : surfaceRaisedLight;
+
+  /// Была AppColors.steel — тонкая граница.
+  static Color border(BuildContext context) => isDark(context) ? steel : steelLight;
+
+  /// Была AppColors.steelStrong — граница чуть заметнее.
+  static Color borderStrong(BuildContext context) => isDark(context) ? steelStrong : steelLight;
+
+  /// Была AppColors.textOnDark — основной цвет текста. Совпадает с
+  /// Theme.of(context).colorScheme.onSurface, но так короче и явнее по смыслу.
+  static Color onSurface(BuildContext context) => isDark(context) ? textOnDark : textOnLight;
+
+  /// Была AppColors.textMutedDark — приглушённый подзаголовок/второстепенный текст.
+  static Color textMuted(BuildContext context) => isDark(context) ? textMutedDark : textMutedLight;
 }

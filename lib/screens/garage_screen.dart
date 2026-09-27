@@ -5,7 +5,6 @@ import '../services/api_service.dart';
 import 'car_detail_screen.dart';
 import 'car_form_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
@@ -257,15 +256,15 @@ class _GarageScreenState extends State<GarageScreen> {
           child: const Icon(Icons.add),
         ),
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topLeft, imageAsset: 'assets/backgrounds/garage.jpg'),
-          Theme(data: AppTheme.dark, child: _isLoading
+          _isLoading
           ? Center(child: AppLoader())
           : RefreshIndicator(
               color: AppColors.red,
-              backgroundColor: AppColors.surfaceDark,
+              backgroundColor: AppColors.surface(context),
               onRefresh: _loadGarage,
               child: _cars.isEmpty
                   ? ListView(
@@ -291,7 +290,7 @@ class _GarageScreenState extends State<GarageScreen> {
                       itemCount: _cars.length,
                       itemBuilder: (context, index) => _buildCarCard(_cars[index]),
                     ),
-            )),
+            ),
         ],
       ),
     );

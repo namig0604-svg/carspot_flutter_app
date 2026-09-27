@@ -6,7 +6,6 @@ import 'event_details_screen.dart';
 import 'club_detail_screen.dart';
 import 'business_detail_screen.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
@@ -130,9 +129,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     return ListView(
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-        Icon(icon, size: 56, color: AppColors.textMutedDark),
+        Icon(icon, size: 56, color: AppColors.textMuted(context)),
         const SizedBox(height: 14),
-        Center(child: Text(text, style: const TextStyle(color: AppColors.textMutedDark, fontSize: 15))),
+        Center(child: Text(text, style: TextStyle(color: AppColors.textMuted(context), fontSize: 15))),
       ],
     );
   }
@@ -142,7 +141,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     if (_events.isEmpty) return _emptyState(context.t('favorites.no_events'), Icons.calendar_today_outlined);
     return RefreshIndicator(
       color: AppColors.blue,
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: AppColors.surface(context),
       onRefresh: _loadEvents,
       child: ListView.builder(
         padding: const EdgeInsets.all(12),
@@ -178,7 +177,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     if (_clubs.isEmpty) return _emptyState(context.t('favorites.no_clubs'), Icons.groups_outlined);
     return RefreshIndicator(
       color: AppColors.blue,
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: AppColors.surface(context),
       onRefresh: _loadClubs,
       child: ListView.builder(
         padding: const EdgeInsets.all(12),
@@ -220,7 +219,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     if (_businesses.isEmpty) return _emptyState(context.t('favorites.no_businesses'), Icons.car_repair);
     return RefreshIndicator(
       color: AppColors.blue,
-      backgroundColor: AppColors.surfaceDark,
+      backgroundColor: AppColors.surface(context),
       onRefresh: _loadBusinesses,
       child: ListView.builder(
         padding: const EdgeInsets.all(12),
@@ -276,16 +275,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
           ],
         ),
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(accent: AppColors.red, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/profile.jpg'),
-          Theme(
-            data: AppTheme.dark,
-            child: TabBarView(
-              controller: _tabController,
-              children: [_eventsTab(), _clubsTab(), _businessesTab()],
-            ),
+          TabBarView(
+            controller: _tabController,
+            children: [_eventsTab(), _clubsTab(), _businessesTab()],
           ),
         ],
       ),

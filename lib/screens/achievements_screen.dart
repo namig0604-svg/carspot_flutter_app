@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_theme.dart';
 import '../utils/gamification.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
@@ -36,7 +35,7 @@ class AchievementsScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: AppColors.black,
       ),
-      backgroundColor: AppColors.black,
+      backgroundColor: AppColors.scaffoldBg(context),
       body: Stack(
         children: [
           const SectionBackground(
@@ -44,9 +43,7 @@ class AchievementsScreen extends StatelessWidget {
             glowAlignment: Alignment.topRight,
             imageAsset: 'assets/backgrounds/profile.jpg',
           ),
-          Theme(
-            data: AppTheme.dark,
-            child: Column(
+          Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 6),
@@ -54,7 +51,7 @@ class AchievementsScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Color.alphaBlend(Colors.amber.withOpacity(0.18), AppColors.surfaceDark),
+                      color: Color.alphaBlend(Colors.amber.withOpacity(0.18), AppColors.surface(context)),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.amber.withOpacity(0.3)),
                     ),
@@ -68,8 +65,8 @@ class AchievementsScreen extends StatelessWidget {
                             children: [
                               Text(
                                 context.tArgs('achievements.unlocked_count', {'unlocked': '$unlockedCount', 'total': '${achievements.length}'}),
-                                style: const TextStyle(
-                                  color: AppColors.textOnDark,
+                                style: TextStyle(
+                                  color: AppColors.onSurface(context),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
                                 ),
@@ -109,28 +106,27 @@ class AchievementsScreen extends StatelessWidget {
                       childAspectRatio: 0.86,
                     ),
                     itemCount: sorted.length,
-                    itemBuilder: (context, index) => _achievementCard(sorted[index]),
+                    itemBuilder: (context, index) => _achievementCard(context, sorted[index]),
                   ),
                 ),
               ],
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _achievementCard(Achievement a) {
+  Widget _achievementCard(BuildContext context, Achievement a) {
     return Opacity(
       opacity: a.unlocked ? 1.0 : 0.6,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: a.unlocked
-              ? Color.alphaBlend(Colors.amber.withOpacity(0.20), AppColors.surfaceDark)
-              : AppColors.surfaceDark,
+              ? Color.alphaBlend(Colors.amber.withOpacity(0.20), AppColors.surface(context))
+              : AppColors.surface(context),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: a.unlocked ? Colors.amber : AppColors.steel),
+          border: Border.all(color: a.unlocked ? Colors.amber : AppColors.border(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +143,7 @@ class AchievementsScreen extends StatelessWidget {
               context.t(a.titleKey),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: AppColors.textOnDark, fontWeight: FontWeight.bold, fontSize: 13),
+              style: TextStyle(color: AppColors.onSurface(context), fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 4),
             Text(
