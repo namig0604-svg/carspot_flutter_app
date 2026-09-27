@@ -4,14 +4,19 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
-const Map<String, String> _statusLabels = {
-  'pending': 'Ожидает подтверждения',
-  'confirmed': 'Подтверждена',
-  'declined': 'Отклонена',
-  'cancelled': 'Отменена',
-  'completed': 'Выполнена',
-};
+String _statusLabel(BuildContext context, String status) {
+  const keys = {
+    'pending': 'my_bookings.status_pending',
+    'confirmed': 'my_bookings.status_confirmed',
+    'declined': 'my_bookings.status_declined',
+    'cancelled': 'my_bookings.status_cancelled',
+    'completed': 'my_bookings.status_completed',
+  };
+  final key = keys[status];
+  return key == null ? status : context.t(key);
+}
 
 const Map<String, Color> _statusColors = {
   'pending': Colors.amber,
@@ -75,17 +80,17 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
     final reason = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Отклонить запись'),
+        title: Text(dialogContext.t('business_bookings.decline_dialog_title')),
         content: TextField(
           controller: controller,
           maxLength: 300,
-          decoration: const InputDecoration(hintText: 'Причина (необязательно)'),
+          decoration: InputDecoration(hintText: dialogContext.t('business_bookings.decline_reason_hint')),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Отмена')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(dialogContext.t('my_bookings.cancel'))),
           ElevatedButton(
             onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
-            child: const Text('Отклонить'),
+            child: Text(dialogContext.t('business_bookings.decline')),
           ),
         ],
       ),
@@ -111,7 +116,7 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Заявки — ${widget.businessName}', overflow: TextOverflow.ellipsis, maxLines: 1),
+        title: Text(context.tArgs('business_bookings.title', {'name': widget.businessName}), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
       ),
       body: _isLoading
@@ -125,8 +130,8 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
                         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                         const Icon(Icons.event_note, size: 64, color: Colors.grey),
                         const SizedBox(height: 16),
-                        const Center(
-                          child: Text('Заявок на запись пока нет', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                        Center(
+                          child: Text(context.t('business_bookings.empty'), style: const TextStyle(fontSize: 16, color: Colors.grey)),
                         ),
                       ],
                     )
@@ -152,7 +157,7 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      user?['username'] ?? 'Клиент',
+                                      user?['username'] ?? context.t('business_bookings.client_fallback'),
                                       style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -164,7 +169,7 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      _statusLabels[status] ?? status,
+                                      _statusLabel(context, status),
                                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: _statusColors[status] ?? Colors.grey),
                                     ),
                                   ),
@@ -198,7 +203,7 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
                                             side: const BorderSide(color: AppColors.red),
                                             foregroundColor: AppColors.red,
                                           ),
-                                          child: const Text('Отклонить'),
+                                          child: Text(context.t('business_bookings.decline')),
                                         ),
                                       ),
                                       const SizedBox(width: 8),
@@ -209,7 +214,7 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
                                             backgroundColor: Colors.green,
                                             minimumSize: const Size(0, 40),
                                           ),
-                                          child: const Text('Подтвердить', style: TextStyle(color: Colors.white)),
+                                          child: Text(context.t('business_bookings.confirm'), style: const TextStyle(color: Colors.white)),
                                         ),
                                       ),
                                     ] else if (status == 'confirmed')
@@ -220,7 +225,7 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
                                             backgroundColor: AppColors.blue,
                                             minimumSize: const Size(0, 40),
                                           ),
-                                          child: const Text('Отметить выполненной', style: TextStyle(color: Colors.white)),
+                                          child: Text(context.t('business_bookings.mark_completed'), style: const TextStyle(color: Colors.white)),
                                         ),
                                       ),
                                   ],

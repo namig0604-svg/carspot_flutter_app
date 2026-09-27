@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 const String carsMineEndpoint = '/api/cars/my';
 
@@ -61,16 +62,16 @@ class _CarPickerFieldState extends State<CarPickerField> {
           color: AppColors.surfaceDarkAlt,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Text('Сначала добавьте машину в Гараж', style: TextStyle(color: AppColors.textMutedDark)),
+        child: Text(context.t('car_picker.no_cars_hint'), style: const TextStyle(color: AppColors.textMutedDark)),
       );
     }
     return DropdownButtonFormField<String>(
       value: _selectedId,
-      decoration: const InputDecoration(labelText: 'Машина', border: OutlineInputBorder()),
+      decoration: InputDecoration(labelText: context.t('car_picker.label'), border: const OutlineInputBorder()),
       items: _cars.map((c) {
         final car = c as Map<String, dynamic>;
         final label = '${car['make'] ?? ''} ${car['model'] ?? ''}'.trim();
-        return DropdownMenuItem<String>(value: car['id'] as String, child: Text(label.isEmpty ? 'Машина' : label));
+        return DropdownMenuItem<String>(value: car['id'] as String, child: Text(label.isEmpty ? context.t('car_picker.label') : label));
       }).toList(),
       onChanged: (value) {
         setState(() => _selectedId = value);

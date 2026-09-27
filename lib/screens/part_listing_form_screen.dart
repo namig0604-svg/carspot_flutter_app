@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/image_url_picker.dart' show ImageUrlPickerField;
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 import 'part_listings_screen.dart' show partCategoryLabels;
 
 class PartListingFormScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _PartListingFormScreenState extends State<PartListingFormScreen> {
     final priceText = _priceController.text.trim().replaceAll(',', '.');
     final price = double.tryParse(priceText);
     if (title.isEmpty || price == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Укажите название и корректную цену')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('part_listing_form.name_price_required'))));
       return;
     }
     setState(() => _isSaving = true);
@@ -64,7 +65,7 @@ class _PartListingFormScreenState extends State<PartListingFormScreen> {
       );
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -74,50 +75,50 @@ class _PartListingFormScreenState extends State<PartListingFormScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     return Scaffold(
-      appBar: AppBar(title: const Text('Новое объявление'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('part_listing_form.title')), backgroundColor: AppColors.black),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           ImageUrlPickerField(
             controller: _photoUrlController,
             token: authProvider.accessToken,
-            galleryLabel: 'Галерея',
-            cameraLabel: 'Камера',
-            errorTextBuilder: (e) => 'Ошибка загрузки: $e',
+            galleryLabel: context.t('part_listing_form.gallery_label'),
+            cameraLabel: context.t('hazards.type_camera'),
+            errorTextBuilder: (e) => context.tArgs('part_listing_form.upload_error', {'error': '$e'}),
           ),
           const SizedBox(height: 14),
-          TextField(controller: _titleController, decoration: const InputDecoration(labelText: 'Название запчасти')),
+          TextField(controller: _titleController, decoration: InputDecoration(labelText: context.t('part_listing_form.name_label'))),
           const SizedBox(height: 10),
           TextField(
             controller: _descriptionController,
             maxLines: 3,
-            decoration: const InputDecoration(labelText: 'Описание (состояние, комплектация)'),
+            decoration: InputDecoration(labelText: context.t('part_listing_form.description_label')),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _priceController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(labelText: 'Цена, ₽'),
+            decoration: InputDecoration(labelText: context.t('part_listing_form.price_label')),
           ),
           const SizedBox(height: 10),
           DropdownButtonFormField<String>(
             value: _category,
-            decoration: const InputDecoration(labelText: 'Категория'),
+            decoration: InputDecoration(labelText: context.t('car_expenses.category_label')),
             items: partCategoryLabels.entries
-                .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                .map((e) => DropdownMenuItem(value: e.key, child: Text(context.t(e.value))))
                 .toList(),
             onChanged: (v) => setState(() => _category = v ?? 'other'),
           ),
           const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: TextField(controller: _carBrandController, decoration: const InputDecoration(labelText: 'Марка авто'))),
+              Expanded(child: TextField(controller: _carBrandController, decoration: InputDecoration(labelText: context.t('part_listing_form.brand_label')))),
               const SizedBox(width: 10),
-              Expanded(child: TextField(controller: _carModelController, decoration: const InputDecoration(labelText: 'Модель'))),
+              Expanded(child: TextField(controller: _carModelController, decoration: InputDecoration(labelText: context.t('part_listing_form.model_label')))),
             ],
           ),
           const SizedBox(height: 10),
-          TextField(controller: _cityController, decoration: const InputDecoration(labelText: 'Город')),
+          TextField(controller: _cityController, decoration: InputDecoration(labelText: context.t('part_listing_form.city_label'))),
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
@@ -126,7 +127,7 @@ class _PartListingFormScreenState extends State<PartListingFormScreen> {
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue, padding: const EdgeInsets.symmetric(vertical: 14)),
               child: _isSaving
                   ? const AppLoader(size: 20, color: Colors.white)
-                  : const Text('Опубликовать'),
+                  : Text(context.t('carpool.publish')),
             ),
           ),
         ],

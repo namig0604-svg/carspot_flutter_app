@@ -6,19 +6,23 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/neon_chip.dart';
 import '../utils/image_url.dart';
+import '../l10n/l10n_extensions.dart';
 import 'part_listing_detail_screen.dart';
 import 'part_listing_form_screen.dart';
 
+// Значения — ключи переводов, переводятся через context.t() в местах
+// использования (в этом файле и в part_listing_detail_screen.dart /
+// part_listing_form_screen.dart, которые импортируют эту карту).
 const Map<String, String> partCategoryLabels = {
-  'engine': 'Двигатель',
-  'suspension': 'Подвеска',
-  'brakes': 'Тормоза',
-  'body': 'Кузов',
-  'interior': 'Салон',
-  'electronics': 'Электроника',
-  'wheels_tires': 'Колёса/шины',
-  'exhaust': 'Выхлоп',
-  'other': 'Другое',
+  'engine': 'part_listings.cat_engine',
+  'suspension': 'part_listings.cat_suspension',
+  'brakes': 'part_listings.cat_brakes',
+  'body': 'part_listings.cat_body',
+  'interior': 'part_listings.cat_interior',
+  'electronics': 'part_listings.cat_electronics',
+  'wheels_tires': 'part_listings.cat_wheels_tires',
+  'exhaust': 'part_listings.cat_exhaust',
+  'other': 'hazards.type_other',
 };
 
 const Map<String, IconData> partCategoryIcons = {
@@ -75,7 +79,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
         setState(() => _items = (response is Map && response['items'] is List) ? response['items'] : []);
       }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -92,7 +96,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Барахолка запчастей'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('part_listings.title')), backgroundColor: AppColors.black),
       floatingActionButton: FloatingActionButton(
         onPressed: _openCreate,
         backgroundColor: AppColors.blue,
@@ -105,7 +109,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Поиск по названию',
+                hintText: context.t('part_listings.search_hint'),
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: AppColors.surfaceDarkAlt,
@@ -122,7 +126,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 NeonChip(
-                  label: 'Мои',
+                  label: context.t('part_listings.mine_chip'),
                   icon: Icons.person,
                   selected: _mineOnly,
                   onTap: () {
@@ -132,7 +136,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
                 ),
                 const SizedBox(width: 8),
                 NeonChip(
-                  label: 'Все категории',
+                  label: context.t('part_listings.all_categories_chip'),
                   selected: _selectedCategory == null,
                   onTap: () {
                     setState(() => _selectedCategory = null);
@@ -142,7 +146,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
                 for (final entry in partCategoryLabels.entries) ...[
                   const SizedBox(width: 8),
                   NeonChip(
-                    label: entry.value,
+                    label: context.t(entry.value),
                     icon: partCategoryIcons[entry.key],
                     selected: _selectedCategory == entry.key,
                     onTap: () {
@@ -159,7 +163,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
             child: _isLoading
                 ? const Center(child: AppLoader())
                 : _items.isEmpty
-                    ? const Center(child: Text('Пока нет объявлений', style: TextStyle(color: AppColors.textMutedDark)))
+                    ? Center(child: Text(context.t('part_listings.empty'), style: const TextStyle(color: AppColors.textMutedDark)))
                     : RefreshIndicator(
                         onRefresh: _load,
                         child: GridView.builder(
@@ -215,7 +219,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
                                                   borderRadius: BorderRadius.circular(8),
                                                 ),
                                                 child: Text(
-                                                  status == 'sold' ? 'Продано' : (status == 'reserved' ? 'Резерв' : 'Снято'),
+                                                  status == 'sold' ? context.t('part_listings.status_sold') : (status == 'reserved' ? context.t('part_listings.status_reserved') : context.t('part_listings.status_removed')),
                                                   style: const TextStyle(fontSize: 10, color: Colors.white),
                                                 ),
                                               ),

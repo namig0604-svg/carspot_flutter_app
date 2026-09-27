@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Форма онлайн-записи в автосервис/ателье: выбор услуги (из списка
 /// заведения), даты и времени, комментарий. POST /api/bookings/business/{id}.
@@ -55,7 +56,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
 
   Future<void> _submit() async {
     if (_date == null || _time == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Выберите дату и время')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('create_booking.pick_datetime'))));
       return;
     }
     final requestedAt = DateTime(_date!.year, _date!.month, _date!.day, _time!.hour, _time!.minute);
@@ -75,7 +76,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
       if (mounted) {
         Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Заявка на запись отправлена')),
+          SnackBar(content: Text(context.t('create_booking.submitted'))),
         );
       }
     } catch (e) {
@@ -90,14 +91,14 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
     final services = _services;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Запись в ${widget.business['name'] ?? ''}', overflow: TextOverflow.ellipsis, maxLines: 1),
+        title: Text(context.tArgs('create_booking.title', {'name': '${widget.business['name'] ?? ''}'}), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           if (services.isNotEmpty) ...[
-            const Text('Услуга', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+            Text(context.t('create_booking.service_label'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -114,7 +115,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
             ),
             const SizedBox(height: 20),
           ],
-          const Text('Дата и время', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+          Text(context.t('create_booking.date_time_label'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -124,7 +125,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                   icon: const Icon(Icons.calendar_today, size: 18),
                   label: Text(
                     _date == null
-                        ? 'Выбрать дату'
+                        ? context.t('create_booking.pick_date')
                         : '${_date!.day.toString().padLeft(2, '0')}.${_date!.month.toString().padLeft(2, '0')}.${_date!.year}',
                   ),
                   style: OutlinedButton.styleFrom(minimumSize: const Size(0, 48)),
@@ -135,22 +136,22 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
                 child: OutlinedButton.icon(
                   onPressed: _pickTime,
                   icon: const Icon(Icons.access_time, size: 18),
-                  label: Text(_time == null ? 'Выбрать время' : _time!.format(context)),
+                  label: Text(_time == null ? context.t('create_booking.pick_time') : _time!.format(context)),
                   style: OutlinedButton.styleFrom(minimumSize: const Size(0, 48)),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          const Text('Комментарий (необязательно)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+          Text(context.t('carpool.comment_label'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 8),
           TextField(
             controller: _noteController,
             maxLines: 3,
             maxLength: 1000,
-            decoration: const InputDecoration(
-              hintText: 'Например: стук в передней подвеске',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              hintText: context.t('create_booking.note_hint'),
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 10),
@@ -165,7 +166,7 @@ class _CreateBookingScreenState extends State<CreateBookingScreen> {
               ),
               child: _isSubmitting
                   ? const AppLoader(size: 22, color: Colors.white)
-                  : const Text('Записаться', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  : Text(context.t('create_booking.submit'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             ),
           ),
         ],

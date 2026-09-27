@@ -8,14 +8,17 @@ import '../theme/app_colors.dart';
 import '../utils/location_helper.dart';
 import '../utils/map_config.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
+// Значения — ключи переводов (см. lib/l10n/gen), переводятся через
+// context.t() в местах использования, а не хранятся как готовый текст.
 const Map<String, String> _typeLabels = {
-  'camera': 'Камера',
-  'pothole': 'Яма',
-  'ice': 'Гололёд',
-  'accident': 'ДТП',
-  'police': 'Пост ДПС',
-  'other': 'Другое',
+  'camera': 'hazards.type_camera',
+  'pothole': 'hazards.type_pothole',
+  'ice': 'hazards.type_ice',
+  'accident': 'hazards.type_accident',
+  'police': 'hazards.type_police',
+  'other': 'hazards.type_other',
 };
 
 const Map<String, IconData> _typeIcons = {
@@ -90,7 +93,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Отметить опасность'),
+          title: Text(dialogContext.t('hazards.mark_dialog_title')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -99,7 +102,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
                 children: _typeLabels.entries.map((e) {
                   final selected = type == e.key;
                   return ChoiceChip(
-                    label: Text(e.value),
+                    label: Text(dialogContext.t(e.value)),
                     avatar: Icon(_typeIcons[e.key], size: 16),
                     selected: selected,
                     onSelected: (_) => setDialogState(() => type = e.key),
@@ -107,12 +110,12 @@ class _HazardsScreenState extends State<HazardsScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 12),
-              TextField(controller: noteController, decoration: const InputDecoration(labelText: 'Заметка (необязательно)')),
+              TextField(controller: noteController, decoration: InputDecoration(labelText: dialogContext.t('hazards.note_hint'))),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Отметить')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(dialogContext.t('carpool.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(dialogContext.t('hazards.mark'))),
           ],
         ),
       ),
@@ -162,7 +165,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
               children: [
                 Icon(_typeIcons[type], color: _typeColors[type]),
                 const SizedBox(width: 8),
-                Text(_typeLabels[type] ?? type, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                Text(context.t(_typeLabels[type] ?? type), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
               ],
             ),
             if ((hazard['note'] ?? '').toString().isNotEmpty) ...[
@@ -170,7 +173,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
               Text(hazard['note']),
             ],
             const SizedBox(height: 12),
-            Text('Подтвердили: ${hazard['confirms_count'] ?? 0} · Опровергли: ${hazard['denies_count'] ?? 0}',
+            Text(context.tArgs('hazards.confirms_denies', {'confirms': '${hazard['confirms_count'] ?? 0}', 'denies': '${hazard['denies_count'] ?? 0}'}),
                 style: const TextStyle(color: AppColors.textMutedDark, fontSize: 12)),
             const SizedBox(height: 12),
             Row(
@@ -182,7 +185,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
                       _vote(hazard['id'] as String, 'confirm');
                     },
                     icon: const Icon(Icons.check, color: Colors.green),
-                    label: const Text('Актуально'),
+                    label: Text(context.t('hazards.confirm_relevant')),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -193,7 +196,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
                       _vote(hazard['id'] as String, 'deny');
                     },
                     icon: const Icon(Icons.close, color: AppColors.red),
-                    label: const Text('Не актуально'),
+                    label: Text(context.t('hazards.deny_relevant')),
                   ),
                 ),
               ],
@@ -207,7 +210,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Дорожные опасности'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('hazards.title')), backgroundColor: AppColors.black),
       body: Stack(
         children: [
           FlutterMap(
@@ -256,10 +259,10 @@ class _HazardsScreenState extends State<HazardsScreen> {
                 color: AppColors.surfaceDarkAlt.withOpacity(0.9),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                'Долгое нажатие на карте — отметить опасность',
+              child: Text(
+                context.t('hazards.long_press_hint'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppColors.textMutedDark),
+                style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
               ),
             ),
           ),

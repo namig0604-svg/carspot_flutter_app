@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../utils/image_url.dart';
+import '../l10n/l10n_extensions.dart';
 import 'chat_room_screen.dart';
 import 'part_listings_screen.dart' show partCategoryLabels, partCategoryIcons;
 
@@ -35,7 +36,7 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
       final response = await ApiService.get('/api/part-listings/${widget.listingId}', token: authProvider.accessToken);
       setState(() => _listing = response as Map<String, dynamic>);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -52,7 +53,7 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
       _statusChanged = true;
       if (mounted) setState(() => _listing = response as Map<String, dynamic>);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     }
   }
 
@@ -71,11 +72,11 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => ChatRoomScreen(roomId: room['id'], title: room['title'] ?? seller?['username'] ?? 'Продавец'),
+          builder: (_) => ChatRoomScreen(roomId: room['id'], title: room['title'] ?? seller?['username'] ?? context.t('part_listing_detail.seller_fallback')),
         ),
       );
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     }
   }
 
@@ -89,7 +90,7 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Объявление'),
+          title: Text(context.t('part_listing_detail.title')),
           backgroundColor: AppColors.black,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -99,7 +100,7 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
         body: _isLoading
             ? const Center(child: AppLoader())
             : _listing == null
-                ? const Center(child: Text('Не удалось загрузить', style: TextStyle(color: AppColors.textMutedDark)))
+                ? Center(child: Text(context.t('part_listing_detail.load_failed'), style: const TextStyle(color: AppColors.textMutedDark)))
                 : _buildBody(context),
       ),
     );
@@ -138,7 +139,7 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            Chip(label: Text(partCategoryLabels[category] ?? category), avatar: Icon(partCategoryIcons[category], size: 16)),
+            Chip(label: Text(context.t(partCategoryLabels[category] ?? category)), avatar: Icon(partCategoryIcons[category], size: 16)),
             if (listing['car_brand'] != null)
               Chip(label: Text('${listing['car_brand']} ${listing['car_model'] ?? ''}'.trim())),
             if (listing['city'] != null) Chip(avatar: const Icon(Icons.location_on, size: 16), label: Text(listing['city'])),
@@ -146,7 +147,7 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
               Chip(
                 backgroundColor: Colors.black87,
                 label: Text(
-                  status == 'sold' ? 'Продано' : (status == 'reserved' ? 'В резерве' : 'Снято с продажи'),
+                  status == 'sold' ? context.t('part_listings.status_sold') : (status == 'reserved' ? context.t('part_listing_detail.status_reserved') : context.t('part_listing_detail.status_removed_label')),
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
@@ -178,7 +179,7 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(seller['full_name'] ?? seller['username'] ?? 'Продавец', style: const TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text(seller['full_name'] ?? seller['username'] ?? context.t('part_listing_detail.seller_fallback'), style: const TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -190,21 +191,21 @@ class _PartListingDetailScreenState extends State<PartListingDetailScreen> {
             child: ElevatedButton.icon(
               onPressed: status == 'active' ? _messageSeller : null,
               icon: const Icon(Icons.chat_bubble_outline),
-              label: const Text('Написать продавцу'),
+              label: Text(context.t('part_listing_detail.message_seller')),
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue, padding: const EdgeInsets.symmetric(vertical: 14)),
             ),
           ),
         if (isMine) ...[
-          const Text('Статус объявления', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(context.t('part_listing_detail.status_section_title'), style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              _statusButton('active', 'Активно'),
-              _statusButton('reserved', 'В резерве'),
-              _statusButton('sold', 'Продано'),
-              _statusButton('removed', 'Снять с продажи'),
+              _statusButton('active', context.t('part_listing_detail.status_active')),
+              _statusButton('reserved', context.t('part_listing_detail.status_reserved')),
+              _statusButton('sold', context.t('part_listings.status_sold')),
+              _statusButton('removed', context.t('part_listing_detail.status_removed_action')),
             ],
           ),
         ],

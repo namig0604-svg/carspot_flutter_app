@@ -5,15 +5,18 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/car_picker_field.dart';
+import '../l10n/l10n_extensions.dart';
 
+// Значения — ключи переводов, переводятся через context.t() в местах
+// использования (эта карта — не готовый текст для отображения).
 const Map<String, String> _categoryLabels = {
-  'fuel': 'Топливо',
-  'service': 'ТО/ремонт',
-  'insurance': 'Страховка',
-  'parking': 'Парковка',
-  'carwash': 'Мойка',
-  'fines': 'Штрафы',
-  'other': 'Другое',
+  'fuel': 'car_expenses.cat_fuel',
+  'service': 'car_expenses.cat_service',
+  'insurance': 'car_expenses.cat_insurance',
+  'parking': 'home.menu_parking',
+  'carwash': 'car_expenses.cat_carwash',
+  'fines': 'car_expenses.cat_fines',
+  'other': 'hazards.type_other',
 };
 
 const Map<String, IconData> _categoryIcons = {
@@ -81,25 +84,25 @@ class _CarExpensesScreenState extends State<CarExpensesScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Новая трата'),
+          title: Text(dialogContext.t('car_expenses.new_expense_title')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DropdownButtonFormField<String>(
                 value: category,
-                decoration: const InputDecoration(labelText: 'Категория'),
-                items: _categoryLabels.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+                decoration: InputDecoration(labelText: dialogContext.t('car_expenses.category_label')),
+                items: _categoryLabels.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(dialogContext.t(e.value)))).toList(),
                 onChanged: (v) => setDialogState(() => category = v ?? 'fuel'),
               ),
               TextField(
                 controller: amountController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Сумма'),
+                decoration: InputDecoration(labelText: dialogContext.t('car_expenses.amount_label')),
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text('Дата: ${date.day}.${date.month}.${date.year}'),
+                title: Text(dialogContext.tArgs('car_expenses.date_label', {'date': '${date.day}.${date.month}.${date.year}'})),
                 trailing: const Icon(Icons.calendar_today, size: 18),
                 onTap: () async {
                   final picked = await showDatePicker(
@@ -111,12 +114,12 @@ class _CarExpensesScreenState extends State<CarExpensesScreen> {
                   if (picked != null) setDialogState(() => date = picked);
                 },
               ),
-              TextField(controller: noteController, decoration: const InputDecoration(labelText: 'Заметка')),
+              TextField(controller: noteController, decoration: InputDecoration(labelText: dialogContext.t('car_expenses.note_label'))),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Сохранить')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(dialogContext.t('carpool.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(dialogContext.t('car_expenses.save'))),
           ],
         ),
       ),
@@ -147,7 +150,7 @@ class _CarExpensesScreenState extends State<CarExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Расходы на авто'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('car_expenses.title')), backgroundColor: AppColors.black),
       floatingActionButton: _selectedCar == null
           ? null
           : FloatingActionButton(onPressed: _addExpense, backgroundColor: AppColors.blue, child: const Icon(Icons.add)),
@@ -169,13 +172,13 @@ class _CarExpensesScreenState extends State<CarExpensesScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Всего: ${_totalAmount.toStringAsFixed(0)} ₽', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                    Text(context.tArgs('car_expenses.total', {'amount': _totalAmount.toStringAsFixed(0)}), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 12,
                       runSpacing: 6,
                       children: _byCategory.entries
-                          .map((e) => Chip(label: Text('${_categoryLabels[e.key] ?? e.key}: ${(e.value as num).toStringAsFixed(0)} ₽')))
+                          .map((e) => Chip(label: Text(context.tArgs('car_expenses.chip_category_amount', {'category': context.t(_categoryLabels[e.key] ?? e.key), 'amount': (e.value as num).toStringAsFixed(0)}))))
                           .toList(),
                     ),
                   ],
@@ -184,7 +187,7 @@ class _CarExpensesScreenState extends State<CarExpensesScreen> {
               const SizedBox(height: 12),
               Expanded(
                 child: _items.isEmpty
-                    ? const Center(child: Text('Трат пока нет', style: TextStyle(color: AppColors.textMutedDark)))
+                    ? Center(child: Text(context.t('car_expenses.empty'), style: const TextStyle(color: AppColors.textMutedDark)))
                     : ListView.builder(
                         itemCount: _items.length,
                         itemBuilder: (context, index) {
@@ -192,7 +195,7 @@ class _CarExpensesScreenState extends State<CarExpensesScreen> {
                           final category = (e['category'] as String?) ?? 'other';
                           return ListTile(
                             leading: Icon(_categoryIcons[category] ?? Icons.more_horiz, color: AppColors.blue),
-                            title: Text('${(e['amount'] as num?)?.toStringAsFixed(0) ?? 0} ₽ — ${_categoryLabels[category] ?? category}'),
+                            title: Text(context.tArgs('car_expenses.list_item', {'amount': '${(e['amount'] as num?)?.toStringAsFixed(0) ?? 0}', 'category': context.t(_categoryLabels[category] ?? category)})),
                             subtitle: Text(_formatDate(e['date'] as String?)),
                           );
                         },

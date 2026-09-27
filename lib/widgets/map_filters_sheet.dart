@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import 'category_filter_bar.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Bottom-sheet "Фильтры карты" — список категорий с чекбоксами (цветной
 /// кружок + подпись), как модалка "Map filters" в референсе CCS. Открывается
@@ -47,10 +48,10 @@ Future<void> showMapFiltersSheet({
                       padding: const EdgeInsets.fromLTRB(20, 14, 12, 6),
                       child: Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Фильтры карты',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                              sheetContext.t('map_filters.title'),
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                             ),
                           ),
                           IconButton(
@@ -65,7 +66,7 @@ Future<void> showMapFiltersSheet({
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Категорий: ${selected.isEmpty ? "все" : selected.length}',
+                          sheetContext.tArgs('map_filters.count_label', {'count': selected.isEmpty ? sheetContext.t('map_filters.count_all') : '${selected.length}'}),
                           style: const TextStyle(color: AppColors.textMutedDark, fontSize: 13),
                         ),
                       ),
@@ -135,7 +136,7 @@ Future<void> showMapFiltersSheet({
                                   side: const BorderSide(color: AppColors.steel),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                 ),
-                                child: const Text('Сбросить'),
+                                child: Text(sheetContext.t('map_filters.reset')),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -144,7 +145,7 @@ Future<void> showMapFiltersSheet({
                               child: ElevatedButton.icon(
                                 onPressed: () => Navigator.pop(sheetContext),
                                 icon: const Icon(Icons.tune, size: 18),
-                                label: const Text('Применить фильтры'),
+                                label: Text(sheetContext.t('map_filters.apply')),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.blue,
                                   minimumSize: const Size(0, 48),

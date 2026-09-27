@@ -5,16 +5,19 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/car_picker_field.dart';
+import '../l10n/l10n_extensions.dart';
 
+// Значения — ключи переводов, переводятся через context.t() в местах
+// использования (эта карта — не готовый текст для отображения).
 const Map<String, String> _typeLabels = {
-  'oil': 'Замена масла',
-  'tires': 'Шиномонтаж',
-  'brakes': 'Тормоза',
-  'filters': 'Фильтры',
-  'inspection': 'ТО / диагностика',
-  'repair': 'Ремонт',
-  'insurance': 'Страховка',
-  'other': 'Другое',
+  'oil': 'maintenance.type_oil',
+  'tires': 'maintenance.type_tires',
+  'brakes': 'part_listings.cat_brakes',
+  'filters': 'maintenance.type_filters',
+  'inspection': 'maintenance.type_inspection',
+  'repair': 'maintenance.type_repair',
+  'insurance': 'car_expenses.cat_insurance',
+  'other': 'hazards.type_other',
 };
 
 const Map<String, IconData> _typeIcons = {
@@ -79,7 +82,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Новая запись'),
+          title: Text(dialogContext.t('maintenance.new_record_title')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -87,26 +90,26 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
               children: [
                 DropdownButtonFormField<String>(
                   value: type,
-                  decoration: const InputDecoration(labelText: 'Тип'),
+                  decoration: InputDecoration(labelText: dialogContext.t('maintenance.type_label')),
                   items: _typeLabels.entries
-                      .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                      .map((e) => DropdownMenuItem(value: e.key, child: Text(dialogContext.t(e.value))))
                       .toList(),
                   onChanged: (v) => setDialogState(() => type = v ?? 'oil'),
                 ),
-                TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Что сделали')),
+                TextField(controller: titleController, decoration: InputDecoration(labelText: dialogContext.t('maintenance.what_done_label'))),
                 TextField(
                   controller: mileageController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Пробег, км (необязательно)'),
+                  decoration: InputDecoration(labelText: dialogContext.t('maintenance.mileage_label')),
                 ),
                 TextField(
                   controller: costController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Стоимость (необязательно)'),
+                  decoration: InputDecoration(labelText: dialogContext.t('maintenance.cost_label')),
                 ),
               ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text('Дата: ${doneAt.day}.${doneAt.month}.${doneAt.year}'),
+                  title: Text(dialogContext.tArgs('car_expenses.date_label', {'date': '${doneAt.day}.${doneAt.month}.${doneAt.year}'})),
                   trailing: const Icon(Icons.calendar_today, size: 18),
                   onTap: () async {
                     final picked =
@@ -122,8 +125,8 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(nextDueAt == null
-                      ? 'Напомнить в следующий раз:  не задано'
-                      : 'Напомнить: ${nextDueAt!.day}.${nextDueAt!.month}.${nextDueAt!.year}'),
+                      ? dialogContext.t('maintenance.reminder_not_set')
+                      : dialogContext.tArgs('maintenance.reminder_set', {'date': '${nextDueAt!.day}.${nextDueAt!.month}.${nextDueAt!.year}'})),
                   trailing: const Icon(Icons.notifications_active_outlined, size: 18),
                   onTap: () async {
                     final picked = await showDatePicker(
@@ -135,13 +138,13 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
                     if (picked != null) setDialogState(() => nextDueAt = picked);
                   },
                 ),
-                TextField(controller: noteController, maxLines: 2, decoration: const InputDecoration(labelText: 'Заметка')),
+                TextField(controller: noteController, maxLines: 2, decoration: InputDecoration(labelText: dialogContext.t('car_expenses.note_label'))),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Сохранить')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(dialogContext.t('carpool.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(dialogContext.t('car_expenses.save'))),
           ],
         ),
       ),
@@ -174,7 +177,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Сервисный дневник'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('maintenance.title')), backgroundColor: AppColors.black),
       floatingActionButton: _selectedCar == null
           ? null
           : FloatingActionButton(onPressed: _addRecord, backgroundColor: AppColors.blue, child: const Icon(Icons.add)),
@@ -189,8 +192,8 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
             else if (_selectedCar == null)
               const Expanded(child: SizedBox.shrink())
             else if (_records.isEmpty)
-              const Expanded(
-                child: Center(child: Text('Записей пока нет — нажмите + чтобы добавить', style: TextStyle(color: AppColors.textMutedDark))),
+              Expanded(
+                child: Center(child: Text(context.t('maintenance.empty'), style: const TextStyle(color: AppColors.textMutedDark))),
               )
             else
               Expanded(
@@ -219,7 +222,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   '${_formatDate(r['done_at'] as String?)}'
-                                  '${r['mileage_km'] != null ? ' · ${r['mileage_km']} км' : ''}'
+                                  '${r['mileage_km'] != null ? ' · ${r['mileage_km']} ${context.t('maintenance.km_unit')}' : ''}'
                                   '${r['cost'] != null ? ' · ${r['cost']} ₽' : ''}',
                                   style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
                                 ),
@@ -227,7 +230,7 @@ class _MaintenanceScreenState extends State<MaintenanceScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 4),
                                     child: Text(
-                                      'Напоминание: ${_formatDate(r['next_due_at'] as String?)}',
+                                      context.tArgs('maintenance.reminder_line', {'date': _formatDate(r['next_due_at'] as String?)}),
                                       style: const TextStyle(fontSize: 12, color: Colors.amber),
                                   ),
                                   ),

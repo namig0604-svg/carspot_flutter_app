@@ -6,14 +6,19 @@ import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/car_picker_field.dart';
 import '../widgets/image_url_picker.dart' show ImageUrlPickerField;
+import '../l10n/l10n_extensions.dart';
 
+// Значения — ключи переводов, переводятся через context.t() в местах
+// использования (эта карта — не готовый текст для отображения, и также
+// служит текстом по умолчанию для titleController — там перевод
+// подставляется через dialogContext.t() в момент установки значения).
 const Map<String, String> _docTypeLabels = {
-  'registration': 'СТС',
-  'insurance_osago': 'ОСАГО',
-  'insurance_kasko': 'КАСКО',
-  'inspection': 'Диагностическая карта',
-  'license': 'Водительское удостоверение',
-  'other': 'Другое',
+  'registration': 'car_documents.type_registration',
+  'insurance_osago': 'car_documents.type_osago',
+  'insurance_kasko': 'car_documents.type_kasko',
+  'inspection': 'car_documents.type_inspection',
+  'license': 'car_documents.type_license',
+  'other': 'hazards.type_other',
 };
 
 /// Электронный бардачок: фото документов машины + срок действия для напоминаний.
@@ -56,7 +61,7 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
     if (car == null) return;
 
     String type = 'registration';
-    final titleController = TextEditingController(text: _docTypeLabels[type]);
+    final titleController = TextEditingController(text: context.t(_docTypeLabels[type]!));
     final photoUrlController = TextEditingController();
     final authProviderForPicker = Provider.of<AuthProvider>(context, listen: false);
     DateTime? expiresAt;
@@ -65,7 +70,7 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Новый документ'),
+          title: Text(dialogContext.t('car_documents.new_document_title')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -73,29 +78,29 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
               children: [
                 DropdownButtonFormField<String>(
                   value: type,
-                  decoration: const InputDecoration(labelText: 'Тип документа'),
-                  items: _docTypeLabels.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+                  decoration: InputDecoration(labelText: dialogContext.t('car_documents.doc_type_label')),
+                  items: _docTypeLabels.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(dialogContext.t(e.value)))).toList(),
                   onChanged: (v) => setDialogState(() {
                     type = v ?? 'registration';
-                    if (titleController.text.isEmpty || _docTypeLabels.values.contains(titleController.text)) {
-                      titleController.text = _docTypeLabels[type] ?? '';
+                    if (titleController.text.isEmpty || _docTypeLabels.values.map((k) => dialogContext.t(k)).contains(titleController.text)) {
+                      titleController.text = _docTypeLabels[type] == null ? '' : dialogContext.t(_docTypeLabels[type]!);
                     }
                   }),
                 ),
-                TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Название')),
+                TextField(controller: titleController, decoration: InputDecoration(labelText: dialogContext.t('car_documents.name_label'))),
                 const SizedBox(height: 10),
                 ImageUrlPickerField(
                   controller: photoUrlController,
                   token: authProviderForPicker.accessToken,
-                  galleryLabel: 'Галерея',
-                  cameraLabel: 'Камера',
-                  errorTextBuilder: (e) => 'Ошибка загрузки: $e',
+                  galleryLabel: dialogContext.t('part_listing_form.gallery_label'),
+                  cameraLabel: dialogContext.t('hazards.type_camera'),
+                  errorTextBuilder: (e) => dialogContext.tArgs('part_listing_form.upload_error', {'error': '$e'}),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(expiresAt == null
-                      ? 'Срок действия: не задан'
-                      : 'Срок действия: ${expiresAt!.day}.${expiresAt!.month}.${expiresAt!.year}'),
+                      ? dialogContext.t('car_documents.expiry_not_set')
+                      : dialogContext.tArgs('car_documents.expiry_set', {'date': '${expiresAt!.day}.${expiresAt!.month}.${expiresAt!.year}'})),
                   trailing: const Icon(Icons.event, size: 18),
                   onTap: () async {
                     final picked = await showDatePicker(
@@ -111,8 +116,8 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Сохранить')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(dialogContext.t('carpool.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(dialogContext.t('car_expenses.save'))),
           ],
         ),
       ),
@@ -162,7 +167,7 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Документы авто'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('car_documents.title')), backgroundColor: AppColors.black),
       floatingActionButton: _selectedCar == null
           ? null
           : FloatingActionButton(onPressed: _addDocument, backgroundColor: AppColors.blue, child: const Icon(Icons.add)),
@@ -175,8 +180,8 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
             const SizedBox(height: 16),
             if (_isLoading) const Expanded(child: Center(child: AppLoader()))
             else if (_documents.isEmpty)
-              const Expanded(
-                child: Center(child: Text('Документов пока нет', style: TextStyle(color: AppColors.textMutedDark))),
+              Expanded(
+                child: Center(child: Text(context.t('car_documents.empty'), style: const TextStyle(color: AppColors.textMutedDark))),
               )
             else
               Expanded(
@@ -204,7 +209,8 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
                                 Text(d['title'] ?? '', style: const TextStyle(fontWeight: FontWeight.w700)),
                                 if (d['expires_at'] != null)
                                   Text(
-                                    'До ${_formatDate(d['expires_at'] as String?)}${expiringSoon ? ' — скоро истекает!' : ''}',
+                                    context.tArgs('car_documents.expires_until', {'date': _formatDate(d['expires_at'] as String?)}) +
+                                        (expiringSoon ? context.t('car_documents.expiring_soon_suffix') : ''),
                                     style: TextStyle(fontSize: 12, color: expiringSoon ? Colors.amber : AppColors.textMutedDark),
                                   ),
                               ],

@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/location_helper.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Живая геолокация на карте: "поделиться позицией" + метки других
 /// пользователей с ником над меткой. Общая логика для экрана сходок и
@@ -259,10 +260,11 @@ class LiveLocationToggleButton extends StatelessWidget {
   }
 }
 
+// Значения — ключи переводов, переводятся через sheetContext.t().
 const Map<String, String> _visibilityLabels = {
-  'everyone': 'Все',
-  'friends': 'Только друзья',
-  'club': 'Только соклубники',
+  'everyone': 'live_location.visibility_everyone',
+  'friends': 'live_location.visibility_friends',
+  'club': 'live_location.visibility_club',
 };
 
 const Map<String, IconData> _visibilityIcons = {
@@ -325,16 +327,16 @@ Future<void> showLiveLocationSheet(BuildContext context, LiveLocationController 
                     ),
                     Row(
                       children: [
-                        const Expanded(
-                          child: Text('Живая геолокация', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                        Expanded(
+                          child: Text(sheetContext.t('live_location.sheet_title'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
                         ),
                         IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(sheetContext)),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Покажите своим друзьям, соклубникам или всем в приложении, где вы сейчас находитесь.',
-                      style: TextStyle(color: AppColors.textMutedDark, fontSize: 13),
+                    Text(
+                      sheetContext.t('live_location.sheet_description'),
+                      style: const TextStyle(color: AppColors.textMutedDark, fontSize: 13),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -346,16 +348,16 @@ Future<void> showLiveLocationSheet(BuildContext context, LiveLocationController 
                       child: SwitchListTile(
                         value: controller.sharing,
                         activeColor: AppColors.blue,
-                        title: const Text('Делиться своей меткой', style: TextStyle(fontWeight: FontWeight.w600)),
+                        title: Text(sheetContext.t('live_location.share_toggle_title'), style: const TextStyle(fontWeight: FontWeight.w600)),
                         subtitle: Text(
-                          controller.sharing ? 'Транслируется сейчас' : 'Сейчас выключено',
+                          controller.sharing ? sheetContext.t('live_location.sharing_now') : sheetContext.t('live_location.sharing_off'),
                           style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
                         ),
                         onChanged: isSaving ? null : (v) => apply(v),
                       ),
                     ),
                     const SizedBox(height: 14),
-                    const Text('Кто видит мою метку', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    Text(sheetContext.t('live_location.visibility_section_title'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
                     const SizedBox(height: 8),
                     ..._visibilityLabels.entries.map((entry) {
                       final selected = controller.visibility == entry.key;
@@ -377,7 +379,7 @@ Future<void> showLiveLocationSheet(BuildContext context, LiveLocationController 
                               children: [
                                 Icon(_visibilityIcons[entry.key], size: 18, color: selected ? AppColors.blue : AppColors.textMutedDark),
                                 const SizedBox(width: 10),
-                                Expanded(child: Text(entry.value, style: const TextStyle(fontWeight: FontWeight.w600))),
+                                Expanded(child: Text(sheetContext.t(entry.value), style: const TextStyle(fontWeight: FontWeight.w600))),
                                 if (selected) const Icon(Icons.check_circle, color: AppColors.blue, size: 18),
                               ],
                             ),
