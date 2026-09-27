@@ -144,14 +144,14 @@ class AchievementsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              a.title,
+              context.t(a.titleKey),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: AppColors.textOnDark, fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 4),
             Text(
-              a.description,
+              context.t(a.descriptionKey),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.grey, fontSize: 11),

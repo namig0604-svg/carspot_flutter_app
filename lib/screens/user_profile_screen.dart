@@ -413,7 +413,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final baseSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final textColor = isDark ? AppColors.textOnDark : AppColors.textOnLight;
     return Tooltip(
-      message: '${a.title}\n${a.description}',
+      message: '${context.t(a.titleKey)}\n${context.t(a.descriptionKey)}',
       child: Opacity(
         opacity: a.unlocked ? 1.0 : 0.45,
         child: Container(
@@ -429,7 +429,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Text(a.emoji, style: const TextStyle(fontSize: 26)),
               const SizedBox(height: 4),
               Text(
-                a.title,
+                context.t(a.titleKey),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
