@@ -25,6 +25,7 @@ import 'friends_list_screen.dart';
 import 'leaderboard_screen.dart';
 import 'admin_panel_screen.dart';
 import 'achievements_screen.dart';
+import 'challenges_screen.dart';
 import 'favorites_screen.dart';
 import 'my_points_screen.dart';
 import 'forum_categories_screen.dart';
@@ -1459,6 +1460,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         levelTitle: context.t(stats.levelTitleKey),
                       ),
                     ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.flag,
+                  label: context.t('home.menu_challenges'),
+                  color: Colors.deepOrange,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ChallengesScreen()),
                   ),
                 ),
               ),
