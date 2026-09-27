@@ -30,10 +30,39 @@ const List<String> _levelTitles = [
 
 const String _maxLevelTitle = 'Легенда трассы';
 
+// Ключи локализации для тех же названий рангов — levelTitle выше остаётся
+// как есть для обратной совместимости, но экраны должны показывать
+// context.t(stats.levelTitleKey), иначе ранг всегда будет на русском
+// независимо от выбранного языка (см. lib/l10n/gen/feature_gamification_tr.dart).
+const List<String> _levelTitleKeys = [
+  'gamification.tier_novice',
+  'gamification.tier_novice',
+  'gamification.tier_amateur',
+  'gamification.tier_amateur',
+  'gamification.tier_amateur',
+  'gamification.tier_expert',
+  'gamification.tier_expert',
+  'gamification.tier_expert',
+  'gamification.tier_expert',
+  'gamification.tier_pro',
+  'gamification.tier_pro',
+  'gamification.tier_pro',
+  'gamification.tier_pro',
+  'gamification.tier_pro',
+  'gamification.tier_master',
+  'gamification.tier_master',
+  'gamification.tier_master',
+  'gamification.tier_master',
+  'gamification.tier_master',
+];
+
+const String _maxLevelTitleKey = 'gamification.tier_legend';
+
 class GamificationStats {
   final int xp;
   final int level;
   final String levelTitle;
+  final String levelTitleKey;
   final int xpIntoLevel;
   final int xpForNextLevel;
   final double progress; // 0..1
@@ -42,6 +71,7 @@ class GamificationStats {
     required this.xp,
     required this.level,
     required this.levelTitle,
+    required this.levelTitleKey,
     required this.xpIntoLevel,
     required this.xpForNextLevel,
     required this.progress,
@@ -129,10 +159,12 @@ GamificationStats computeStats(int xp) {
   final level = (xp / xpPerLevel).floor() + 1;
   final xpIntoLevel = xp % xpPerLevel;
   final title = level - 1 < _levelTitles.length ? _levelTitles[level - 1] : _maxLevelTitle;
+  final titleKey = level - 1 < _levelTitleKeys.length ? _levelTitleKeys[level - 1] : _maxLevelTitleKey;
   return GamificationStats(
     xp: xp,
     level: level,
     levelTitle: title,
+    levelTitleKey: titleKey,
     xpIntoLevel: xpIntoLevel,
     xpForNextLevel: xpPerLevel,
     progress: xpIntoLevel / xpPerLevel,

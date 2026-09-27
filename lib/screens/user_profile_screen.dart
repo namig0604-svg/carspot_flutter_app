@@ -694,7 +694,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            context.tArgs('user_profile.level_title', {'level': '${stats.level}', 'title': '${stats.levelTitle}'}),
+                                            context.tArgs('user_profile.level_title', {'level': '${stats.level}', 'title': context.t(stats.levelTitleKey)}),
                                             style: TextStyle(fontWeight: FontWeight.bold, color: cardText),
                                           ),
                                           AnimatedCountText(

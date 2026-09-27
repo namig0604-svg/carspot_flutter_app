@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../firebase_options.dart';
 import '../screens/notifications_screen.dart';
 import 'api_service.dart';
+import '../l10n/l10n_extensions.dart';
+import '../l10n/app_translations.dart';
 
 /// Глобальные ключи для показа снэкбара и навигации из push, когда нет
 /// под рукой BuildContext (push приходит асинхронно, не из виджета).
@@ -46,10 +48,12 @@ class PushService {
       FirebaseMessaging.onMessage.listen((message) {
         final n = message.notification;
         if (n == null) return;
+        final ctx = rootScaffoldMessengerKey.currentState?.context;
+        final openLabel = ctx != null ? ctx.t('push_notification.open_button') : tr('push_notification.open_button', 'ru');
         rootScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text('${n.title ?? 'CarSpot'}: ${n.body ?? ''}'),
-            action: SnackBarAction(label: 'Открыть', onPressed: _openNotifications),
+            action: SnackBarAction(label: openLabel, onPressed: _openNotifications),
           ),
         );
       });

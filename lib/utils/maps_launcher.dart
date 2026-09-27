@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Открывает маршрут до точки во внешнем приложении Google Maps (или в браузере,
 /// если приложения нет) — без какого-либо API-ключа, обычная диплинк-ссылка.
@@ -11,12 +12,12 @@ Future<void> openDirections(BuildContext context, double latitude, double longit
     final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!ok && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Не удалось открыть Google Maps')),
+        SnackBar(content: Text(context.t('maps_launcher.open_failed'))),
       );
     }
   } catch (e) {
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('maps_launcher.error_message', {'error': '$e'}))));
     }
   }
 }

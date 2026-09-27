@@ -202,7 +202,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
                             ],
                           ),
                           subtitle: Text(
-                            context.tArgs('leaderboard.level_line', {'level': '${stats.level}', 'title': stats.levelTitle}),
+                            context.tArgs('leaderboard.level_line', {'level': '${stats.level}', 'title': context.t(stats.levelTitleKey)}),
                             style: const TextStyle(color: Colors.grey),
                           ),
                           trailing: Column(

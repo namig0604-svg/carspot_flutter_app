@@ -206,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           context,
           emoji: '🏁',
           title: context.tArgs('home.new_level_title', {'level': '${stats.level}'}),
-          subtitle: stats.levelTitle,
+          subtitle: context.t(stats.levelTitleKey),
         );
         await prefs.setInt('seen_level', stats.level);
       }
@@ -1171,7 +1171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            context.tArgs('home.level_label', {'level': '${stats.level}', 'title': stats.levelTitle}),
+                            context.tArgs('home.level_label', {'level': '${stats.level}', 'title': context.t(stats.levelTitleKey)}),
                             style: TextStyle(fontWeight: FontWeight.bold, color: cardText),
                           ),
                           AnimatedCountText(
@@ -1457,7 +1457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (_) => AchievementsScreen(
                         achievements: achievements,
                         level: stats.level,
-                        levelTitle: stats.levelTitle,
+                        levelTitle: context.t(stats.levelTitleKey),
                       ),
                     ),
                   ),
@@ -1643,7 +1643,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (_) => AchievementsScreen(
                   achievements: achievements,
                   level: stats.level,
-                  levelTitle: stats.levelTitle,
+                  levelTitle: context.t(stats.levelTitleKey),
                 ),
               ),
             ),
