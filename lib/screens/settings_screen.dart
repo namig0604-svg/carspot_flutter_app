@@ -251,12 +251,12 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
           _sectionCard(
-            title: 'Помощь',
+            title: context.t('settings.help_section'),
             children: [
               ListTile(
                 leading: const Icon(Icons.menu_book_outlined, color: AppColors.blue),
-                title: const Text('Как пользоваться CarSpot'),
-                subtitle: const Text('Короткий гид по разделам приложения'),
+                title: Text(context.t('settings.app_guide_title')),
+                subtitle: Text(context.t('settings.app_guide_subtitle')),
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const AppGuideScreen()),
@@ -264,7 +264,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.help_outline, color: AppColors.blue),
-                title: const Text('Частые вопросы (FAQ)'),
+                title: Text(context.t('settings.faq_title')),
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const FaqScreen()),

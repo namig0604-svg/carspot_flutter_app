@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../utils/vin_decoder.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Офлайн-проверка VIN перед покупкой б/у авто: страна, вероятный бренд,
 /// примерный год, валидность контрольной суммы. Не заменяет платную проверку
@@ -32,7 +33,7 @@ class _VinDecoderScreenState extends State<VinDecoderScreen> {
   Widget build(BuildContext context) {
     final r = _result;
     return Scaffold(
-      appBar: AppBar(title: const Text('Проверка VIN'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('vin.title')), backgroundColor: AppColors.black),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -40,9 +41,9 @@ class _VinDecoderScreenState extends State<VinDecoderScreen> {
             controller: _controller,
             textCapitalization: TextCapitalization.characters,
             maxLength: 17,
-            decoration: const InputDecoration(
-              labelText: 'VIN-номер (17 символов)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: context.t('vin.input_label'),
+              border: const OutlineInputBorder(),
             ),
             onSubmitted: (_) => _decode(),
           ),
@@ -52,7 +53,7 @@ class _VinDecoderScreenState extends State<VinDecoderScreen> {
             child: ElevatedButton(
               onPressed: _decode,
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue),
-              child: const Text('Проверить', style: TextStyle(color: Colors.white)),
+              child: Text(context.t('vin.check_button'), style: const TextStyle(color: Colors.white)),
             ),
           ),
           const SizedBox(height: 20),
@@ -64,22 +65,22 @@ class _VinDecoderScreenState extends State<VinDecoderScreen> {
                   color: AppColors.red.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(r.warnings.join('\n'), style: const TextStyle(color: AppColors.red)),
+                child: Text(r.warnings.map((k) => context.t(k)).join('\n'), style: const TextStyle(color: AppColors.red)),
               )
             else ...[
               _infoRow('VIN', r.vin),
-              _infoRow('Формат', 'корректный (17 символов)'),
+              _infoRow(context.t('vin.label_format'), context.t('vin.format_valid_value')),
               if (r.checksumValid != null)
-                _infoRow('Контрольная сумма', r.checksumValid! ? 'сходится ✓' : 'не сходится ⚠️'),
-              if (r.countryRegion != null) _infoRow('Регион производства', r.countryRegion!),
-              if (r.manufacturerHint != null) _infoRow('Вероятный бренд', r.manufacturerHint!),
-              if (r.approximateYear != null) _infoRow('Примерный год', '${r.approximateYear}'),
+                _infoRow(context.t('vin.label_checksum'), r.checksumValid! ? context.t('vin.checksum_ok') : context.t('vin.checksum_fail')),
+              if (r.countryRegion != null) _infoRow(context.t('vin.label_country'), context.t(r.countryRegion!)),
+              if (r.manufacturerHint != null) _infoRow(context.t('vin.label_brand'), r.manufacturerHint!),
+              if (r.approximateYear != null) _infoRow(context.t('vin.label_year'), '${r.approximateYear}'),
               if (r.warnings.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 ...r.warnings.map(
                   (w) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('⚠️ $w', style: const TextStyle(fontSize: 12, color: Colors.amber)),
+                    child: Text('⚠️ ${context.t(w)}', style: const TextStyle(fontSize: 12, color: Colors.amber)),
                   ),
                 ),
               ],
@@ -93,7 +94,7 @@ class _VinDecoderScreenState extends State<VinDecoderScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.steel),
             ),
-            child: const Text(vinLimitationsNote, style: TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
+            child: Text(context.t(vinLimitationsNoteKey), style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark)),
           ),
         ],
       ),

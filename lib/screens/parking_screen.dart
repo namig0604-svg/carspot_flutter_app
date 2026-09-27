@@ -10,6 +10,7 @@ import '../utils/map_config.dart';
 import '../utils/maps_launcher.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/map_pin_marker.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// "Где я припарковался": сохраняет текущую геопозицию одной кнопкой,
 /// показывает метку на карте и строит маршрут обратно во внешнем навигаторе.
@@ -63,7 +64,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
       if (position == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Не удалось определить геопозицию — проверьте разрешения')),
+            SnackBar(content: Text(context.t('parking.geo_error'))),
           );
         }
         return;
@@ -83,7 +84,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
         _mapController.move(LatLng(position.latitude, position.longitude), 16);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Место парковки сохранено')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('parking.saved'))));
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
@@ -111,7 +112,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
         : const LatLng(55.751244, 37.618423);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Где я припарковался'), backgroundColor: AppColors.black),
+      appBar: AppBar(title: Text(context.t('parking.title')), backgroundColor: AppColors.black),
       body: _isLoading
           ? const Center(child: AppLoader())
           : Column(
@@ -151,8 +152,8 @@ class _ParkingScreenState extends State<ParkingScreen> {
                               color: AppColors.surfaceDarkAlt.withOpacity(0.95),
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            child: const Text(
-                              'Метки пока нет. Нажмите «Я здесь припарковался», когда оставите машину.',
+                            child: Text(
+                              context.t('parking.no_marker'),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -167,13 +168,13 @@ class _ParkingScreenState extends State<ParkingScreen> {
                       if (hasSpot && (spot['note'] ?? '').toString().isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: Text('Заметка: ${spot['note']}', style: const TextStyle(color: AppColors.textMutedDark)),
+                          child: Text(context.tArgs('parking.note_label', {'note': '${spot['note']}'}), style: const TextStyle(color: AppColors.textMutedDark)),
                         ),
                       TextField(
                         controller: _noteController,
-                        decoration: const InputDecoration(
-                          hintText: 'Заметка (например: 3 этаж, синий сектор)',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          hintText: context.t('parking.note_hint'),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -183,7 +184,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
                         child: ElevatedButton.icon(
                           onPressed: _isSaving ? null : _saveHere,
                           icon: _isSaving ? const AppLoader(size: 20, color: Colors.white) : const Icon(Icons.my_location),
-                          label: const Text('Я здесь припарковался'),
+                          label: Text(context.t('parking.save_here')),
                           style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue, foregroundColor: Colors.white),
                         ),
                       ),
@@ -195,7 +196,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
                               child: OutlinedButton.icon(
                                 onPressed: () => openDirections(context, point.latitude, point.longitude),
                                 icon: const Icon(Icons.directions),
-                                label: const Text('Маршрут туда'),
+                                label: Text(context.t('parking.route')),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -203,7 +204,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
                               child: OutlinedButton.icon(
                                 onPressed: _clear,
                                 icon: const Icon(Icons.delete_outline, color: AppColors.red),
-                                label: const Text('Убрать метку', style: TextStyle(color: AppColors.red)),
+                                label: Text(context.t('parking.remove_marker'), style: const TextStyle(color: AppColors.red)),
                                 style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.red)),
                               ),
                             ),

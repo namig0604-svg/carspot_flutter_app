@@ -4,15 +4,20 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 import 'business_detail_screen.dart';
 
-const Map<String, String> _statusLabels = {
-  'pending': 'Ожидает подтверждения',
-  'confirmed': 'Подтверждена',
-  'declined': 'Отклонена',
-  'cancelled': 'Отменена',
-  'completed': 'Выполнена',
-};
+String _statusLabel(BuildContext context, String status) {
+  const keys = {
+    'pending': 'my_bookings.status_pending',
+    'confirmed': 'my_bookings.status_confirmed',
+    'declined': 'my_bookings.status_declined',
+    'cancelled': 'my_bookings.status_cancelled',
+    'completed': 'my_bookings.status_completed',
+  };
+  final key = keys[status];
+  return key == null ? status : context.t(key);
+}
 
 const Map<String, Color> _statusColors = {
   'pending': Colors.amber,
@@ -72,7 +77,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Оставить отзыв'),
+          title: Text(dialogContext.t('my_bookings.leave_review')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,13 +99,13 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 controller: textController,
                 maxLines: 3,
                 maxLength: 500,
-                decoration: const InputDecoration(hintText: 'Как всё прошло? (необязательно)'),
+                decoration: InputDecoration(hintText: dialogContext.t('my_bookings.review_hint')),
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Отмена')),
-            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Отправить')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(dialogContext.t('my_bookings.cancel'))),
+            ElevatedButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(dialogContext.t('my_bookings.send'))),
           ],
         ),
       ),
@@ -119,7 +124,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         token: authProvider.accessToken,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Спасибо за отзыв!')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.t('my_bookings.review_thanks'))));
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
@@ -143,7 +148,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Мои записи'),
+        title: Text(context.t('my_bookings.title')),
         backgroundColor: AppColors.black,
       ),
       body: _isLoading
@@ -157,8 +162,8 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                         SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                         const Icon(Icons.event_available, size: 64, color: Colors.grey),
                         const SizedBox(height: 16),
-                        const Center(
-                        child: Text('Увас пока нет записей', style: TextStyle(fontSize: 16, color: Colors.grey)),
+                        Center(
+                        child: Text(context.t('my_bookings.empty_state'), style: const TextStyle(fontSize: 16, color: Colors.grey)),
                         ),
                       ],
                     )
@@ -193,7 +198,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                                               MaterialPageRoute(builder: (_) => BusinessDetailScreen(businessId: business['id'])),
                                             ),
                                       child: Text(
-                                        business?['name'] ?? 'Заведение',
+                                        business?['name'] ?? context.t('my_bookings.business_fallback'),
                                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                                        overflow: TextOverflow.ellipsis,
                                     ),
@@ -206,7 +211,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                 ),
                                     child: Text(
-                                      _statusLabels[status] ?? status,
+                                      _statusLabel(context, status),
                                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: _statusColors[status] ?? Colors.grey),
                                   ),
                                 ),
@@ -225,7 +230,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                         ),
                         if (status == 'declined' && (b['decline_reason'] ?? '').toString().isNotEmpty) ...[
                           const SizedBox(height: 4),
-                          Text('Причина: ${b['decline_reason']}', style: const TextStyle(fontSize: 12, color: AppColors.red)),
+                          Text(context.tArgs('my_bookings.decline_reason', {'reason': '${b['decline_reason']}'}), style: const TextStyle(fontSize: 12, color: AppColors.red)),
                         ],
                         if (canCancel) ...[
                           const SizedBox(height: 8),
@@ -237,7 +242,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                                 minimumSize: const Size(0, 34),
                                 side: const BorderSide(color: AppColors.steel),
                               ),
-                              child: const Text('Отменить'),
+                              child: Text(context.t('my_bookings.cancel_booking')),
                             ),
                           ),
                         ],
@@ -248,7 +253,7 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                             child: OutlinedButton.icon(
                               onPressed: () => _leaveReview(business!['id'] as String),
                               icon: const Icon(Icons.star_border, size: 18),
-                              label: const Text('Оставить отзыв'),
+                              label: Text(context.t('my_bookings.leave_review')),
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(0, 34),
                                 side: const BorderSide(color: Colors.amber),

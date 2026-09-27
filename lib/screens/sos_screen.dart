@@ -8,6 +8,7 @@ import '../theme/app_colors.dart';
 import '../utils/location_helper.dart';
 import '../widgets/app_loader.dart';
 import '../widgets/live_location_layer.dart' show LiveLocationController, showLiveLocationSheet;
+import '../l10n/l10n_extensions.dart';
 import 'business_detail_screen.dart';
 
 // Реальные категории заведений (app/models/business.py): для экстренной
@@ -112,7 +113,7 @@ class _SosScreenState extends State<SosScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Экстренная помощь'), backgroundColor: AppColors.red),
+      appBar: AppBar(title: Text(context.t('sos.title')), backgroundColor: AppColors.red),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -122,11 +123,11 @@ class _SosScreenState extends State<SosScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Сломались на дороге?', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                Text(context.t('sos.broke_down'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                 const SizedBox(height: 8),
-                const Text(
-                  'Отправьте свою геопозицию другу или соклубникам, чтобы вас было проще найти.',
-                  style: TextStyle(color: AppColors.textMutedDark),
+                Text(
+                  context.t('sos.share_hint'),
+                  style: const TextStyle(color: AppColors.textMutedDark),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -134,7 +135,7 @@ class _SosScreenState extends State<SosScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _shareLocation,
                     icon: const Icon(Icons.share_location),
-                    label: const Text('Поделиться геопозицией'),
+                    label: Text(context.t('sos.share_button')),
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.red, foregroundColor: Colors.white),
                   ),
                 ),
@@ -142,12 +143,12 @@ class _SosScreenState extends State<SosScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text('Ближайшие эвакуаторы и шиномонтажи', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+          Text(context.t('sos.nearby_title'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 10),
           if (_isLoading)
             const Center(child: AppLoader())
           else if (_nearby.isEmpty)
-            const Text('Рядом ничего не нашлось — попробуйте другой район', style: TextStyle(color: AppColors.textMutedDark))
+            Text(context.t('sos.empty'), style: const TextStyle(color: AppColors.textMutedDark))
           else
             ..._nearby.map((b) {
               final business = b as Map<String, dynamic>;

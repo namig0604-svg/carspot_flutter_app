@@ -26,25 +26,27 @@ class VinDecodeResult {
   });
 }
 
-const String vinLimitationsNote =
-    'Это базовая офлайн-расшифровка (страна, примерный год, формат). '
-    'Полную историю — пробег, ДТП, залоги, число владельцев — так проверить нельзя: '
-    'для этого нужен платный агрегатор (например Автотека, Автокод) или официальная база.';
+// Ключ перевода для примечания об ограничениях офлайн-проверки VIN
+// (отображается через context.t() в vin_decoder_screen.dart).
+const String vinLimitationsNoteKey = 'vin.limitations_note';
 
 // WMI (первые 1-3 символа) → регион/страна, упрощённая таблица самых частых.
+// Значения — ключи переводов (см. lib/l10n/gen/feature_vin_decoder_tr.dart),
+// а не готовый текст: countryRegion переводится в vin_decoder_screen.dart
+// через context.t(), т.к. у этой функции нет BuildContext.
 const Map<String, String> _wmiCountry = {
-  '1': 'США', '4': 'США', '5': 'США',
-  '2': 'Канада',
-  '3': 'Мексика',
-  'J': 'Япония',
-  'K': 'Корея',
-  'L': 'Китай',
-  'S': 'Великобритания',
-  'V': 'Франция/Испания',
-  'W': 'Германия',
-  'X': 'Россия/СНГ',
-  'Y': 'Швеция/Финляндия',
-  'Z': 'Италия',
+  '1': 'vin.country_us', '4': 'vin.country_us', '5': 'vin.country_us',
+  '2': 'vin.country_ca',
+  '3': 'vin.country_mx',
+  'J': 'vin.country_jp',
+  'K': 'vin.country_kr',
+  'L': 'vin.country_cn',
+  'S': 'vin.country_gb',
+  'V': 'vin.country_fr_es',
+  'W': 'vin.country_de',
+  'X': 'vin.country_ru_cis',
+  'Y': 'vin.country_se_fi',
+  'Z': 'vin.country_it',
 };
 
 const Map<String, String> _wmiBrandHint = {
@@ -52,7 +54,7 @@ const Map<String, String> _wmiBrandHint = {
   'JHM': 'Honda', 'JTD': 'Toyota', 'JN1': 'Nissan', 'JM1': 'Mazda',
   'KMH': 'Hyundai', 'KNA': 'Kia',
   '1FA': 'Ford', '1FT': 'Ford', '1G1': 'Chevrolet', '1GC': 'Chevrolet',
-  'XTA': 'ВАЗ/Lada', 'XW8': 'Volkswagen (РФ)', 'X7L': 'Hyundai (РФ)',
+  'XTA': 'ВАЗ/Lada', 'XW8': 'Volkswagen (RU)', 'X7L': 'Hyundai (RU)',
   'VF1': 'Renault', 'VF3': 'Peugeot', 'VF7': 'Citroën',
   'ZFA': 'Fiat', 'ZAR': 'Alfa Romeo',
 };
@@ -86,7 +88,7 @@ VinDecodeResult decodeVin(String rawVin) {
     return VinDecodeResult(
       vin: vin,
       formatValid: false,
-      warnings: const ['VIN должен собтоять из 17 символов (без I, O, Q).'],
+      warnings: const ['vin.warning_format'],
     );
   }
 
@@ -123,10 +125,10 @@ VinDecodeResult decodeVin(String rawVin) {
   final approximateYear = _yearCode[yearChar];
 
   if (checksumValid == false) {
-    warnings.add('Контрольная сумма не сошлась — возможна опечатка при вводе или VIN не североамериканского стандарта.');
+    warnings.add('vin.warning_checksum');
   }
   if (approximateYear != null) {
-    warnings.add('Год определён по 30-летнему циклу — если авто старше ~2010, возможна ошибка на 30 лет, сверяйте по ПТС.');
+    warnings.add('vin.warning_year');
   }
 
   return VinDecodeResult(

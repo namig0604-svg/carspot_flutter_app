@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/image_url.dart';
 import '../widgets/app_loader.dart';
+import '../l10n/l10n_extensions.dart';
 
 class CarpoolScreen extends StatefulWidget {
   final String eventId;
@@ -33,7 +34,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
       final response = await ApiService.get('/api/carpool/event/${widget.eventId}', token: authProvider.accessToken);
       setState(() => _offers = (response is Map && response['items'] is List) ? response['items'] : []);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -45,7 +46,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
       await ApiService.post('/api/carpool/$offerId/book', {}, token: authProvider.accessToken);
       _load();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     }
   }
 
@@ -55,7 +56,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
       await ApiService.delete('/api/carpool/$offerId/book', token: authProvider.accessToken);
       _load();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     }
   }
 
@@ -65,7 +66,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
       await ApiService.delete('/api/carpool/$offerId', token: authProvider.accessToken);
       _load();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tArgs('carpool.error', {'error': '$e'}))));
     }
   }
 
@@ -80,7 +81,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: AppColors.surfaceDarkAlt,
-          title: const Text('Предложить место в машине'),
+          title: Text(ctx.t('carpool.dialog_title')),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -88,14 +89,14 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
               children: [
                 TextField(
                   controller: pointController,
-                  decoration: const InputDecoration(labelText: 'Откуда едем'),
+                  decoration: InputDecoration(labelText: ctx.t('carpool.from_label')),
                 ),
                 const SizedBox(height: 10),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(departureTime == null
-                      ? 'Время отправления: не задано'
-                      : 'Время отправления: ${departureTime!.day}.${departureTime!.month}.${departureTime!.year} ${departureTime!.hour.toString().padLeft(2, '0')}:${departureTime!.minute.toString().padLeft(2, '0')}'),
+                      ? ctx.t('carpool.departure_not_set')
+                      : ctx.tArgs('carpool.departure_time_label', {'value': '${departureTime!.day}.${departureTime!.month}.${departureTime!.year} ${departureTime!.hour.toString().padLeft(2, '0')}:${departureTime!.minute.toString().padLeft(2, '0')}'})),
                   trailing: const Icon(Icons.schedule, size: 18),
                   onTap: () async {
                     final date = await showDatePicker(
@@ -113,7 +114,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
                 ),
                 Row(
                   children: [
-                    const Text('Мест: '),
+                    Text(ctx.t('carpool.seats_label')),
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline),
                       onPressed: seats > 1 ? () => setDialogState(() => seats--) : null,
@@ -128,13 +129,13 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
                 TextField(
                   controller: noteController,
                   maxLines: 2,
-                  decoration: const InputDecoration(labelText: 'Комментарий (необязательно)'),
+                  decoration: InputDecoration(labelText: ctx.t('carpool.comment_label')),
                 ),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(ctx.t('carpool.cancel'))),
             ElevatedButton(
               onPressed: () async {
                 try {
@@ -152,10 +153,10 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
                   );
                   if (ctx.mounted) Navigator.pop(ctx, true);
                 } catch (e) {
-                  if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Ошибка: $e')));
+                  if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text(ctx.tArgs('carpool.error', {'error': '$e'}))));
                 }
               },
-              child: const Text('Опубликовать'),
+              child: Text(ctx.t('carpool.publish')),
             ),
           ],
         ),
@@ -172,19 +173,19 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Карпулинг · ${widget.eventTitle}', overflow: TextOverflow.ellipsis, maxLines: 1),
+        title: Text(context.tArgs('carpool.title', {'title': widget.eventTitle}), overflow: TextOverflow.ellipsis, maxLines: 1),
         backgroundColor: AppColors.black,
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openCreateDialog,
         backgroundColor: AppColors.blue,
         icon: const Icon(Icons.add),
-        label: const Text('Предложить место'),
+        label: Text(context.t('carpool.offer_seat')),
       ),
       body: _isLoading
           ? const Center(child: AppLoader())
           : _offers.isEmpty
-              ? const Center(child: Text('Пока никто не предложил место — предложите первым!', style: TextStyle(color: AppColors.textMutedDark)))
+              ? Center(child: Text(context.t('carpool.empty_state'), style: const TextStyle(color: AppColors.textMutedDark)))
               : RefreshIndicator(
                   onRefresh: _load,
                   child: ListView.builder(
@@ -225,7 +226,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    driver?['full_name'] ?? driver?['username'] ?? 'Водитель',
+                                    driver?['full_name'] ?? driver?['username'] ?? context.t('carpool.driver_fallback'),
                                     style: const TextStyle(fontWeight: FontWeight.w700),
                                   ),
                                 ),
@@ -236,7 +237,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    seatsLeft > 0 ? '$seatsLeft своб. из $seatsTotal' : 'Мест нет',
+                                    seatsLeft > 0 ? context.tArgs('carpool.seats_free', {'left': '$seatsLeft', 'total': '$seatsTotal'}) : context.t('carpool.no_seats'),
                                     style: TextStyle(fontSize: 11, color: seatsLeft > 0 ? AppColors.blue : Colors.red),
                                   ),
                                 ),
@@ -258,7 +259,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
                                 children: [
                                   const Icon(Icons.schedule, size: 16, color: AppColors.textMutedDark),
                                   const SizedBox(width: 4),
-                                  Text(_formatDateTime(departureTime), style: const TextStyle(fontSize: 13)),
+                                  Text(_formatDateTime(context, departureTime), style: const TextStyle(fontSize: 13)),
                                 ],
                               ),
                             ],
@@ -273,19 +274,19 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
                                   TextButton.icon(
                                     onPressed: () => _deleteOffer(offer['id']),
                                     icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
-                                    label: const Text('Удалить', style: TextStyle(color: Colors.red)),
+                                    label: Text(context.t('carpool.delete'), style: const TextStyle(color: Colors.red)),
                                   )
                                 else if (iBooked)
                                   TextButton.icon(
                                     onPressed: () => _cancelBooking(offer['id']),
                                     icon: const Icon(Icons.close, size: 18),
-                                    label: const Text('Отменить бронь'),
+                                    label: Text(context.t('carpool.cancel_booking')),
                                   )
                                 else
                                   ElevatedButton(
                                     onPressed: seatsLeft > 0 ? () => _book(offer['id']) : null,
                                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.blue),
-                                    child: const Text('Забронировать место'),
+                                    child: Text(context.t('carpool.book_seat')),
                                   ),
                               ],
                             ),
@@ -298,10 +299,13 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
     );
   }
 
-  String _formatDateTime(String iso) {
+  String _formatDateTime(BuildContext context, String iso) {
     try {
       final dt = DateTime.parse(iso).toLocal();
-      return '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')} в ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+      return context.tArgs('carpool.datetime_format', {
+        'date': '${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}',
+        'time': '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}',
+      });
     } catch (_) {
       return iso;
     }

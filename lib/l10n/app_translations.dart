@@ -22,6 +22,8 @@ import 'gen/feature_home_menu_grid_tr.dart';
 import 'gen/feature_gamification_tr.dart';
 import 'gen/feature_misc_utils_tr.dart';
 import 'gen/feature_achievements_tr.dart';
+import 'gen/feature_carpool_tr.dart';
+import 'gen/feature_screens_batch1_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -32,6 +34,8 @@ import 'gen/lang_uk_chunk4_tr.dart';
 import 'gen/lang_uk_chunk5_tr.dart';
 import 'gen/lang_uk_chunk6_tr.dart';
 import 'gen/lang_uk_chunk7_tr.dart';
+import 'gen/lang_uk_chunk8_tr.dart';
+import 'gen/lang_uk_chunk9_tr.dart';
 import 'gen/lang_az_chunk1_tr.dart';
 import 'gen/lang_az_chunk2_tr.dart';
 import 'gen/lang_az_chunk3_tr.dart';
@@ -39,6 +43,8 @@ import 'gen/lang_az_chunk4_tr.dart';
 import 'gen/lang_az_chunk5_tr.dart';
 import 'gen/lang_az_chunk6_tr.dart';
 import 'gen/lang_az_chunk7_tr.dart';
+import 'gen/lang_az_chunk8_tr.dart';
+import 'gen/lang_az_chunk9_tr.dart';
 import 'gen/lang_hy_chunk1_tr.dart';
 import 'gen/lang_hy_chunk2_tr.dart';
 import 'gen/lang_hy_chunk3_tr.dart';
@@ -46,6 +52,8 @@ import 'gen/lang_hy_chunk4_tr.dart';
 import 'gen/lang_hy_chunk5_tr.dart';
 import 'gen/lang_hy_chunk6_tr.dart';
 import 'gen/lang_hy_chunk7_tr.dart';
+import 'gen/lang_hy_chunk8_tr.dart';
+import 'gen/lang_hy_chunk9_tr.dart';
 import 'gen/lang_kk_chunk1_tr.dart';
 import 'gen/lang_kk_chunk2_tr.dart';
 import 'gen/lang_kk_chunk3_tr.dart';
@@ -53,6 +61,8 @@ import 'gen/lang_kk_chunk4_tr.dart';
 import 'gen/lang_kk_chunk5_tr.dart';
 import 'gen/lang_kk_chunk6_tr.dart';
 import 'gen/lang_kk_chunk7_tr.dart';
+import 'gen/lang_kk_chunk8_tr.dart';
+import 'gen/lang_kk_chunk9_tr.dart';
 
 /// Переводы интерфейса CarSpot.
 ///
@@ -126,6 +136,8 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeatureGamificationTranslations,
   ...kFeatureMiscUtilsTranslations,
   ...kFeatureAchievementsTranslations,
+  ...kFeatureCarpoolTranslations,
+  ...kFeatureScreensBatch1Translations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из
@@ -139,6 +151,8 @@ const Map<String, String> kUkTranslations = {
   ...kUkChunk5Translations,
   ...kUkChunk6Translations,
   ...kUkChunk7Translations,
+  ...kUkChunk8Translations,
+  ...kUkChunk9Translations,
 };
 const Map<String, String> kAzTranslations = {
   ...kAzChunk1Translations,
@@ -148,6 +162,8 @@ const Map<String, String> kAzTranslations = {
   ...kAzChunk5Translations,
   ...kAzChunk6Translations,
   ...kAzChunk7Translations,
+  ...kAzChunk8Translations,
+  ...kAzChunk9Translations,
 };
 const Map<String, String> kHyTranslations = {
   ...kHyChunk1Translations,
@@ -157,6 +173,8 @@ const Map<String, String> kHyTranslations = {
   ...kHyChunk5Translations,
   ...kHyChunk6Translations,
   ...kHyChunk7Translations,
+  ...kHyChunk8Translations,
+  ...kHyChunk9Translations,
 };
 const Map<String, String> kKkTranslations = {
   ...kKkChunk1Translations,
@@ -166,6 +184,8 @@ const Map<String, String> kKkTranslations = {
   ...kKkChunk5Translations,
   ...kKkChunk6Translations,
   ...kKkChunk7Translations,
+  ...kKkChunk8Translations,
+  ...kKkChunk9Translations,
 };
 
 /// Добавляет к каждой записи базовой таблицы перевод на язык [langCode] из

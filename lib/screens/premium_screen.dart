@@ -347,7 +347,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               ),
             TextButton(
               onPressed: () => BillingService.instance.restorePurchases(),
-              child: const Text('Восстановить покупки'),
+              child: Text(context.t('premium.restore_purchases')),
             ),
           ],
         ),
