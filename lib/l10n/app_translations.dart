@@ -25,6 +25,7 @@ import 'gen/feature_achievements_tr.dart';
 import 'gen/feature_carpool_tr.dart';
 import 'gen/feature_screens_batch1_tr.dart';
 import 'gen/feature_screens_batch2_tr.dart';
+import 'gen/feature_faq_guide_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -144,6 +145,7 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeatureCarpoolTranslations,
   ...kFeatureScreensBatch1Translations,
   ...kFeatureScreensBatch2Translations,
+  ...kFeatureFaqGuideTranslations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из
