@@ -4,36 +4,39 @@
 /// проходит event_date + duration_minutes — это считает сервер сам.
 library event_duration;
 
+import 'package:flutter/material.dart';
+import '../l10n/l10n_extensions.dart';
+
 class DurationOption {
   final int minutes;
-  final String label;
-  const DurationOption(this.minutes, this.label);
+  final String labelKey;
+  const DurationOption(this.minutes, this.labelKey);
 }
 
 const List<DurationOption> eventDurationOptions = [
-  DurationOption(30, '30 минут'),
-  DurationOption(60, '1 час'),
-  DurationOption(90, '1.5 часа'),
-  DurationOption(120, '2 часа'),
-  DurationOption(180, '3 часа'),
-  DurationOption(240, '4 часа'),
-  DurationOption(360, '6 часов'),
-  DurationOption(480, '8 часов'),
-  DurationOption(720, '12 часов'),
-  DurationOption(1440, '24 часа (1 день)'),
-  DurationOption(2880, '2 дня'),
-  DurationOption(4320, '3 дня'),
-  DurationOption(10080, '7 дней'),
+  DurationOption(30, 'event_duration.min30'),
+  DurationOption(60, 'event_duration.h1'),
+  DurationOption(90, 'event_duration.h1_5'),
+  DurationOption(120, 'event_duration.h2'),
+  DurationOption(180, 'event_duration.h3'),
+  DurationOption(240, 'event_duration.h4'),
+  DurationOption(360, 'event_duration.h6'),
+  DurationOption(480, 'event_duration.h8'),
+  DurationOption(720, 'event_duration.h12'),
+  DurationOption(1440, 'event_duration.h24'),
+  DurationOption(2880, 'event_duration.d2'),
+  DurationOption(4320, 'event_duration.d3'),
+  DurationOption(10080, 'event_duration.d7'),
 ];
 
-String formatEventDuration(int minutes) {
+String formatEventDuration(BuildContext context, int minutes) {
   for (final o in eventDurationOptions) {
-    if (o.minutes == minutes) return o.label;
+    if (o.minutes == minutes) return context.t(o.labelKey);
   }
-  if (minutes < 60) return '$minutes мин';
-  if (minutes % 1440 == 0) return '${minutes ~/ 1440} дн.';
-  if (minutes % 60 == 0) return '${minutes ~/ 60} ч.';
-  return '${minutes ~/ 60} ч ${minutes % 60} мин';
+  if (minutes < 60) return context.tArgs('event_duration.fmt_min', {'minutes': '$minutes'});
+  if (minutes % 1440 == 0) return context.tArgs('event_duration.fmt_day', {'days': '${minutes ~/ 1440}'});
+  if (minutes % 60 == 0) return context.tArgs('event_duration.fmt_hour', {'hours': '${minutes ~/ 60}'});
+  return context.tArgs('event_duration.fmt_hour_min', {'hours': '${minutes ~/ 60}', 'minutes': '${minutes % 60}'});
 }
 
 /// Ближайшее допустимое значение из списка — на случай, если в данных

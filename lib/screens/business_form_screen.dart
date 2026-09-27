@@ -199,7 +199,7 @@ class _BusinessFormScreenState extends State<BusinessFormScreen> {
             ),
             CategoryPickerGrid(
               items: businessCategories
-                  .map((c) => FilterChipData(c.value, c.label, c.icon, c.color))
+                  .map((c) => FilterChipData(c.value, context.t(c.labelKey), c.icon, c.color))
                   .toList(),
               selected: _category,
               onSelect: (value) => setState(() => _category = value),

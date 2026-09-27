@@ -1,27 +1,28 @@
 /// Типы сходок — значения должны совпадать с тем, что шлёт/принимает бэкенд
-/// (event_type), а лейблы/иконки — только для отображения на русском.
+/// (event_type). labelKey — ключ локализации для отображения (см.
+/// lib/l10n/app_translations.dart), сами value на бэкенд не влияют.
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class EventCategoryOption {
   final String value;
-  final String label;
+  final String labelKey;
   final IconData icon;
   final Color color;
-  const EventCategoryOption(this.value, this.label, this.icon, this.color);
+  const EventCategoryOption(this.value, this.labelKey, this.icon, this.color);
 }
 
 const List<EventCategoryOption> eventCategories = [
-  EventCategoryOption('all', 'Все', Icons.apps, AppColors.blue),
-  EventCategoryOption('meetup', 'Тусовка', Icons.groups, AppColors.blue),
-  EventCategoryOption('racing', 'Гонки', Icons.speed, AppColors.red),
-  EventCategoryOption('drift', 'Дрифт', Icons.blur_on, AppColors.red),
-  EventCategoryOption('drag', 'Драг', Icons.bolt, AppColors.red),
-  EventCategoryOption('offroad', 'Офроуд', Icons.terrain, AppColors.blue),
-  EventCategoryOption('show', 'Автошоу', Icons.star, Colors.amber),
-  EventCategoryOption('cruise', 'Круиз', Icons.route, AppColors.blue),
-  EventCategoryOption('track_day', 'Трек-день', Icons.flag, AppColors.red),
-  EventCategoryOption('charity', 'Благотворительность', Icons.favorite, Colors.pinkAccent),
+  EventCategoryOption('all', 'event_category.all', Icons.apps, AppColors.blue),
+  EventCategoryOption('meetup', 'event_category.meetup', Icons.groups, AppColors.blue),
+  EventCategoryOption('racing', 'event_category.racing', Icons.speed, AppColors.red),
+  EventCategoryOption('drift', 'event_category.drift', Icons.blur_on, AppColors.red),
+  EventCategoryOption('drag', 'event_category.drag', Icons.bolt, AppColors.red),
+  EventCategoryOption('offroad', 'event_category.offroad', Icons.terrain, AppColors.blue),
+  EventCategoryOption('show', 'event_category.show', Icons.star, Colors.amber),
+  EventCategoryOption('cruise', 'event_category.cruise', Icons.route, AppColors.blue),
+  EventCategoryOption('track_day', 'event_category.track_day', Icons.flag, AppColors.red),
+  EventCategoryOption('charity', 'event_category.charity', Icons.favorite, Colors.pinkAccent),
 ];
 
 EventCategoryOption eventCategoryByValue(String? value) {
@@ -30,8 +31,6 @@ EventCategoryOption eventCategoryByValue(String? value) {
     orElse: () => eventCategories.first,
   );
 }
-
-String eventCategoryLabel(String? value) => eventCategoryByValue(value).label;
 
 IconData eventCategoryIcon(String? value) => eventCategoryByValue(value).icon;
 

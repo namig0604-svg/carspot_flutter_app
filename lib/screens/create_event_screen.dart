@@ -150,7 +150,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
             CategoryPickerGrid(
               items: eventTypeStyles
-                  .map((t) => FilterChipData(t.value, t.label, t.icon, t.color))
+                  .map((t) => FilterChipData(t.value, context.t(t.labelKey), t.icon, t.color))
                   .toList(),
               selected: _selectedType,
               onSelect: (value) => setState(() => _selectedType = value),
@@ -234,7 +234,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               items: eventDurationOptions
-                  .map((o) => DropdownMenuItem(value: o.minutes, child: Text(o.label)))
+                  .map((o) => DropdownMenuItem(value: o.minutes, child: Text(context.t(o.labelKey))))
                   .toList(),
               onChanged: (value) {
                 if (value != null) setState(() => _durationMinutes = value);

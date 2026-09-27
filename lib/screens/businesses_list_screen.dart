@@ -236,7 +236,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                   ...businessCategories.map((c) => Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: NeonChip(
-                          label: c.label,
+                          label: context.t(c.labelKey),
                           icon: c.icon,
                           color: AppColors.blue,
                           selected: _selectedCategory == c.value,
@@ -364,7 +364,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
                                                     Expanded(
                                                       child: Text(
                                                         [
-                                                          businessCategoryLabel(business['category']),
+                                                          businessCategoryLabel(context, business['category']),
                                                           if ((business['city'] ?? '').toString().isNotEmpty) business['city'],
                                                           if (distanceText != null) distanceText,
                                                         ].join(' · '),

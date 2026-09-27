@@ -83,7 +83,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                '${peer['username'] ?? ''} сейчас делится своей геопозицией',
+                context.tArgs('live_location.peer_sharing', {'username': '${peer['username'] ?? ''}'}),
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
@@ -154,7 +154,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
               ],
             ),
             const SizedBox(height: 6),
-            Text(eventTypeLabel(marker['event_type']), style: const TextStyle(color: Colors.grey)),
+            Text(eventTypeLabel(context, marker['event_type']), style: const TextStyle(color: Colors.grey)),
             if ((marker['city'] ?? '').toString().isNotEmpty)
               Text(marker['city'], style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 6),
@@ -312,7 +312,7 @@ class _EventsMapScreenState extends State<EventsMapScreen> {
                         onTap: () => showMapFiltersSheet(
                           context: context,
                           items: eventTypeStyles
-                              .map((t) => FilterChipData(t.value, t.label, t.icon, t.color))
+                              .map((t) => FilterChipData(t.value, context.t(t.labelKey), t.icon, t.color))
                               .toList(),
                           selected: _selectedCategories,
                           onToggle: (v) => setState(() => _toggleCategory(v)),

@@ -145,7 +145,7 @@ class _MyPointsScreenState extends State<MyPointsScreen> with SingleTickerProvid
                             Text(e['title'] ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                             const SizedBox(height: 3),
                             Text(
-                              [style.label, if ((e['city'] ?? '').toString().isNotEmpty) e['city']].join(' • '),
+                              [context.t(style.labelKey), if ((e['city'] ?? '').toString().isNotEmpty) e['city']].join(' • '),
                               style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -232,8 +232,8 @@ class _MyPointsScreenState extends State<MyPointsScreen> with SingleTickerProvid
                                 Flexible(
                                   child: Text(
                                     hasAddress
-                                        ? [businessCategoryLabel(b['category']), b['address']].join(' • ')
-                                        : businessCategoryLabel(b['category']),
+                                        ? [businessCategoryLabel(context, b['category']), b['address']].join(' • ')
+                                        : businessCategoryLabel(context, b['category']),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(fontSize: 12, color: AppColors.textMutedDark),

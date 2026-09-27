@@ -267,7 +267,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
           if (_isOwner) ...[
             IconButton(
               icon: const Icon(Icons.event_note),
-              tooltip: 'Заявки на запись',
+              tooltip: context.t('business_detail.bookings_tooltip'),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -286,7 +286,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
           if (!_isOwner) ...[
             IconButton(
               icon: const Icon(Icons.event_available),
-              tooltip: 'Записаться',
+              tooltip: context.t('create_booking.submit'),
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
@@ -346,7 +346,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
                           ],
                         ],
                       ),
-                      Text(businessCategoryLabel(b['category']), style: const TextStyle(color: Colors.grey)),
+                      Text(businessCategoryLabel(context, b['category']), style: const TextStyle(color: Colors.grey)),
                     ],
                   ),
                 ),

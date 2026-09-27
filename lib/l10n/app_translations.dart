@@ -26,6 +26,7 @@ import 'gen/feature_carpool_tr.dart';
 import 'gen/feature_screens_batch1_tr.dart';
 import 'gen/feature_screens_batch2_tr.dart';
 import 'gen/feature_faq_guide_tr.dart';
+import 'gen/feature_misc_ui_batch2_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -39,6 +40,7 @@ import 'gen/lang_uk_chunk7_tr.dart';
 import 'gen/lang_uk_chunk8_tr.dart';
 import 'gen/lang_uk_chunk9_tr.dart';
 import 'gen/lang_uk_chunk10_tr.dart';
+import 'gen/lang_uk_chunk11_tr.dart';
 import 'gen/lang_az_chunk1_tr.dart';
 import 'gen/lang_az_chunk2_tr.dart';
 import 'gen/lang_az_chunk3_tr.dart';
@@ -49,6 +51,7 @@ import 'gen/lang_az_chunk7_tr.dart';
 import 'gen/lang_az_chunk8_tr.dart';
 import 'gen/lang_az_chunk9_tr.dart';
 import 'gen/lang_az_chunk10_tr.dart';
+import 'gen/lang_az_chunk11_tr.dart';
 import 'gen/lang_hy_chunk1_tr.dart';
 import 'gen/lang_hy_chunk2_tr.dart';
 import 'gen/lang_hy_chunk3_tr.dart';
@@ -59,6 +62,7 @@ import 'gen/lang_hy_chunk7_tr.dart';
 import 'gen/lang_hy_chunk8_tr.dart';
 import 'gen/lang_hy_chunk9_tr.dart';
 import 'gen/lang_hy_chunk10_tr.dart';
+import 'gen/lang_hy_chunk11_tr.dart';
 import 'gen/lang_kk_chunk1_tr.dart';
 import 'gen/lang_kk_chunk2_tr.dart';
 import 'gen/lang_kk_chunk3_tr.dart';
@@ -69,6 +73,7 @@ import 'gen/lang_kk_chunk7_tr.dart';
 import 'gen/lang_kk_chunk8_tr.dart';
 import 'gen/lang_kk_chunk9_tr.dart';
 import 'gen/lang_kk_chunk10_tr.dart';
+import 'gen/lang_kk_chunk11_tr.dart';
 
 /// Переводы интерфейса CarSpot.
 ///
@@ -146,6 +151,7 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeatureScreensBatch1Translations,
   ...kFeatureScreensBatch2Translations,
   ...kFeatureFaqGuideTranslations,
+  ...kFeatureMiscUiBatch2Translations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из
@@ -162,6 +168,7 @@ const Map<String, String> kUkTranslations = {
   ...kUkChunk8Translations,
   ...kUkChunk9Translations,
   ...kUkChunk10Translations,
+  ...kUkChunk11Translations,
 };
 const Map<String, String> kAzTranslations = {
   ...kAzChunk1Translations,
@@ -174,6 +181,7 @@ const Map<String, String> kAzTranslations = {
   ...kAzChunk8Translations,
   ...kAzChunk9Translations,
   ...kAzChunk10Translations,
+  ...kAzChunk11Translations,
 };
 const Map<String, String> kHyTranslations = {
   ...kHyChunk1Translations,
@@ -186,6 +194,7 @@ const Map<String, String> kHyTranslations = {
   ...kHyChunk8Translations,
   ...kHyChunk9Translations,
   ...kHyChunk10Translations,
+  ...kHyChunk11Translations,
 };
 const Map<String, String> kKkTranslations = {
   ...kKkChunk1Translations,
@@ -198,6 +207,7 @@ const Map<String, String> kKkTranslations = {
   ...kKkChunk8Translations,
   ...kKkChunk9Translations,
   ...kKkChunk10Translations,
+  ...kKkChunk11Translations,
 };
 
 /// Добавляет к каждой записи базовой таблицы перевод на язык [langCode] из

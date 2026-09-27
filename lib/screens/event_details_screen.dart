@@ -332,7 +332,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
           if (_isJoined)
             IconButton(
               icon: const Icon(Icons.directions_car_filled),
-              tooltip: 'Карпулинг',
+              tooltip: context.t('event_details.carpool_tooltip'),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -439,7 +439,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               icon: Icons.calendar_today,
               title: context.t('event_details.date_time_label'),
               value: formatEventDateTime(_event['event_date'], _event['event_time'] as String?) +
-                  '${_event['duration_minutes'] != null ? " · ${formatEventDuration(_event['duration_minutes'] as int)}" : ""}',
+                  '${_event['duration_minutes'] != null ? " · ${formatEventDuration(context, _event['duration_minutes'] as int)}" : ""}',
             ),
             const SizedBox(height: 10),
 

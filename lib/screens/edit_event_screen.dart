@@ -352,7 +352,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               ),
               items: eventDurationOptions
-                  .map((o) => DropdownMenuItem(value: o.minutes, child: Text(o.label)))
+                  .map((o) => DropdownMenuItem(value: o.minutes, child: Text(context.t(o.labelKey))))
                   .toList(),
               onChanged: (value) {
                 if (value != null) setState(() => _durationMinutes = value);

@@ -88,7 +88,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                '${peer['username'] ?? ''} сейчас делится своей геопозицией',
+                context.tArgs('live_location.peer_sharing', {'username': '${peer['username'] ?? ''}'}),
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
@@ -159,7 +159,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               ],
             ),
             const SizedBox(height: 6),
-            Text(businessCategoryLabel(marker['category']), style: const TextStyle(color: Colors.grey)),
+            Text(businessCategoryLabel(context, marker['category']), style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 6),
             Row(
               children: [
@@ -321,7 +321,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
                         onTap: () => showMapFiltersSheet(
                           context: context,
                           items: businessCategories
-                              .map((c) => FilterChipData(c.value, c.label, c.icon, c.color))
+                              .map((c) => FilterChipData(c.value, context.t(c.labelKey), c.icon, c.color))
                               .toList(),
                           selected: _selectedCategories,
                           onToggle: (v) => setState(() => _toggleCategory(v)),

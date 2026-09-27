@@ -211,7 +211,7 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
                 RadioListTile<String?>(
                   value: rank,
                   groupValue: selected,
-                  title: Text(adminRankTitle(rank)),
+                  title: Text(adminRankTitle(context, rank)),
                   onChanged: (v) => setDialogState(() => selected = v),
                 ),
             ],
@@ -255,7 +255,7 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
                 child: ((user['avatar_url'] as String?) ?? '').isEmpty ? Text((user['username'] as String).substring(0, 1).toUpperCase()) : null,
               ),
               title: Text('@${user['username']}'),
-              subtitle: Text(adminRankTitle(user['admin_rank'] as String?)),
+              subtitle: Text(adminRankTitle(context, user['admin_rank'] as String?)),
             ),
             const Divider(height: 1),
             if (_myLevel >= kTechAdminLevel)
@@ -300,7 +300,7 @@ class _AdminRanksScreenState extends State<AdminRanksScreen> {
         child: ((user['avatar_url'] as String?) ?? '').isEmpty ? Text((user['username'] as String).substring(0, 1).toUpperCase()) : null,
       ),
       title: Text('@${user['username']}', style: TextStyle(color: cardText)),
-      subtitle: rank != null ? Text(adminRankTitle(rank), style: const TextStyle(color: AppColors.blue, fontWeight: FontWeight.w600)) : null,
+      subtitle: rank != null ? Text(adminRankTitle(context, rank), style: const TextStyle(color: AppColors.blue, fontWeight: FontWeight.w600)) : null,
       trailing: const Icon(Icons.more_vert),
       onTap: () => _openUserActions(user),
     );

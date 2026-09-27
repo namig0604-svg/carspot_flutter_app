@@ -546,7 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: NeonChip(
-                  label: c.label,
+                  label: context.t(c.labelKey),
                   icon: c.icon,
                   color: c.color,
                   selected: _selectedType == c.value,

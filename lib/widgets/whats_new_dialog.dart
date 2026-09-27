@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
 import '../utils/app_changelog.dart';
 import '../utils/app_version.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Ключ в SharedPreferences, под которым хранится версия приложения,
 /// которую пользователь уже видел (чтобы показать диалог "Что нового"
@@ -84,12 +85,12 @@ class _WhatsNewDialog extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'CarSpot обновлён',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                        Text(
+                          context.t('whats_new.title'),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                         ),
                         Text(
-                          'Версия $version',
+                          context.tArgs('whats_new.version', {'version': version}),
                           style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                         ),
                       ],
@@ -98,9 +99,9 @@ class _WhatsNewDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Что нового:',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+              Text(
+                context.t('whats_new.header'),
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
               ConstrainedBox(
@@ -140,7 +141,7 @@ class _WhatsNewDialog extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: const Text('Отлично!', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  child: Text(context.t('whats_new.button'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                 ),
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../l10n/l10n_extensions.dart';
 
 /// Режим тайлов карты: тёмная / светлая / авто (следовать за темой
 /// приложения). См. lib/utils/map_config.dart — именно этот режим
@@ -17,9 +18,9 @@ class MapThemeToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <(MapThemeMode, IconData, String)>[
-      (MapThemeMode.dark, Icons.dark_mode, 'Тёмная'),
-      (MapThemeMode.light, Icons.light_mode, 'Светлая'),
-      (MapThemeMode.auto, Icons.brightness_auto, 'Авто'),
+      (MapThemeMode.dark, Icons.dark_mode, 'map_theme.dark'),
+      (MapThemeMode.light, Icons.light_mode, 'map_theme.light'),
+      (MapThemeMode.auto, Icons.brightness_auto, 'map_theme.auto'),
     ];
     return Container(
       padding: const EdgeInsets.all(3),
@@ -48,7 +49,7 @@ class MapThemeToggle extends StatelessWidget {
                   Icon(item.$2, size: 14, color: selected ? AppColors.blueBright : Colors.white60),
                   const SizedBox(width: 4),
                   Text(
-                    item.$3,
+                    context.t(item.$3),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
