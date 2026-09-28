@@ -39,6 +39,7 @@ const List<_GuideSection> _guideSections = [
     _GuideItem(Icons.groups, AppColors.blue, 'guide.community_clubs_title', 'guide.community_clubs_desc'),
     _GuideItem(Icons.forum, Colors.deepOrange, 'guide.community_forum_title', 'guide.community_forum_desc'),
     _GuideItem(Icons.storefront, Colors.deepPurple, 'guide.community_marketplace_title', 'guide.community_marketplace_desc'),
+    _GuideItem(Icons.sell_outlined, Colors.deepPurple, 'guide.community_car_listings_title', 'guide.community_car_listings_desc'),
     _GuideItem(Icons.emoji_events, Colors.amber, 'guide.community_leaderboard_title', 'guide.community_leaderboard_desc'),
   ]),
   _GuideSection('guide.section_activity', [

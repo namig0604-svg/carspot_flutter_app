@@ -36,6 +36,7 @@ import 'maintenance_screen.dart';
 import 'car_documents_screen.dart';
 import 'car_expenses_screen.dart';
 import 'fuel_tracker_screen.dart';
+import 'car_listings_screen.dart';
 import 'sos_screen.dart';
 import 'vin_decoder_screen.dart';
 import 'hazards_screen.dart';
@@ -1479,6 +1480,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const PartListingsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.sell_outlined,
+                  label: context.t('home.menu_car_listings'),
+                  color: Colors.deepPurple,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CarListingsScreen()),
                   ),
                 ),
               ),
