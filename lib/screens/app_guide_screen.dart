@@ -31,6 +31,7 @@ const List<_GuideSection> _guideSections = [
     _GuideItem(Icons.build, Colors.brown, 'guide.car_service_title', 'guide.car_service_desc'),
     _GuideItem(Icons.description, Colors.blueGrey, 'guide.car_documents_title', 'guide.car_documents_desc'),
     _GuideItem(Icons.attach_money, Colors.green, 'guide.car_expenses_title', 'guide.car_expenses_desc'),
+    _GuideItem(Icons.local_gas_station, Colors.teal, 'guide.car_fuel_title', 'guide.car_fuel_desc'),
     _GuideItem(Icons.qr_code_scanner, Colors.purple, 'guide.car_vin_title', 'guide.car_vin_desc'),
   ]),
   _GuideSection('faq.section_community', [

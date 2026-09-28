@@ -35,6 +35,7 @@ import 'parking_screen.dart';
 import 'maintenance_screen.dart';
 import 'car_documents_screen.dart';
 import 'car_expenses_screen.dart';
+import 'fuel_tracker_screen.dart';
 import 'sos_screen.dart';
 import 'vin_decoder_screen.dart';
 import 'hazards_screen.dart';
@@ -1393,6 +1394,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const CarExpensesScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.local_gas_station,
+                  label: context.t('home.menu_fuel_tracker'),
+                  color: Colors.teal,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FuelTrackerScreen()),
                   ),
                 ),
               ),
