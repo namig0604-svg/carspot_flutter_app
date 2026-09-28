@@ -37,6 +37,7 @@ import 'car_documents_screen.dart';
 import 'car_expenses_screen.dart';
 import 'fuel_tracker_screen.dart';
 import 'car_listings_screen.dart';
+import 'car_of_week_screen.dart';
 import 'sos_screen.dart';
 import 'vin_decoder_screen.dart';
 import 'hazards_screen.dart';
@@ -1492,6 +1493,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const CarListingsScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.how_to_vote,
+                  label: context.t('home.menu_car_of_week'),
+                  color: Colors.orangeAccent,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CarOfWeekScreen()),
                   ),
                 ),
               ),
