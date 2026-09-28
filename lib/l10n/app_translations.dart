@@ -47,6 +47,7 @@ import 'gen/lang_uk_chunk8_tr.dart';
 import 'gen/lang_uk_chunk9_tr.dart';
 import 'gen/lang_uk_chunk10_tr.dart';
 import 'gen/lang_uk_chunk11_tr.dart';
+import 'gen/lang_uk_chunk12_tr.dart';
 import 'gen/lang_az_chunk1_tr.dart';
 import 'gen/lang_az_chunk2_tr.dart';
 import 'gen/lang_az_chunk3_tr.dart';
@@ -58,6 +59,7 @@ import 'gen/lang_az_chunk8_tr.dart';
 import 'gen/lang_az_chunk9_tr.dart';
 import 'gen/lang_az_chunk10_tr.dart';
 import 'gen/lang_az_chunk11_tr.dart';
+import 'gen/lang_az_chunk12_tr.dart';
 import 'gen/lang_hy_chunk1_tr.dart';
 import 'gen/lang_hy_chunk2_tr.dart';
 import 'gen/lang_hy_chunk3_tr.dart';
@@ -69,6 +71,7 @@ import 'gen/lang_hy_chunk8_tr.dart';
 import 'gen/lang_hy_chunk9_tr.dart';
 import 'gen/lang_hy_chunk10_tr.dart';
 import 'gen/lang_hy_chunk11_tr.dart';
+import 'gen/lang_hy_chunk12_tr.dart';
 import 'gen/lang_kk_chunk1_tr.dart';
 import 'gen/lang_kk_chunk2_tr.dart';
 import 'gen/lang_kk_chunk3_tr.dart';
@@ -80,6 +83,7 @@ import 'gen/lang_kk_chunk8_tr.dart';
 import 'gen/lang_kk_chunk9_tr.dart';
 import 'gen/lang_kk_chunk10_tr.dart';
 import 'gen/lang_kk_chunk11_tr.dart';
+import 'gen/lang_kk_chunk12_tr.dart';
 
 /// Переводы интерфейса CarSpot.
 ///
@@ -181,6 +185,7 @@ const Map<String, String> kUkTranslations = {
   ...kUkChunk9Translations,
   ...kUkChunk10Translations,
   ...kUkChunk11Translations,
+  ...kUkChunk12Translations,
 };
 const Map<String, String> kAzTranslations = {
   ...kAzChunk1Translations,
@@ -194,6 +199,7 @@ const Map<String, String> kAzTranslations = {
   ...kAzChunk9Translations,
   ...kAzChunk10Translations,
   ...kAzChunk11Translations,
+  ...kAzChunk12Translations,
 };
 const Map<String, String> kHyTranslations = {
   ...kHyChunk1Translations,
@@ -207,6 +213,7 @@ const Map<String, String> kHyTranslations = {
   ...kHyChunk9Translations,
   ...kHyChunk10Translations,
   ...kHyChunk11Translations,
+  ...kHyChunk12Translations,
 };
 const Map<String, String> kKkTranslations = {
   ...kKkChunk1Translations,
@@ -220,6 +227,7 @@ const Map<String, String> kKkTranslations = {
   ...kKkChunk9Translations,
   ...kKkChunk10Translations,
   ...kKkChunk11Translations,
+  ...kKkChunk12Translations,
 };
 
 /// Добавляет к каждой записи базовой таблицы перевод на язык [langCode] из
