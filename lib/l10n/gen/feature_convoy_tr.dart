@@ -1,0 +1,50 @@
+/// Конвой-режим — convoy_screen.dart. Только ru/en/ka — остальные языки
+/// (az/hy/kk/uk) откатываются на русский. Подключается централизованно в
+/// lib/l10n/app_translations.dart.
+const Map<String, Map<String, String>> kFeatureConvoyTranslations = {
+  'convoy.title': {'ru': 'Конвой', 'en': 'Convoy', 'ka': 'კონვოი'},
+  'home.menu_convoy': {'ru': 'Конвой', 'en': 'Convoy', 'ka': 'კონვოი'},
+  'convoy.empty_title': {'ru': 'Вы не в конвое', 'en': "You're not in a convoy", 'ka': 'თქვენ კონვოიში არ ხართ'},
+  'convoy.empty_description': {
+    'ru': 'Создайте конвой для совместной поездки или присоединитесь по коду друга — все участники будут видеть друг друга на карте в реальном времени.',
+    'en': 'Create a convoy for a group ride or join with a friend\'s code — every member sees the others live on the map.',
+    'ka': 'შექმენით კონვოი ერთად მგზავრობისთვის ან შეუერთდით მეგობრის კოდით — ყველა მონაწილე ერთმანეთს რეალურ დროში ხედავს რუკაზე.',
+  },
+  'convoy.create_button': {'ru': 'Создать конвой', 'en': 'Create convoy', 'ka': 'კონვოის შექმნა'},
+  'convoy.join_button': {'ru': 'Присоединиться по коду', 'en': 'Join with a code', 'ka': 'შეერთება კოდით'},
+  'convoy.create_dialog_title': {'ru': 'Новый конвой', 'en': 'New convoy', 'ka': 'ახალი კონვოი'},
+  'convoy.name_label': {'ru': 'Название', 'en': 'Name', 'ka': 'სახელი'},
+  'convoy.name_hint': {'ru': 'Например: Ночной заезд', 'en': 'e.g. Night cruise', 'ka': 'მაგ.: ღამის გასეირნება'},
+  'convoy.destination_label_field': {
+    'ru': 'Точка назначения (необязательно)',
+    'en': 'Destination (optional)',
+    'ka': 'დანიშნულების ადგილი (არასავალდებულო)',
+  },
+  'convoy.create_submit': {'ru': 'Создать', 'en': 'Create', 'ka': 'შექმნა'},
+  'convoy.name_required_hint': {'ru': 'Введите название конвоя', 'en': 'Enter a convoy name', 'ka': 'შეიყვანეთ კონვოის სახელი'},
+  'convoy.join_dialog_title': {'ru': 'Код приглашения', 'en': 'Invite code', 'ka': 'მოწვევის კოდი'},
+  'convoy.code_label': {'ru': 'Код', 'en': 'Code', 'ka': 'კოდი'},
+  'convoy.join_submit': {'ru': 'Присоединиться', 'en': 'Join', 'ka': 'შეერთება'},
+  'convoy.invite_code_title': {'ru': 'Код приглашения', 'en': 'Invite code', 'ka': 'მოწვევის კოდი'},
+  'convoy.invite_code_hint': {
+    'ru': 'Поделитесь этим кодом, чтобы друзья присоединились',
+    'en': 'Share this code so friends can join',
+    'ka': 'გაუზიარეთ ეს კოდი მეგობრებს შესაერთებლად',
+  },
+  'convoy.code_copied': {'ru': 'Код скопирован', 'en': 'Code copied', 'ka': 'კოდი დაკოპირდა'},
+  'convoy.members_title': {'ru': 'Участники ({count})', 'en': 'Members ({count})', 'ka': 'მონაწილეები ({count})'},
+  'convoy.you_label': {'ru': '(вы)', 'en': '(you)', 'ka': '(თქვენ)'},
+  'convoy.creator_badge': {'ru': 'Создатель', 'en': 'Creator', 'ka': 'შემქმნელი'},
+  'convoy.leave_button': {'ru': 'Покинуть конвой', 'en': 'Leave convoy', 'ka': 'კონვოის დატოვება'},
+  'convoy.leave_confirm_title': {'ru': 'Покинуть конвой?', 'en': 'Leave this convoy?', 'ka': 'დატოვოთ კონვოი?'},
+  'convoy.end_button': {'ru': 'Завершить конвой', 'en': 'End convoy', 'ka': 'კონვოის დასრულება'},
+  'convoy.end_confirm_title': {
+    'ru': 'Завершить конвой для всех участников?',
+    'en': 'End the convoy for all members?',
+    'ka': 'დაასრულოთ კონვოი ყველა მონაწილისთვის?',
+  },
+  'convoy.destination_title': {'ru': 'Пункт назначения', 'en': 'Destination', 'ka': 'დანიშნულების ადგილი'},
+  'convoy.edit_destination': {'ru': 'Изменить точку назначения', 'en': 'Edit destination', 'ka': 'დანიშნულების შეცვლა'},
+  'convoy.waiting_position': {'ru': 'Ожидание позиции…', 'en': 'Waiting for position…', 'ka': 'პოზიციის მოლოდინში…'},
+  'convoy.no_destination': {'ru': 'Точка назначения не задана', 'en': 'No destination set', 'ka': 'დანიშნულების ადგილი არ არის მითითებული'},
+};

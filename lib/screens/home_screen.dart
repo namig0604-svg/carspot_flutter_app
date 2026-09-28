@@ -38,6 +38,7 @@ import 'car_expenses_screen.dart';
 import 'fuel_tracker_screen.dart';
 import 'car_listings_screen.dart';
 import 'car_of_week_screen.dart';
+import 'convoy_screen.dart';
 import 'sos_screen.dart';
 import 'vin_decoder_screen.dart';
 import 'hazards_screen.dart';
@@ -1505,6 +1506,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const CarOfWeekScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.route,
+                  label: context.t('home.menu_convoy'),
+                  color: AppColors.blue,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ConvoyScreen()),
                   ),
                 ),
               ),

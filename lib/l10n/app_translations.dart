@@ -32,6 +32,7 @@ import 'gen/feature_onboarding_tour_tr.dart';
 import 'gen/feature_fuel_tracker_tr.dart';
 import 'gen/feature_car_listings_tr.dart';
 import 'gen/feature_car_of_week_tr.dart';
+import 'gen/feature_convoy_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -162,6 +163,7 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeatureFuelTrackerTranslations,
   ...kFeatureCarListingsTranslations,
   ...kFeatureCarOfWeekTranslations,
+  ...kFeatureConvoyTranslations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из
