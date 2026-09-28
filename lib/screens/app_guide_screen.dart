@@ -44,6 +44,7 @@ const List<_GuideSection> _guideSections = [
     _GuideItem(Icons.event_available, Colors.tealAccent, 'guide.activity_bookings_title', 'guide.activity_bookings_desc'),
     _GuideItem(Icons.bookmark, AppColors.red, 'guide.activity_favorites_title', 'guide.activity_favorites_desc'),
     _GuideItem(Icons.military_tech, Colors.amber, 'guide.activity_achievements_title', 'guide.activity_achievements_desc'),
+    _GuideItem(Icons.flag, Colors.deepOrange, 'guide.activity_challenges_title', 'guide.activity_challenges_desc'),
   ]),
   _GuideSection('faq.section_safety', [
     _GuideItem(Icons.sos, Colors.red, 'guide.safety_sos_title', 'guide.safety_sos_desc'),

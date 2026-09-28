@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 import '../utils/app_changelog.dart';
 import '../utils/app_version.dart';
 import '../l10n/l10n_extensions.dart';
+import '../utils/onboarding_flags.dart';
 
 /// Ключ в SharedPreferences, под которым хранится версия приложения,
 /// которую пользователь уже видел (чтобы показать диалог "Что нового"
@@ -31,6 +32,10 @@ Future<void> checkAndShowWhatsNew(BuildContext context) async {
 
   if (lastSeenVersion == null) {
     // Первый запуск после установки — ничего не показываем, только запоминаем версию.
+    // Взводим флаг интерактивного тура (см. onboarding_flags.dart) — покажем
+    // его позже, когда пользователь дойдёт до реального домашнего экрана
+    // (после логина/регистрации), а не здесь поверх экрана логина.
+    await prefs.setBool(kShouldShowOnboardingTourPrefsKey, true);
     await prefs.setString(_kLastSeenVersionKey, kAppVersion);
     return;
   }

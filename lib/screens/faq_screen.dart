@@ -51,6 +51,10 @@ const List<_FaqSection> _faqSections = [
     _FaqItem('faq.safety_q2', 'faq.safety_a2'),
     _FaqItem('faq.safety_q3', 'faq.safety_a3'),
   ]),
+  _FaqSection('faq.section_gamification', Icons.emoji_events_outlined, [
+    _FaqItem('faq.gami_q1', 'faq.gami_a1'),
+    _FaqItem('faq.gami_q2', 'faq.gami_a2'),
+  ]),
   _FaqSection('faq.section_premium', Icons.workspace_premium_outlined, [
     _FaqItem('faq.premium_q1', 'faq.premium_a1'),
     _FaqItem('faq.premium_q2', 'faq.premium_a2'),

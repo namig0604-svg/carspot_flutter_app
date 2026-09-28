@@ -28,6 +28,7 @@ import 'gen/feature_screens_batch2_tr.dart';
 import 'gen/feature_faq_guide_tr.dart';
 import 'gen/feature_misc_ui_batch2_tr.dart';
 import 'gen/feature_challenges_tr.dart';
+import 'gen/feature_onboarding_tour_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -154,6 +155,7 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeatureFaqGuideTranslations,
   ...kFeatureMiscUiBatch2Translations,
   ...kFeatureChallengesTranslations,
+  ...kFeatureOnboardingTourTranslations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из

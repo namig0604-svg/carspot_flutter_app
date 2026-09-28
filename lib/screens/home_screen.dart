@@ -26,6 +26,7 @@ import 'leaderboard_screen.dart';
 import 'admin_panel_screen.dart';
 import 'achievements_screen.dart';
 import 'challenges_screen.dart';
+import '../widgets/onboarding_tour.dart';
 import 'favorites_screen.dart';
 import 'my_points_screen.dart';
 import 'forum_categories_screen.dart';
@@ -85,6 +86,11 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> _myCars = [];
   Map<String, dynamic>? _referral;
 
+  // Ключи для интерактивного тура по приложению (onboarding_tour.dart) —
+  // подсвечивают реальные виджеты нижней навигации и колокольчика уведомлений.
+  final GlobalKey _tourNavBarKey = GlobalKey();
+  final GlobalKey _tourNotificationsKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -94,6 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.wait([_loadMyClubs(), _loadReferral()]).then((_) => _checkGamificationProgress());
     _loadUnreadNotifications();
     _notificationsTimer = Timer.periodic(const Duration(seconds: 30), (_) => _loadUnreadNotifications());
+    // Интерактивный тур — только если флаг взведён (см. onboarding_flags.dart),
+    // то есть ровно один раз для только что установившего приложение нового
+    // пользователя, после первого кадра с реальными виджетами.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) maybeShowOnboardingTour(context, _tourSteps());
+    });
   }
 
   @override
@@ -136,6 +148,64 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {
       return 0;
     }
+  }
+
+  /// Шаги интерактивного тура по приложению — см. onboarding_tour.dart.
+  /// Первый и последний шаги без цели (просто центрированная карточка),
+  /// остальные подсвечивают реальные пункты нижней навигации (все пять
+  /// используют один и тот же _tourNavBarKey — ширина бара делится на
+  /// количество пунктов, см. AnimatedBottomNav) и колокольчик уведомлений.
+  List<TourStep> _tourSteps() {
+    return [
+      const TourStep(
+        titleKey: 'onboarding_tour.step_welcome_title',
+        bodyKey: 'onboarding_tour.step_welcome_body',
+      ),
+      TourStep(
+        targetKey: _tourNavBarKey,
+        segmentIndex: 0,
+        segmentCount: 5,
+        titleKey: 'onboarding_tour.step_feed_title',
+        bodyKey: 'onboarding_tour.step_feed_body',
+      ),
+      TourStep(
+        targetKey: _tourNavBarKey,
+        segmentIndex: 1,
+        segmentCount: 5,
+        titleKey: 'onboarding_tour.step_map_title',
+        bodyKey: 'onboarding_tour.step_map_body',
+      ),
+      TourStep(
+        targetKey: _tourNavBarKey,
+        segmentIndex: 2,
+        segmentCount: 5,
+        titleKey: 'onboarding_tour.step_add_title',
+        bodyKey: 'onboarding_tour.step_add_body',
+      ),
+      TourStep(
+        targetKey: _tourNavBarKey,
+        segmentIndex: 3,
+        segmentCount: 5,
+        titleKey: 'onboarding_tour.step_chats_title',
+        bodyKey: 'onboarding_tour.step_chats_body',
+      ),
+      TourStep(
+        targetKey: _tourNavBarKey,
+        segmentIndex: 4,
+        segmentCount: 5,
+        titleKey: 'onboarding_tour.step_profile_title',
+        bodyKey: 'onboarding_tour.step_profile_body',
+      ),
+      TourStep(
+        targetKey: _tourNotificationsKey,
+        titleKey: 'onboarding_tour.step_notifications_title',
+        bodyKey: 'onboarding_tour.step_notifications_body',
+      ),
+      const TourStep(
+        titleKey: 'onboarding_tour.step_final_title',
+        bodyKey: 'onboarding_tour.step_final_body',
+      ),
+    ];
   }
 
   /// Сравнивает текущий уровень/достижения с тем, что видели в прошлый раз
@@ -360,6 +430,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           Stack(
+            key: _tourNotificationsKey,
             clipBehavior: Clip.none,
             children: [
               IconButton(
@@ -405,6 +476,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // раньше это делали "Гараж" и "Чаты". Гараж переехал в сетку быстрых
       // действий на экране "Профиль" — там же, где Клубы/Сервисы/Форум и т.д.
       bottomNavigationBar: AnimatedBottomNav(
+        key: _tourNavBarKey,
         currentIndex: _selectedIndex,
         items: [
           NavBarItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: context.t('home.nav_events')),
@@ -1569,6 +1641,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     context,
                     MaterialPageRoute(builder: (_) => const FaqScreen()),
                   ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.explore_outlined,
+                  label: context.t('home.menu_tour'),
+                  color: Colors.deepOrange,
+                  onTap: () => showOnboardingTour(context, _tourSteps()),
                 ),
               ),
               if (user['is_admin'] == true)
