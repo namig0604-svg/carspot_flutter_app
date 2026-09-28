@@ -1090,6 +1090,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final referralsCount = (_referral?['referrals_count'] ?? 0) as int;
     final isVerified = user['is_verified'] == true;
     final isPremium = user['is_premium'] == true;
+    // ИИ-диагностика и PDF-отчёт — эксклюзив тарифа Max (не любой Premium).
+    final isMaxTier = user['premium_tier'] == 'max';
     final accountAgeDays = _accountAgeDays(user['created_at']);
     final xp = computeXp(
       eventsAttended: (user['events_attended'] ?? 0) as int,
@@ -1451,11 +1453,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.psychology_alt,
                   label: context.t('home.menu_ai_diagnosis'),
                   color: Colors.deepOrange,
-                  locked: !isPremium,
+                  locked: !isMaxTier,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => isPremium
+                      builder: (_) => isMaxTier
                           ? AiDiagnosisScreen(carId: _myCars.isNotEmpty ? _myCars.first['id'] as String? : null)
                           : const PremiumScreen(),
                     ),
@@ -1468,10 +1470,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.picture_as_pdf,
                   label: context.t('home.menu_car_report'),
                   color: Colors.redAccent,
-                  locked: !isPremium,
+                  locked: !isMaxTier,
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => isPremium ? const CarReportScreen() : const PremiumScreen()),
+                    MaterialPageRoute(builder: (_) => isMaxTier ? const CarReportScreen() : const PremiumScreen()),
                   ),
                 ),
               ),

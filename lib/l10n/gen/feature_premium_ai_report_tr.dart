@@ -75,4 +75,34 @@ const Map<String, Map<String, String>> kFeaturePremiumAiReportTranslations = {
     'en': 'Generate and share PDF',
     'ka': 'PDF-ის შექმნა და გაზიარება',
   },
+  'premium.compare_ai_diagnosis': {
+    'ru': 'ИИ-диагностика по симптомам',
+    'en': 'AI symptom diagnostics',
+    'ka': 'AI დიაგნოსტიკა სიმპტომებით',
+  },
+  'premium.compare_car_report': {
+    'ru': 'PDF-отчёт об авто',
+    'en': 'Car PDF report',
+    'ka': 'მანქანის PDF ანგარიში',
+  },
+  'premium.perk_ai_diagnosis_title': {
+    'ru': 'ИИ-диагностика',
+    'en': 'AI diagnostics',
+    'ka': 'AI დიაგნოსტიკა',
+  },
+  'premium.perk_ai_diagnosis_subtitle': {
+    'ru': 'Опиши симптом — ИИ подскажет вероятную причину и нужный тип сервиса',
+    'en': 'Describe a symptom — AI suggests a likely cause and which service to visit',
+    'ka': 'აღწერე სიმპტომი — AI შემოგთავაზებს სავარაუდო მიზეზს',
+  },
+  'premium.perk_car_report_title': {
+    'ru': 'PDF-отчёт об авто',
+    'en': 'Car PDF report',
+    'ka': 'მანქანის PDF ანგარიში',
+  },
+  'premium.perk_car_report_subtitle': {
+    'ru': 'Сервисный журнал, расходы, документы и топливо машины — в одном PDF',
+    'en': 'Maintenance log, expenses, documents and fuel stats in one PDF',
+    'ka': 'სერვისის ჟურნალი, ხარჯები და დოკუმენტები ერთ PDF-ში',
+  },
 };
