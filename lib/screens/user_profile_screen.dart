@@ -588,23 +588,40 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                   ],
                                 ],
                               ),
-                              Text('@${_user!['username']}', style: const TextStyle(color: Colors.grey, fontSize: 14)),
                               const SizedBox(height: 4),
-                              if ((_user!['city'] ?? '').toString().isNotEmpty ||
-                                  (_user!['country'] ?? '').toString().isNotEmpty)
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                              // Как и в своём профиле (home_screen.dart): юзернейм/локация на
+                              // собственной полупрозрачной плашке в цвет карточек темы, а не
+                              // голым Colors.grey — тот в светлой теме читался слишком блёкло.
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: cardSurface.withOpacity(0.85),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      [_user!['city'], _user!['country']]
-                                          .where((v) => v != null && v.toString().isNotEmpty)
-                                          .join(', '),
-                                      style: const TextStyle(color: Colors.grey),
-                                    ),
+                                    Text('@${_user!['username']}', style: TextStyle(color: cardText.withOpacity(0.8), fontSize: 14)),
+                                    if ((_user!['city'] ?? '').toString().isNotEmpty ||
+                                        (_user!['country'] ?? '').toString().isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.location_on, size: 14, color: cardText.withOpacity(0.8)),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            [_user!['city'], _user!['country']]
+                                                .where((v) => v != null && v.toString().isNotEmpty)
+                                                .join(', '),
+                                            style: TextStyle(color: cardText.withOpacity(0.8)),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ],
                                 ),
+                              ),
                             ],
                           ),
                         ),
