@@ -19,7 +19,9 @@ import '../utils/image_url.dart';
 import '../utils/distance_format.dart';
 
 class BusinessesListScreen extends StatefulWidget {
-  const BusinessesListScreen({Key? key}) : super(key: key);
+  final String? initialCategory;
+
+  const BusinessesListScreen({Key? key, this.initialCategory}) : super(key: key);
 
   @override
   State<BusinessesListScreen> createState() => _BusinessesListScreenState();
@@ -36,6 +38,7 @@ class _BusinessesListScreenState extends State<BusinessesListScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedCategory = widget.initialCategory;
     _load();
   }
 

@@ -41,6 +41,8 @@ import 'car_of_week_screen.dart';
 import 'convoy_screen.dart';
 import 'sos_screen.dart';
 import 'vin_decoder_screen.dart';
+import 'ai_diagnosis_screen.dart';
+import 'car_report_screen.dart';
 import 'hazards_screen.dart';
 import 'part_listings_screen.dart';
 import '../theme/app_colors.dart';
@@ -1440,6 +1442,36 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const VinDecoderScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.psychology_alt,
+                  label: context.t('home.menu_ai_diagnosis'),
+                  color: Colors.deepOrange,
+                  locked: !isPremium,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => isPremium
+                          ? AiDiagnosisScreen(carId: _myCars.isNotEmpty ? _myCars.first['id'] as String? : null)
+                          : const PremiumScreen(),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.picture_as_pdf,
+                  label: context.t('home.menu_car_report'),
+                  color: Colors.redAccent,
+                  locked: !isPremium,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => isPremium ? const CarReportScreen() : const PremiumScreen()),
                   ),
                 ),
               ),

@@ -13,6 +13,10 @@ class AnimatedMenuTile extends StatefulWidget {
   final VoidCallback onTap;
   final String? badge;
   final bool dense;
+  /// Плитка премиум-фичи без активной подписки: иконка затемняется и
+  /// вместо обычного badge показывается замок. onTap всё равно вызывается —
+  /// решение "открыть фичу или экран Premium" остаётся за вызывающим кодом.
+  final bool locked;
 
   const AnimatedMenuTile({
     Key? key,
@@ -22,6 +26,7 @@ class AnimatedMenuTile extends StatefulWidget {
     this.color = AppColors.blue,
     this.badge,
     this.dense = false,
+    this.locked = false,
   }) : super(key: key);
 
   @override
@@ -38,6 +43,7 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = widget.locked ? Colors.grey : widget.color;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) => _setPressed(true),
@@ -57,7 +63,7 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
           decoration: BoxDecoration(
             color: AppColors.surfaceDark,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: widget.color.withOpacity(0.25)),
+            border: Border.all(color: effectiveColor.withOpacity(widget.locked ? 0.18 : 0.25)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -70,12 +76,26 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
                     height: widget.dense ? 38 : 44,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: widget.color.withOpacity(0.15),
+                      color: effectiveColor.withOpacity(widget.locked ? 0.10 : 0.15),
                     ),
                     alignment: Alignment.center,
-                    child: Icon(widget.icon, color: widget.color, size: widget.dense ? 19 : 21),
+                    child: Icon(
+                      widget.icon,
+                      color: widget.locked ? effectiveColor.withOpacity(0.5) : effectiveColor,
+                      size: widget.dense ? 19 : 21,
+                    ),
                   ),
-                  if (widget.badge != null)
+                  if (widget.locked)
+                    Positioned(
+                      right: -4,
+                      top: -4,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: const BoxDecoration(color: Colors.black87, shape: BoxShape.circle),
+                        child: const Icon(Icons.lock, size: 10, color: Colors.amber),
+                      ),
+                    )
+                  else if (widget.badge != null)
                     Positioned(
                       right: -4,
                       top: -4,
@@ -99,7 +119,7 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: AppColors.textOnDark,
+                  color: AppColors.textOnDark.withOpacity(widget.locked ? 0.5 : 1.0),
                   fontSize: widget.dense ? 10.5 : 11.5,
                   fontWeight: FontWeight.w600,
                 ),
