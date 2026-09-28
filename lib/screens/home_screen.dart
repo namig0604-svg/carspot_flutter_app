@@ -44,6 +44,7 @@ import 'vin_decoder_screen.dart';
 import 'ai_diagnosis_screen.dart';
 import 'car_report_screen.dart';
 import 'maintenance_forecast_screen.dart';
+import 'daily_login_dialog.dart';
 import 'hazards_screen.dart';
 import 'part_listings_screen.dart';
 import '../theme/app_colors.dart';
@@ -113,6 +114,11 @@ class _HomeScreenState extends State<HomeScreen> {
     // пользователя, после первого кадра с реальными виджетами.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) maybeShowOnboardingTour(context, _tourSteps());
+    });
+    // Автопоказ ежедневной награды — только если её ещё не забрали сегодня
+    // (showDailyLoginDialog сам молча ничего не делает, если уже забрано).
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) showDailyLoginDialog(context, onlyIfClaimable: true);
     });
   }
 
@@ -437,6 +443,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => const SettingsScreen()),
               ),
             ),
+          IconButton(
+            icon: const Icon(Icons.card_giftcard_outlined),
+            tooltip: context.t('daily_login.title'),
+            onPressed: () => showDailyLoginDialog(context),
+          ),
           Stack(
             key: _tourNotificationsKey,
             clipBehavior: Clip.none,
