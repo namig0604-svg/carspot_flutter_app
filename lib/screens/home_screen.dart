@@ -43,6 +43,7 @@ import 'sos_screen.dart';
 import 'vin_decoder_screen.dart';
 import 'ai_diagnosis_screen.dart';
 import 'car_report_screen.dart';
+import 'maintenance_forecast_screen.dart';
 import 'hazards_screen.dart';
 import 'part_listings_screen.dart';
 import '../theme/app_colors.dart';
@@ -1474,6 +1475,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => isMaxTier ? const CarReportScreen() : const PremiumScreen()),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 78,
+                child: AnimatedMenuTile(
+                  icon: Icons.event_available,
+                  label: context.t('home.menu_maintenance_forecast'),
+                  color: Colors.teal,
+                  locked: !isMaxTier,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => isMaxTier ? const MaintenanceForecastScreen() : const PremiumScreen()),
                   ),
                 ),
               ),

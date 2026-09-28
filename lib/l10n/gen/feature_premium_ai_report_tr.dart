@@ -105,4 +105,79 @@ const Map<String, Map<String, String>> kFeaturePremiumAiReportTranslations = {
     'en': 'Maintenance log, expenses, documents and fuel stats in one PDF',
     'ka': 'სერვისის ჟურნალი, ხარჯები და დოკუმენტები ერთ PDF-ში',
   },
+  'home.menu_maintenance_forecast': {
+    'ru': 'Прогноз ТО',
+    'en': 'Maintenance forecast',
+    'ka': 'ტექმომსახურების პროგნოზი',
+  },
+  'maintenance_forecast.title': {
+    'ru': 'Прогноз следующего ТО',
+    'en': 'Next maintenance forecast',
+    'ka': 'შემდეგი ტექმომსახურების პროგნოზი',
+  },
+  'maintenance_forecast.hint': {
+    'ru': 'По истории «Сервисного дневника» посчитаем, когда примерно понадобится следующая замена масла, шин, фильтров и т.д. — и напомним заранее.',
+    'en': 'Based on your maintenance log history, we estimate when the next oil change, tires, filters and so on will likely be due — and remind you ahead of time.',
+    'ka': '«სერვისის ჟურნალის» ისტორიის მიხედვით გამოვთვლით, როდის დაგჭირდებათ შემდეგი ტექმომსახურება.',
+  },
+  'maintenance_forecast.empty': {
+    'ru': 'Пока недостаточно данных для прогноза — добавьте больше записей в сервисный дневник (минимум 2 записи одного типа или укажите дату/пробег следующего ТО вручную).',
+    'en': 'Not enough data yet for a forecast — add more entries to the maintenance log (at least 2 of the same type, or set a manual next-due date/mileage).',
+    'ka': 'პროგნოზისთვის ჯერ არასაკმარისია მონაცემები — დაამატეთ ჩანაწერები სერვისის ჟურნალში.',
+  },
+  'maintenance_forecast.current_mileage': {
+    'ru': 'Текущий пробег: {km} км',
+    'en': 'Current mileage: {km} km',
+    'ka': 'მიმდინარე გარბენი: {km} კმ',
+  },
+  'maintenance_forecast.source_manual': {
+    'ru': 'по вашей дате/пробегу',
+    'en': 'from your set date/mileage',
+    'ka': 'თქვენი მითითებული თარიღით/გარბენით',
+  },
+  'maintenance_forecast.source_estimated': {
+    'ru': 'оценка по истории записей',
+    'en': 'estimated from your history',
+    'ka': 'შეფასებულია ისტორიის მიხედვით',
+  },
+  'maintenance_forecast.urgency_overdue': {
+    'ru': 'Просрочено',
+    'en': 'Overdue',
+    'ka': 'ვადაგადაცილებული',
+  },
+  'maintenance_forecast.urgency_soon': {
+    'ru': 'Скоро',
+    'en': 'Soon',
+    'ka': 'მალე',
+  },
+  'maintenance_forecast.urgency_ok': {
+    'ru': 'В порядке',
+    'en': 'OK',
+    'ka': 'წესრიგშია',
+  },
+  'maintenance_forecast.predicted_date': {
+    'ru': 'Ориентировочно: {date}',
+    'en': 'Estimated: {date}',
+    'ka': 'სავარაუდოდ: {date}',
+  },
+  'maintenance_forecast.predicted_mileage': {
+    'ru': 'Ориентировочно на {km} км',
+    'en': 'Estimated at {km} km',
+    'ka': 'სავარაუდოდ {km} კმ-ზე',
+  },
+  'premium.compare_maintenance_forecast': {
+    'ru': 'Прогноз следующего ТО',
+    'en': 'Next maintenance forecast',
+    'ka': 'შემდეგი ტექმომსახურების პროგნოზი',
+  },
+  'premium.perk_maintenance_forecast_title': {
+    'ru': 'Прогноз ТО',
+    'en': 'Maintenance forecast',
+    'ka': 'ტექმომსახურების პროგნოზი',
+  },
+  'premium.perk_maintenance_forecast_subtitle': {
+    'ru': 'Считаем по истории сервисного дневника, когда понадобится следующее ТО',
+    'en': 'We estimate your next service date from your maintenance log history',
+    'ka': 'გამოვთვლით შემდეგ ტექმომსახურებას სერვისის ჟურნალის მიხედვით',
+  },
 };
