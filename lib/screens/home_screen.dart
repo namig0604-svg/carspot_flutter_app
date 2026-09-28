@@ -1174,21 +1174,39 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ],
           ),
-          Text(
-            '@${user['username'] ?? ''}',
-            style: TextStyle(color: AppColors.textMuted(context), fontSize: 14),
-          ),
           const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.location_on, size: 14, color: AppColors.textMuted(context)),
-              const SizedBox(width: 4),
-              Text(
-                '${user['city'] ?? ''}, ${user['country'] ?? ''}',
-                style: TextStyle(color: AppColors.textMuted(context)),
-              ),
-            ],
+          // Юзернейм и локация выводятся поверх фонового фото профиля, где
+          // просто приглушённого текста (AppColors.textMuted) недостаточно —
+          // контраст "плавает" в зависимости от яркости фото под ним. Кладём
+          // текст на собственную полупрозрачную "плашку" в цвет карточек
+          // текущей темы, чтобы он был читаем при любом фото и любой теме.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: cardSurface.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '@${user['username'] ?? ''}',
+                  style: TextStyle(color: cardText.withOpacity(0.8), fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.location_on, size: 14, color: cardText.withOpacity(0.8)),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${user['city'] ?? ''}, ${user['country'] ?? ''}',
+                      style: TextStyle(color: cardText.withOpacity(0.8)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 10),
           TextButton.icon(

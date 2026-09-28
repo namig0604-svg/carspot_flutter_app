@@ -169,11 +169,19 @@ class _CarExpensesScreenState extends State<CarExpensesScreen> {
             else ...[
               Container(
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: AppColors.surfaceDarkAlt, borderRadius: BorderRadius.circular(14)),
+                // Было жёстко AppColors.surfaceDarkAlt (тёмная плашка) без
+                // цвета текста — в светлой теме получался тёмный текст на
+                // тёмном фоне. surfaceAlt(context) сам выбирает тёмный/светлый
+                // вариант под текущую тему, а onSurface(context) — читаемый
+                // текст под него.
+                decoration: BoxDecoration(color: AppColors.surfaceAlt(context), borderRadius: BorderRadius.circular(14)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(context.tArgs('car_expenses.total', {'amount': _totalAmount.toStringAsFixed(0)}), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                    Text(
+                      context.tArgs('car_expenses.total', {'amount': _totalAmount.toStringAsFixed(0)}),
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColors.onSurface(context)),
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 12,

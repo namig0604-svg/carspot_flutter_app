@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'category_filter_bar.dart' show FilterChipData;
+import '../theme/app_colors.dart';
 
 /// Setka tsvetnyh kartochek kategorii dlya vybora ODNOY kategorii (forma
 /// sozdaniya sobytiya/servisa) - vizualno tot zhe stil, chto i
@@ -19,6 +20,12 @@ class CategoryPickerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Раньше цвета неактивной карточки (фон/рамка/подпись) были жёстко
+    // зашиты под тёмную тему (Colors.white с малой непрозрачностью,
+    // Colors.white70 для текста) — в светлой теме подпись получалась почти
+    // невидимой бледно-серой на белом. Берём theme-aware цвета из AppColors,
+    // как это уже сделано в остальном приложении.
+    final unselectedText = AppColors.onSurface(context);
     return Wrap(
       spacing: 10,
       runSpacing: 10,
@@ -30,10 +37,10 @@ class CategoryPickerGrid extends StatelessWidget {
             width: 92,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
             decoration: BoxDecoration(
-              color: isSelected ? item.color.withOpacity(0.22) : Colors.white.withOpacity(0.04),
+              color: isSelected ? item.color.withOpacity(0.22) : AppColors.surfaceAlt(context),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isSelected ? item.color : Colors.white24,
+                color: isSelected ? item.color : AppColors.border(context),
                 width: isSelected ? 2 : 1,
               ),
             ),
@@ -55,7 +62,7 @@ class CategoryPickerGrid extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? Colors.white : Colors.white70,
+                    color: isSelected ? Colors.white : unselectedText.withOpacity(0.75),
                   ),
                 ),
               ],
