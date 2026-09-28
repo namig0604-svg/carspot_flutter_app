@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/neon_chip.dart';
 import '../utils/image_url.dart';
 import '../l10n/l10n_extensions.dart';
@@ -161,7 +162,7 @@ class _PartListingsScreenState extends State<PartListingsScreen> {
           const SizedBox(height: 10),
           Expanded(
             child: _isLoading
-                ? const Center(child: AppLoader())
+                ? const Center(child: AppFullLoader())
                 : _items.isEmpty
                     ? Center(child: Text(context.t('part_listings.empty'), style: const TextStyle(color: AppColors.textMutedDark)))
                     : RefreshIndicator(

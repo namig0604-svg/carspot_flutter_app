@@ -18,6 +18,7 @@ import 'business_bookings_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/map_pin_marker.dart';
 import '../widgets/image_url_picker.dart';
 import '../utils/sound_player.dart';
@@ -238,7 +239,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoadingDetail && _business == null) {
-      return Scaffold(body: Center(child: AppLoader()));
+      return Scaffold(body: Center(child: AppFullLoader()));
     }
     if (_business == null) {
       return Scaffold(body: Center(child: Text(context.t('business_detail.not_found'))));

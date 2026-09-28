@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/challenge_goal.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
 
@@ -98,7 +99,7 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
             imageAsset: 'assets/backgrounds/events.jpg',
           ),
           _isLoading
-              ? Center(child: AppLoader())
+              ? Center(child: AppFullLoader())
               : RefreshIndicator(
                   color: Colors.deepOrange,
                   backgroundColor: AppColors.surface(context),
@@ -255,7 +256,7 @@ class _ChallengesScreenState extends State<ChallengesScreen> {
                           ? const SizedBox(
                               width: 18,
                               height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: AppLoader(size: 18, color: Colors.white),
                             )
                           : Text(context.t('challenges.claim_button')),
                     ),

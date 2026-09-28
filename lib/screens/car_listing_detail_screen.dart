@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../utils/image_url.dart';
 import '../l10n/l10n_extensions.dart';
 import 'chat_room_screen.dart';
@@ -119,7 +120,7 @@ class _CarListingDetailScreenState extends State<CarListingDetailScreen> {
         ),
         backgroundColor: AppColors.scaffoldBg(context),
         body: _isLoading
-            ? const Center(child: AppLoader())
+            ? const Center(child: AppFullLoader())
             : _listing == null
                 ? Center(child: Text(context.t('part_listing_detail.load_failed'), style: TextStyle(color: AppColors.textMuted(context))))
                 : _buildBody(context),

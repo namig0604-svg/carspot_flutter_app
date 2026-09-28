@@ -6,6 +6,7 @@ import '../widgets/report_dialog.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
 
@@ -332,7 +333,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
               ),
               Expanded(
                 child: _isLoadingReports
-                    ? Center(child: AppLoader())
+                    ? Center(child: AppFullLoader())
                     : RefreshIndicator(
                         color: AppColors.red,
                         backgroundColor: AppColors.surfaceDark,
@@ -385,7 +386,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> with SingleTickerPr
               ),
               Expanded(
                 child: _isLoadingUsers
-                    ? Center(child: AppLoader())
+                    ? Center(child: AppFullLoader())
                     : RefreshIndicator(
                         color: AppColors.red,
                         backgroundColor: AppColors.surfaceDark,

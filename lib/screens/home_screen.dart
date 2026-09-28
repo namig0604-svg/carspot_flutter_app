@@ -45,6 +45,7 @@ import 'hazards_screen.dart';
 import 'part_listings_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/celebration_overlay.dart';
 import '../widgets/section_background.dart';
 import '../widgets/neon_chip.dart';
@@ -674,7 +675,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Список сходок
         Expanded(
           child: _isLoading
-            ? Center(child: AppLoader())
+            ? Center(child: AppFullLoader())
             : _filteredEvents.isEmpty
               ? Center(
                   child: Column(
@@ -1081,7 +1082,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final cardSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final cardText = isDark ? AppColors.textOnDark : AppColors.textOnLight;
 
-    if (user == null) return Center(child: AppLoader());
+    if (user == null) return Center(child: AppFullLoader());
 
     final isClubLeader = _myClubs.any((c) => c['role'] == 'owner' || c['role'] == 'admin');
     final referralsCount = (_referral?['referrals_count'] ?? 0) as int;

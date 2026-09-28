@@ -10,6 +10,7 @@ import 'event_details_screen.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
 import '../utils/event_date.dart';
@@ -399,7 +400,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
     if (_isLoadingDetail && _club == null) {
       return Scaffold(
         appBar: AppBar(title: Text(context.t('club_detail.title'), overflow: TextOverflow.ellipsis, maxLines: 1), backgroundColor: AppColors.black, elevation: 0),
-        body: Center(child: AppLoader()),
+        body: Center(child: AppFullLoader()),
       );
     }
     if (_club == null) {

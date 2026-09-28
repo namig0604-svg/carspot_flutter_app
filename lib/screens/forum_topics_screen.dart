@@ -6,6 +6,7 @@ import '../utils/forum_category.dart';
 import '../providers/settings_provider.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
 import 'forum_create_topic_screen.dart';
@@ -153,7 +154,7 @@ class _ForumTopicsScreenState extends State<ForumTopicsScreen> {
           ),
           Expanded(
             child: _isLoading
-                ? const Center(child: AppLoader())
+                ? const Center(child: AppFullLoader())
                 : _topics.isEmpty
                     ? Center(
                         child: Padding(

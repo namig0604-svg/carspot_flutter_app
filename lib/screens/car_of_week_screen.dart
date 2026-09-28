@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/car_picker_field.dart';
 import '../utils/image_url.dart';
 import '../l10n/l10n_extensions.dart';
@@ -149,7 +150,7 @@ class _CarOfWeekScreenState extends State<CarOfWeekScreen> {
               label: Text(context.t('car_of_week.nominate_button')),
             ),
       body: _isLoading
-          ? const Center(child: AppLoader())
+          ? const Center(child: AppFullLoader())
           : RefreshIndicator(
               color: Colors.deepPurple,
               backgroundColor: AppColors.surface(context),

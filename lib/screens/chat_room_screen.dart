@@ -8,6 +8,7 @@ import '../widgets/report_dialog.dart';
 import 'user_profile_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
 import '../utils/premium_status.dart';
@@ -384,7 +385,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         children: [
           Expanded(
             child: _isLoading
-                ? Center(child: AppLoader())
+                ? Center(child: AppFullLoader())
                 : _messages.isEmpty
                     ? Center(
                         child: Text(context.t('chat_room.no_messages_yet'), style: const TextStyle(color: Colors.grey)),

@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 
 String _statusLabel(BuildContext context, String status) {
@@ -120,7 +121,7 @@ class _BusinessBookingsScreenState extends State<BusinessBookingsScreen> {
         backgroundColor: AppColors.black,
       ),
       body: _isLoading
-          ? Center(child: AppLoader())
+          ? Center(child: AppFullLoader())
           : RefreshIndicator(
               color: AppColors.blue,
               onRefresh: _load,

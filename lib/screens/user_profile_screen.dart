@@ -14,6 +14,7 @@ import 'chat_room_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/animated_counter.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
@@ -517,7 +518,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(child: AppLoader())
+          ? Center(child: AppFullLoader())
           : _user == null
               ? Center(child: Text(context.t('user_profile.user_not_found')))
               : RefreshIndicator(

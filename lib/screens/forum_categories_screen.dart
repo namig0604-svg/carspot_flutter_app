@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../utils/forum_category.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 import 'forum_topics_screen.dart';
 
@@ -55,7 +56,7 @@ class _ForumCategoriesScreenState extends State<ForumCategoriesScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(context.t('forum.categories_title'), overflow: TextOverflow.ellipsis, maxLines: 1)),
       body: _isLoading
-          ? const Center(child: AppLoader())
+          ? const Center(child: AppFullLoader())
           : RefreshIndicator(
               onRefresh: _load,
               child: ListView(

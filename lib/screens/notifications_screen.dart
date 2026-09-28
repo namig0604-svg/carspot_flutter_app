@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/section_background.dart';
 import 'club_detail_screen.dart';
 import 'event_details_screen.dart';
@@ -127,7 +128,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/chats.jpg'),
           _isLoading
-                ? Center(child: AppLoader())
+                ? Center(child: AppFullLoader())
                 : RefreshIndicator(
                     color: AppColors.red,
                     backgroundColor: AppColors.surface(context),

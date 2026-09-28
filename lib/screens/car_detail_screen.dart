@@ -8,6 +8,7 @@ import 'people_list_screen.dart';
 import 'premium_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
@@ -179,7 +180,7 @@ class _CarDetailScreenState extends State<CarDetailScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(child: AppLoader())
+          ? Center(child: AppFullLoader())
           : car == null
               ? Center(child: Text(context.t('car_detail.not_found')))
               : RefreshIndicator(

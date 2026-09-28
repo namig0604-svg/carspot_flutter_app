@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/gamification.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/section_background.dart';
 import 'club_detail_screen.dart';
 import 'user_profile_screen.dart';
@@ -129,7 +130,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
     final myId = Provider.of<AuthProvider>(context, listen: false).user?['id'];
 
     return _isLoading
-        ? Center(child: AppLoader())
+        ? Center(child: AppFullLoader())
         : RefreshIndicator(
             color: AppColors.red,
             backgroundColor: AppColors.surface(context),
@@ -227,7 +228,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
 
   Widget _buildClubsTab() {
     return _isLoadingClubs
-        ? Center(child: AppLoader())
+        ? Center(child: AppFullLoader())
         : RefreshIndicator(
             color: AppColors.red,
             backgroundColor: AppColors.surface(context),

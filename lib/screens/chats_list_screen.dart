@@ -6,6 +6,7 @@ import 'chat_room_screen.dart';
 import 'forum_categories_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
 
@@ -102,7 +103,7 @@ class _ChatsListScreenState extends State<ChatsListScreen> {
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/chats.jpg'),
           _isLoading
-          ? Center(child: AppLoader())
+          ? Center(child: AppFullLoader())
           : RefreshIndicator(
               color: AppColors.red,
               backgroundColor: AppColors.surface(context),

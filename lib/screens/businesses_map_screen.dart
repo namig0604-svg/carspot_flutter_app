@@ -13,6 +13,7 @@ import '../utils/maps_launcher.dart';
 import 'business_detail_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/map_pin_marker.dart';
 import '../widgets/category_filter_bar.dart';
 import '../widgets/map_theme_toggle.dart';
@@ -334,7 +335,7 @@ class _BusinessesMapScreenState extends State<BusinessesMapScreen> {
               ),
             ),
           ),
-          if (_isLoading) Positioned(top: 90, left: 0, right: 0, child: Center(child: AppLoader())),
+          if (_isLoading) Positioned(top: 90, left: 0, right: 0, child: Center(child: AppFullLoader())),
           if (!_isLoading && markers.isEmpty)
             Positioned(
               top: 90,

@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/image_url.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 
 class CarpoolScreen extends StatefulWidget {
@@ -183,7 +184,7 @@ class _CarpoolScreenState extends State<CarpoolScreen> {
         label: Text(context.t('carpool.offer_seat')),
       ),
       body: _isLoading
-          ? const Center(child: AppLoader())
+          ? const Center(child: AppFullLoader())
           : _offers.isEmpty
               ? Center(child: Text(context.t('carpool.empty_state'), style: const TextStyle(color: AppColors.textMutedDark)))
               : RefreshIndicator(

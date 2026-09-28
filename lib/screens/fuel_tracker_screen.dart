@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/car_picker_field.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
@@ -202,7 +203,7 @@ class _FuelTrackerScreenState extends State<FuelTrackerScreen> {
                 CarPickerField(onSelected: _onCarSelected),
                 const SizedBox(height: 16),
                 if (_isLoading)
-                  const Expanded(child: Center(child: AppLoader()))
+                  const Expanded(child: Center(child: AppFullLoader()))
                 else if (_selectedCar == null)
                   const Expanded(child: SizedBox.shrink())
                 else ...[

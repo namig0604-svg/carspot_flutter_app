@@ -8,6 +8,7 @@ import '../theme/app_colors.dart';
 import '../utils/location_helper.dart';
 import '../utils/map_config.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 
 // Значения — ключи переводов (см. lib/l10n/gen), переводятся через
@@ -248,7 +249,7 @@ class _HazardsScreenState extends State<HazardsScreen> {
               ),
             ],
           ),
-          if (_isLoading) const Center(child: AppLoader()),
+          if (_isLoading) const Center(child: AppFullLoader()),
           Positioned(
             left: 12,
             right: 12,

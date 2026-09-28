@@ -7,6 +7,7 @@ import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../utils/location_helper.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/live_location_layer.dart' show LiveLocationController, showLiveLocationSheet;
 import '../l10n/l10n_extensions.dart';
 import 'business_detail_screen.dart';
@@ -146,7 +147,7 @@ class _SosScreenState extends State<SosScreen> {
           Text(context.t('sos.nearby_title'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 10),
           if (_isLoading)
-            const Center(child: AppLoader())
+            const Center(child: AppFullLoader())
           else if (_nearby.isEmpty)
             Text(context.t('sos.empty'), style: const TextStyle(color: AppColors.textMutedDark))
           else

@@ -6,6 +6,7 @@ import 'car_detail_screen.dart';
 import 'car_form_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
@@ -261,7 +262,7 @@ class _GarageScreenState extends State<GarageScreen> {
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topLeft, imageAsset: 'assets/backgrounds/garage.jpg'),
           _isLoading
-          ? Center(child: AppLoader())
+          ? Center(child: AppFullLoader())
           : RefreshIndicator(
               color: AppColors.red,
               backgroundColor: AppColors.surface(context),

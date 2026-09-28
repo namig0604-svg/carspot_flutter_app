@@ -8,6 +8,7 @@ import 'business_detail_screen.dart';
 import 'event_details_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Sozdannye tekushchim polzovatelem skhodki i zavedeniya - dva taba, kak
@@ -94,7 +95,7 @@ class _MyPointsScreenState extends State<MyPointsScreen> with SingleTickerProvid
   }
 
   Widget _buildEventsTab() {
-    if (_isLoadingEvents) return const Center(child: AppLoader());
+    if (_isLoadingEvents) return const Center(child: AppFullLoader());
     if (_events.isEmpty) {
       return Center(
         child: Padding(
@@ -176,7 +177,7 @@ class _MyPointsScreenState extends State<MyPointsScreen> with SingleTickerProvid
   }
 
   Widget _buildBusinessesTab() {
-    if (_isLoadingBusinesses) return const Center(child: AppLoader());
+    if (_isLoadingBusinesses) return const Center(child: AppFullLoader());
     if (_businesses.isEmpty) {
       return Center(
         child: Padding(

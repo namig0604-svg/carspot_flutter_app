@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Управление подпиской CarSpot Premium: текущий статус, история платежей,
@@ -157,7 +158,7 @@ class _SubscriptionManagementScreenState extends State<SubscriptionManagementScr
             Text(context.t('subscription_mgmt.history_title'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
             const SizedBox(height: 8),
             if (_isLoading)
-              const Center(child: AppLoader())
+              const Center(child: AppFullLoader())
             else if (_error != null)
               Text(context.tArgs('subscription_mgmt.load_error', {'error': _error!}), style: const TextStyle(color: AppColors.red))
             else if (_history.isEmpty)

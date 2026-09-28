@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/comments_section.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
@@ -239,7 +240,7 @@ class _PhotoGalleryScreenState extends State<PhotoGalleryScreen> {
             : const Icon(Icons.add_a_photo),
       ),
       body: _isLoading
-          ? Center(child: AppLoader())
+          ? Center(child: AppFullLoader())
           : RefreshIndicator(
               color: AppColors.red,
               backgroundColor: AppColors.surfaceDark,

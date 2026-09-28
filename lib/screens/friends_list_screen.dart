@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/section_background.dart';
 import 'user_profile_screen.dart';
 import '../l10n/l10n_extensions.dart';
@@ -243,7 +244,7 @@ class _FriendsListScreenState extends State<FriendsListScreen> with SingleTicker
         children: [
           const SectionBackground(accent: AppColors.blue, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/chats.jpg'),
           _isLoading
-                ? Center(child: AppLoader())
+                ? Center(child: AppFullLoader())
                 : RefreshIndicator(
                     color: AppColors.red,
                     backgroundColor: AppColors.surface(context),

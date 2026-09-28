@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../utils/location_helper.dart';
 import '../utils/map_config.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Конвой-режим: временная группа для совместной поездки с live-локацией
@@ -288,7 +289,7 @@ class _ConvoyScreenState extends State<ConvoyScreen> {
       ),
       backgroundColor: AppColors.scaffoldBg(context),
       body: _isLoading
-          ? const Center(child: AppLoader())
+          ? const Center(child: AppFullLoader())
           : RefreshIndicator(
               color: Colors.deepPurple,
               backgroundColor: AppColors.surface(context),

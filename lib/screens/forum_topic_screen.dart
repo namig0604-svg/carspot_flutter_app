@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../utils/forum_category.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
 
@@ -112,7 +113,7 @@ class _ForumTopicScreenState extends State<ForumTopicScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(topic?['title'] ?? '', overflow: TextOverflow.ellipsis, maxLines: 1)),
       body: _isLoading || topic == null
-          ? const Center(child: AppLoader())
+          ? const Center(child: AppFullLoader())
           : Column(
               children: [
                 Expanded(

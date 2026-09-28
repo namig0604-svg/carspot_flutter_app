@@ -9,6 +9,7 @@ import '../utils/location_helper.dart';
 import '../utils/map_config.dart';
 import '../utils/maps_launcher.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/map_pin_marker.dart';
 import '../l10n/l10n_extensions.dart';
 
@@ -114,7 +115,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(context.t('parking.title')), backgroundColor: AppColors.black),
       body: _isLoading
-          ? const Center(child: AppLoader())
+          ? const Center(child: AppFullLoader())
           : Column(
               children: [
                 Expanded(

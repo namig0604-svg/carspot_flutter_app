@@ -7,6 +7,7 @@ import 'club_detail_screen.dart';
 import 'business_detail_screen.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/section_background.dart';
 import '../l10n/l10n_extensions.dart';
 import '../utils/image_url.dart';
@@ -137,7 +138,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
   }
 
   Widget _eventsTab() {
-    if (_isLoadingEvents) return Center(child: AppLoader());
+    if (_isLoadingEvents) return Center(child: AppFullLoader());
     if (_events.isEmpty) return _emptyState(context.t('favorites.no_events'), Icons.calendar_today_outlined);
     return RefreshIndicator(
       color: AppColors.blue,
@@ -173,7 +174,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
   }
 
   Widget _clubsTab() {
-    if (_isLoadingClubs) return Center(child: AppLoader());
+    if (_isLoadingClubs) return Center(child: AppFullLoader());
     if (_clubs.isEmpty) return _emptyState(context.t('favorites.no_clubs'), Icons.groups_outlined);
     return RefreshIndicator(
       color: AppColors.blue,
@@ -215,7 +216,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
   }
 
   Widget _businessesTab() {
-    if (_isLoadingBusinesses) return Center(child: AppLoader());
+    if (_isLoadingBusinesses) return Center(child: AppFullLoader());
     if (_businesses.isEmpty) return _emptyState(context.t('favorites.no_businesses'), Icons.car_repair);
     return RefreshIndicator(
       color: AppColors.blue,

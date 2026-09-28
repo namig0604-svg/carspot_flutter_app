@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_loader.dart';
+import '../widgets/car_loaders.dart';
 import '../widgets/car_picker_field.dart';
 import '../widgets/image_url_picker.dart' show ImageUrlPickerField;
 import '../l10n/l10n_extensions.dart';
@@ -178,7 +179,7 @@ class _CarDocumentsScreenState extends State<CarDocumentsScreen> {
           children: [
             CarPickerField(onSelected: _onCarSelected),
             const SizedBox(height: 16),
-            if (_isLoading) const Expanded(child: Center(child: AppLoader()))
+            if (_isLoading) const Expanded(child: Center(child: AppFullLoader()))
             else if (_documents.isEmpty)
               Expanded(
                 child: Center(child: Text(context.t('car_documents.empty'), style: const TextStyle(color: AppColors.textMutedDark))),
