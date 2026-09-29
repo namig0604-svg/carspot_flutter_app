@@ -10,6 +10,7 @@ import 'club_detail_screen.dart';
 import 'event_details_screen.dart';
 import 'user_profile_screen.dart';
 import 'car_documents_screen.dart';
+import 'challenges_screen.dart';
 import '../l10n/l10n_extensions.dart';
 
 /// Лента уведомлений: заявки в друзья, лайки профиля, кто присоединился
@@ -61,6 +62,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Icons.comment;
       case 'document_expiring':
         return Icons.description;
+      case 'new_challenge':
+        return Icons.flag;
       default:
         return Icons.notifications;
     }
@@ -77,6 +80,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Colors.green;
       case 'document_expiring':
         return Colors.orange;
+      case 'new_challenge':
+        return Colors.deepOrange;
       default:
         return Colors.amber;
     }
@@ -109,6 +114,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       // Экран не принимает id конкретного документа/машины — покажет выбор
       // машины, пользователь откроет ту, где истекает документ.
       Navigator.push(context, MaterialPageRoute(builder: (_) => const CarDocumentsScreen()));
+    } else if (targetType == 'challenge') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const ChallengesScreen()));
     } else if (actor != null && actor['id'] != null) {
       // заявки в друзья / лайки — ведём в профиль того, кто это сделал
       Navigator.push(context, MaterialPageRoute(builder: (_) => UserProfileScreen(userId: actor['id'] as String)));
