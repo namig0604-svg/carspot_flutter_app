@@ -47,4 +47,14 @@ const Map<String, Map<String, String>> kFeatureChallengesTranslations = {
     'en': 'Rate meetups',
     'ka': 'შეხვედრების შეფასება',
   },
+  'home.challenges_banner_label': {
+    'ru': 'Активный челлендж',
+    'en': 'Active challenge',
+    'ka': 'აქტიური გამოწვევა',
+  },
+  'home.challenges_banner_view_all': {
+    'ru': 'Все челленджи',
+    'en': 'All challenges',
+    'ka': 'ყველა გამოწვევა',
+  },
 };

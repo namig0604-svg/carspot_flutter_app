@@ -45,6 +45,7 @@ import 'ai_diagnosis_screen.dart';
 import 'car_report_screen.dart';
 import 'maintenance_forecast_screen.dart';
 import 'daily_login_dialog.dart';
+import '../widgets/challenges_banner.dart';
 import 'hazards_screen.dart';
 import 'part_listings_screen.dart';
 import '../theme/app_colors.dart';
@@ -1354,6 +1355,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 20),
           const WeatherAlertBanner(),
+          const SizedBox(height: 12),
+          const ChallengesBanner(),
 
           // Меню разложено по смысловым разделам (раньше все ~19 пунктов
           // лежали одним плоским списком, и "Настройки" было тяжело найти).
