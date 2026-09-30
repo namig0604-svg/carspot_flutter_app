@@ -8,6 +8,7 @@ import 'maintenance_screen.dart';
 import 'car_documents_screen.dart';
 import 'car_expenses_screen.dart';
 import 'fuel_tracker_screen.dart';
+import 'trips_list_screen.dart';
 import 'vin_decoder_screen.dart';
 import 'ai_diagnosis_screen.dart';
 import 'car_report_screen.dart';
@@ -122,6 +123,18 @@ class CarHubScreen extends StatelessWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const FuelTrackerScreen()),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 78,
+                    child: AnimatedMenuTile(
+                      icon: Icons.route,
+                      label: context.t('home.menu_trips'),
+                      color: Colors.indigo,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TripsListScreen()),
                       ),
                     ),
                   ),
