@@ -11,6 +11,7 @@ import '../theme/app_colors.dart';
 import '../widgets/section_background.dart';
 import 'faq_screen.dart';
 import 'app_guide_screen.dart';
+import 'bottom_nav_settings_screen.dart';
 import '../l10n/l10n_extensions.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -170,6 +171,22 @@ class SettingsScreen extends StatelessWidget {
                 value: ThemeMode.dark,
                 groupValue: themeProvider.themeMode,
                 onChanged: (v) => themeProvider.setThemeMode(v!),
+              ),
+            ],
+          ),
+
+          _sectionCard(
+            title: context.t('bottom_nav_settings.section_title'),
+            children: [
+              ListTile(
+                leading: const Icon(Icons.dashboard_customize_outlined),
+                title: Text(context.t('bottom_nav_settings.entry_title')),
+                subtitle: Text(context.t('bottom_nav_settings.entry_subtitle')),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BottomNavSettingsScreen()),
+                ),
               ),
             ],
           ),

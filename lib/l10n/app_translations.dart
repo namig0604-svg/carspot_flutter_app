@@ -36,6 +36,7 @@ import 'gen/feature_convoy_tr.dart';
 import 'gen/feature_premium_ai_report_tr.dart';
 import 'gen/feature_daily_login_tr.dart';
 import 'gen/feature_drive_tracker_tr.dart';
+import 'gen/feature_bottom_nav_settings_tr.dart';
 
 // Дополнительные языки (перевод интерфейса поверх базового ru/en/ka) —
 // каждый язык разбит на 3 части, заполняется отдельными переводчиками.
@@ -174,6 +175,7 @@ const Map<String, Map<String, String>> _kBaseTranslations = {
   ...kFeaturePremiumAiReportTranslations,
   ...kFeatureDailyLoginTranslations,
   ...kFeatureDriveTrackerTranslations,
+  ...kFeatureBottomNavSettingsTranslations,
 };
 
 /// Доп. языки поверх базового набора (ru/en/ka) — каждый язык собран из
