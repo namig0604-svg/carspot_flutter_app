@@ -694,10 +694,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _buildSortTabs(),
         const SizedBox(height: 10),
 
-        // Карточки-счётчики быстрого перехода — сходки/сервисы/клубы.
-        _buildQuickStats(),
-        const SizedBox(height: 6),
-
         // Фильтр по типу
         SizedBox(
           height: 50,
@@ -727,33 +723,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // Заголовок секции списка — янтарная плашка, как анонс-блок в референсе
-        Container(
-          margin: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppColors.amber.withOpacity(0.10),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.amber.withOpacity(0.35)),
-          ),
+        // Заголовок секции списка — лёгкий текстовый лейбл вместо тяжёлой
+        // цветной плашки (упрощение визуала стартового экрана).
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
           child: Row(
             children: [
-              Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(color: AppColors.amber.withOpacity(0.22), shape: BoxShape.circle),
-                child: const Icon(Icons.campaign, color: AppColors.amber, size: 16),
-              ),
-              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   context.t('home.section_soon'),
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textMuted(context)),
                 ),
               ),
               Text(
                 '${_filteredEvents.length}',
-                style: const TextStyle(color: AppColors.amber, fontWeight: FontWeight.w800, fontSize: 16),
+                style: TextStyle(color: AppColors.textMuted(context), fontWeight: FontWeight.w700, fontSize: 15),
               ),
             ],
           ),
@@ -985,63 +969,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _quickStatCard({
-    required IconData icon,
-    required Color color,
-    required String label,
-    required int count,
-    VoidCallback? onTap,
-    bool highlight = false,
-  }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-          decoration: BoxDecoration(
-            color: AppColors.surface(context),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: highlight ? AppColors.amber.withOpacity(0.7) : AppColors.border(context),
-              width: highlight ? 1.4 : 1,
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.18),
-                  borderRadius: BorderRadius.circular(9),
-                ),
-                child: Icon(icon, color: color, size: 16),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    Text('$count', style: TextStyle(fontSize: 11, color: AppColors.textMuted(context))),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   /// Заглушка превью сходки без обложки — цветной квадрат с иконкой категории.
   Widget _eventThumbFallback(Color color, String? type) {
     return Container(
@@ -1049,80 +976,6 @@ class _HomeScreenState extends State<HomeScreen> {
       height: 72,
       color: color.withOpacity(0.18),
       child: Icon(eventCategoryIcon(type), color: color, size: 28),
-    );
-  }
-
-  Widget _buildQuickStats() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: Row(
-        children: [
-          _quickStatCard(
-            icon: Icons.event_available,
-            color: AppColors.amber,
-            label: context.t('home.quick_soon'),
-            count: _eventsTotal,
-            highlight: true,
-          ),
-          _quickStatCard(
-            icon: Icons.car_repair,
-            color: AppColors.red,
-            label: context.t('home.quick_services'),
-            count: _businessesTotal,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BusinessesListScreen())),
-          ),
-          _quickStatCard(
-            icon: Icons.groups,
-            color: AppColors.blue,
-            label: context.t('home.quick_clubs'),
-            count: _myClubs.length,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ClubsListScreen())).then((_) => _loadMyClubs()),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _miniCarCard(Map<String, dynamic> car) {
-    final photoUrl = car['photo_url'] as String?;
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: (photoUrl != null && photoUrl.isNotEmpty)
-              ? Image.network(
-                  resolveImageUrl(photoUrl),
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _carPlaceholder(),
-                )
-              : _carPlaceholder(),
-        ),
-        title: Text('${car['make'] ?? ''} ${car['model'] ?? ''}'.trim(), overflow: TextOverflow.ellipsis, maxLines: 1),
-        subtitle: Text(
-          [car['year']?.toString(), car['color'], car['license_plate']]
-              .where((v) => v != null && v.toString().isNotEmpty)
-              .join(' · '),
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        ),
-        trailing: (car['is_primary'] ?? false) ? const Icon(Icons.star, color: Colors.orange, size: 18) : null,
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const GarageScreen()),
-        ).then((_) => _loadMyCars()),
-      ),
-    );
-  }
-
-  Widget _carPlaceholder() {
-    return Container(
-      width: 48,
-      height: 48,
-      color: AppColors.blue.withOpacity(0.14),
-      child: const Icon(Icons.directions_car, color: AppColors.blue),
     );
   }
 
@@ -1540,109 +1393,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 10),
                 Text(user['bio'] ?? context.t('home.no_bio_info'), style: TextStyle(color: cardText.withOpacity(0.85))),
               ],
-            ),
-          ),
-
-          if (_myCars.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(context.t('home.my_cars_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
-            const SizedBox(height: 10),
-            ..._myCars.map((c) => _miniCarCard(c as Map<String, dynamic>)),
-          ],
-
-          if (_myClubs.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(context.t('home.my_clubs_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _myClubs.map<Widget>((c) {
-                final role = c['role'] as String?;
-                final roleLabel = role == 'owner'
-                    ? ' · ${context.t('home.role_owner')}'
-                    : (role == 'admin' ? ' · ${context.t('home.role_admin')}' : '');
-                return Chip(
-                  avatar: const Icon(Icons.groups, size: 16, color: AppColors.blue),
-                  label: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 180),
-                    child: Text('${c['name']}$roleLabel', overflow: TextOverflow.ellipsis),
-                  ),
-                  backgroundColor: AppColors.blue.withOpacity(0.08),
-                );
-              }).toList(),
-            ),
-          ],
-
-          // Раньше здесь была плитка на все 28 достижений сразу — теперь
-          // только короткий превью открытых + переход на отдельный экран
-          // с полным списком и прогрессом («7/10») по каждому — так профиль
-          // не превращается в длинную простыню.
-          const SizedBox(height: 20),
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => AchievementsScreen(
-                  achievements: achievements,
-                  level: stats.level,
-                  levelTitle: context.t(stats.levelTitleKey),
-                ),
-              ),
-            ),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Color.alphaBlend(Colors.amber.withOpacity(0.18), cardSurface),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.amber.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.military_tech, color: Colors.amber, size: 26),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          context.tArgs('home.achievements_progress', {
-                            'unlocked': '${achievements.where((a) => a.unlocked).length}',
-                            'total': '${achievements.length}',
-                          }),
-                          style: TextStyle(fontWeight: FontWeight.bold, color: cardText),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: achievements.where((a) => a.unlocked).take(6).isEmpty
-                              ? [
-                                  Text(
-                                    context.t('home.achievements_empty'),
-                                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                  ),
-                                ]
-                              : achievements
-                                  .where((a) => a.unlocked)
-                                  .take(6)
-                                  .map((a) => Padding(
-                                        padding: const EdgeInsets.only(right: 6),
-                                        child: Text(a.emoji, style: const TextStyle(fontSize: 18)),
-                                      ))
-                                  .toList(),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.chevron_right, color: Colors.grey),
-                ],
-              ),
             ),
           ),
 
