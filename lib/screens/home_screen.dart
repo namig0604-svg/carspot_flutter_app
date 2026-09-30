@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/auth_provider.dart';
-import '../providers/bottom_nav_prefs_provider.dart';
 import '../services/api_service.dart';
 import '../utils/location_helper.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,7 +12,6 @@ import '../utils/gamification.dart';
 import 'create_event_screen.dart';
 import 'event_details_screen.dart';
 import 'garage_screen.dart';
-import 'trips_list_screen.dart';
 import 'chats_list_screen.dart';
 import 'clubs_list_screen.dart';
 import 'businesses_list_screen.dart';
@@ -511,31 +509,25 @@ class _HomeScreenState extends State<HomeScreen> {
     // (Гараж, Настройки, карточка события и т.д.), выезжает поверх области
     // над панелью, а сама панель остаётся на месте — как в большинстве
     // приложений с постоянным нижним меню.
-    //
-    // Какие 4 раздела показаны здесь (и в каком порядке) — выбирает сам
-    // пользователь в Настройках → "Нижняя панель" (см. BottomNavSettingsScreen
-    // и BottomNavPrefsProvider). "Добавить" в этот список не входит — она
-    // всегда отдельной кнопкой по центру, независимо от выбора пользователя.
-    final sections = context.watch<BottomNavPrefsProvider>().sections;
     return Scaffold(
       body: Navigator(
         key: _shellNavKey,
-        onGenerateRoute: (settings) => MaterialPageRoute(builder: (_) => _buildShellHome(sections)),
+        onGenerateRoute: (settings) => MaterialPageRoute(builder: (_) => _buildShellHome()),
       ),
-      // Нижняя навигация в духе референса: раздел / раздел / Добавить /
-      // раздел / раздел. Первые 4 — страницы одного PageView — между ними
-      // можно не только тапать по иконке, но и свайпать пальцем влево/
-      // вправо, как между вкладками в почте. "Добавить" — по-прежнему не
-      // страница, а модальная шторка, закреплена по центру всегда.
+      // Нижняя навигация в духе референса: Лента / Карта / Добавить / Чаты /
+      // Профиль. "Лента"/"Карта"/"Чаты"/"Профиль" теперь страницы одного
+      // PageView — между ними можно не только тапать по иконке, но и
+      // свайпать пальцем влево/вправо, как между вкладками в почте.
+      // "Добавить" — по-прежнему не страница, а модальная шторка.
       bottomNavigationBar: AnimatedBottomNav(
         key: _tourNavBarKey,
         currentIndex: _selectedIndex,
         items: [
-          _navBarItemForSection(sections[0]),
-          _navBarItemForSection(sections[1]),
+          NavBarItem(icon: Icons.calendar_today_outlined, activeIcon: Icons.calendar_today, label: context.t('home.nav_events')),
+          NavBarItem(icon: Icons.map_outlined, activeIcon: Icons.map, label: context.t('home.nav_map')),
           NavBarItem(icon: Icons.add_circle_outline, activeIcon: Icons.add_circle, label: context.t('home.nav_add')),
-          _navBarItemForSection(sections[2]),
-          _navBarItemForSection(sections[3]),
+          NavBarItem(icon: Icons.chat_bubble_outline, activeIcon: Icons.chat_bubble, label: context.t('home.nav_chats')),
+          NavBarItem(icon: Icons.person_outline, activeIcon: Icons.person, label: context.t('home.nav_profile')),
         ],
         onTap: (index) {
           if (index == 2) {
@@ -552,55 +544,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Иконка + подпись для конкретного раздела нижней панели — метаданные
-  /// берутся из общего списка kBottomNavCandidates (см.
-  /// bottom_nav_prefs_provider.dart), чтобы не дублировать их здесь и в
-  /// экране настройки BottomNavSettingsScreen.
-  NavBarItem _navBarItemForSection(String id) {
-    final meta = kBottomNavCandidates.firstWhere(
-      (s) => s.id == id,
-      orElse: () => kBottomNavCandidates.first,
-    );
-    return NavBarItem(icon: meta.icon, activeIcon: meta.activeIcon, label: context.t(meta.labelKey));
-  }
-
-  /// Разделы, у которых уже есть собственный AppBar (со своим заголовком) —
-  /// для них общий AppBar "CarSpot" скрывается, чтобы не было двух панелей
-  /// подряд. "events" и "profile" собственного AppBar не имеют — их строят
-  /// _buildEventsTab()/_buildProfileTab() без своего Scaffold.
-  static const Set<String> _sectionsWithOwnAppBar = {'map', 'chats', 'trips', 'garage'};
-
-  /// Содержимое конкретной страницы PageView по id раздела — единая точка
-  /// сборки для build() (панель) и _buildShellHome() (сама страница).
-  Widget _buildPageForSection(String id) {
-    switch (id) {
-      case 'map':
-        return const EventsMapScreen();
-      case 'chats':
-        return const ChatsListScreen();
-      case 'trips':
-        return const TripsListScreen();
-      case 'garage':
-        return const GarageScreen();
-      case 'profile':
-        return _buildProfileTab();
-      case 'events':
-      default:
-        return _buildEventsTab();
-    }
-  }
-
   /// Содержимое единственного (непоппаемого) корневого маршрута вложенного
   /// Navigator — общий AppBar + свайпаемые вкладки. Экраны, открытые поверх
   /// (через _shellNavKey.currentState!.push(...)), рисуются уже вне этого
   /// виджета, поверх него, но всё ещё под нижней панелью из build() выше.
-  Widget _buildShellHome(List<String> sections) {
-    final currentSectionId = sections[_navPosToPageIndex(_selectedIndex)];
-    // У "Карты"/"Чатов"/"Поездок"/"Гаража" уже есть собственный AppBar с
-    // заголовком — не дублируем общий "CarSpot" поверх него, чтобы не было
-    // двух панелей подряд. На "Ленте"/"Профиле" общий AppBar остаётся как
-    // обычно.
-    final showSharedAppBar = !_sectionsWithOwnAppBar.contains(currentSectionId);
+  Widget _buildShellHome() {
+    // У "Карты" и "Чатов" уже есть собственный AppBar с заголовком — не
+    // дублируем общий "CarSpot" поверх него, чтобы не было двух панелей
+    // подряд. На "Ленте"/"Профиле" общий AppBar остаётся как обычно.
+    final showSharedAppBar = _selectedIndex == 0 || _selectedIndex == 4;
     return Scaffold(
       appBar: showSharedAppBar
           ? AppBar(
@@ -620,7 +572,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Быстрый доступ к настройкам прямо из AppBar вкладки "Профиль" —
                 // раньше настройки было видно только проскроллив весь список меню
                 // до конца, теперь так их видно сразу.
-                if (currentSectionId == 'profile')
+                if (_selectedIndex == 4)
                   IconButton(
                     icon: const Icon(Icons.settings_outlined),
                     tooltip: context.t('home.menu_settings'),
@@ -666,16 +618,21 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           SectionBackground(
-            accent: currentSectionId == 'profile' ? AppColors.blue : AppColors.red,
-            glowAlignment: currentSectionId == 'profile' ? Alignment.topLeft : Alignment.topRight,
-            imageAsset: currentSectionId == 'profile'
+            accent: _selectedIndex == 4 ? AppColors.blue : AppColors.red,
+            glowAlignment: _selectedIndex == 4 ? Alignment.topLeft : Alignment.topRight,
+            imageAsset: _selectedIndex == 4
                 ? 'assets/backgrounds/profile.jpg'
                 : 'assets/backgrounds/events.jpg',
           ),
           PageView(
             controller: _pageController,
             onPageChanged: (pageIndex) => setState(() => _selectedIndex = _pageIndexToNavPos[pageIndex]),
-            children: sections.map(_buildPageForSection).toList(),
+            children: [
+              _buildEventsTab(),
+              const EventsMapScreen(),
+              const ChatsListScreen(),
+              _buildProfileTab(),
+            ],
           ),
         ],
       ),
