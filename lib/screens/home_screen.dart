@@ -81,7 +81,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // _selectedIndex — позиция в нижней навигации (0=Лента, 1=Карта,
+  // 3=Чаты, 4=Профиль; 2="Добавить" никогда сюда не попадает, это
+  // не вкладка, а модальное действие). Отдельный Navigator (_shellNavKey)
+  // живёт ПОД нижней панелью и НЕ включает её в свой стек — поэтому
+  // панель видна на абсолютно всех экранах, куда бы пользователь ни
+  // зашёл из главного меню (см. build() и _buildShellHome() ниже).
   int _selectedIndex = 0;
+  final GlobalKey<NavigatorState> _shellNavKey = GlobalKey<NavigatorState>();
+  late final PageController _pageController;
+  // Соответствие между позицией в нижней навигации и страницей PageView
+  // (свайп между Лентой/Картой/Чатами/Профилем) — "Добавить" пропущено.
+  static const List<int> _pageIndexToNavPos = [0, 1, 3, 4];
+  int _navPosToPageIndex(int navPos) => _pageIndexToNavPos.indexOf(navPos);
   List<dynamic> _events = [];
   List<dynamic> _filteredEvents = [];
   bool _isLoading = false;
@@ -109,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _navPosToPageIndex(_selectedIndex));
     _loadEvents();
     _loadMyCars();
     _loadBusinessesTotal();
@@ -131,6 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _notificationsTimer?.cancel();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -145,8 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openNotifications() {
-    Navigator.push(
-      context,
+    _shellNavKey.currentState!.push(
       MaterialPageRoute(builder: (_) => const NotificationsScreen()),
     ).then((_) => _loadUnreadNotifications());
   }
@@ -490,84 +503,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Внешний Scaffold отвечает ТОЛЬКО за нижнюю панель — она объявлена
+    // здесь и поэтому никогда не пропадает, что бы ни показывал вложенный
+    // Navigator (_shellNavKey) ниже: любой экран, открытый из главного меню
+    // (Гараж, Настройки, карточка события и т.д.), выезжает поверх области
+    // над панелью, а сама панель остаётся на месте — как в большинстве
+    // приложений с постоянным нижним меню.
     return Scaffold(
-      appBar: AppBar(
-        title: GestureDetector(
-          onLongPress: () {
-            HapticFeedback.mediumImpact();
-            SoundPlayer.play(context, AppSound.success);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(context.t('home.easter_egg_message'))),
-            );
-          },
-          child: const Text('CarSpot'),
-        ),
-        elevation: 0,
-        backgroundColor: AppColors.black,
-        actions: [
-          // Быстрый доступ к настройкам прямо из AppBar вкладки "Профиль" —
-          // раньше настройки было видно только проскроллив весь список меню
-          // до конца, теперь так их видно сразу.
-          if (_selectedIndex == 4)
-            IconButton(
-              icon: const Icon(Icons.settings_outlined),
-              tooltip: context.t('home.menu_settings'),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
-              ),
-            ),
-          IconButton(
-            icon: const Icon(Icons.card_giftcard_outlined),
-            tooltip: context.t('daily_login.title'),
-            onPressed: () => showDailyLoginDialog(context),
-          ),
-          Stack(
-            key: _tourNotificationsKey,
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                tooltip: context.t('home.tooltip_notifications'),
-                onPressed: _openNotifications,
-              ),
-              if (_unreadNotifications > 0)
-                Positioned(
-                  right: 6,
-                  top: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                    decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(10)),
-                    constraints: const BoxConstraints(minWidth: 16),
-                    child: Text(
-                      _unreadNotifications > 99 ? '99+' : '$_unreadNotifications',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-      backgroundColor: AppColors.scaffoldBg(context),
-      body: Stack(
-        children: [
-          SectionBackground(
-            accent: _selectedIndex == 4 ? AppColors.blue : AppColors.red,
-            glowAlignment: _selectedIndex == 4 ? Alignment.topLeft : Alignment.topRight,
-            imageAsset: _selectedIndex == 4
-                ? 'assets/backgrounds/profile.jpg'
-                : 'assets/backgrounds/events.jpg',
-          ),
-          _buildBody(),
-        ],
+      body: Navigator(
+        key: _shellNavKey,
+        onGenerateRoute: (settings) => MaterialPageRoute(builder: (_) => _buildShellHome()),
       ),
       // Нижняя навигация в духе референса: Лента / Карта / Добавить / Чаты /
-      // Профиль — 5 пунктов вместо прежних 4. "Карта" и "Добавить" всегда
-      // открывают отдельный экран/шторку (не меняют текущую вкладку), как
-      // раньше это делали "Гараж" и "Чаты". Гараж переехал в сетку быстрых
-      // действий на экране "Профиль" — там же, где Клубы/Сервисы/Форум и т.д.
+      // Профиль. "Лента"/"Карта"/"Чаты"/"Профиль" теперь страницы одного
+      // PageView — между ними можно не только тапать по иконке, но и
+      // свайпать пальцем влево/вправо, как между вкладками в почте.
+      // "Добавить" — по-прежнему не страница, а модальная шторка.
       bottomNavigationBar: AnimatedBottomNav(
         key: _tourNavBarKey,
         currentIndex: _selectedIndex,
@@ -579,36 +530,113 @@ class _HomeScreenState extends State<HomeScreen> {
           NavBarItem(icon: Icons.person_outline, activeIcon: Icons.person, label: context.t('home.nav_profile')),
         ],
         onTap: (index) {
-          if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const EventsMapScreen()),
-            );
-            return;
-          }
           if (index == 2) {
             _showCreateSheet();
             return;
           }
-          if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ChatsListScreen()),
-            );
-            return;
-          }
-          setState(() => _selectedIndex = index);
+          _pageController.animateToPage(
+            _navPosToPageIndex(index),
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOut,
+          );
         },
       ),
     );
   }
 
-  Widget _buildBody() {
-    switch (_selectedIndex) {
-      case 0: return _buildEventsTab();
-      case 4: return _buildProfileTab();
-      default: return _buildEventsTab();
-    }
+  /// Содержимое единственного (непоппаемого) корневого маршрута вложенного
+  /// Navigator — общий AppBar + свайпаемые вкладки. Экраны, открытые поверх
+  /// (через _shellNavKey.currentState!.push(...)), рисуются уже вне этого
+  /// виджета, поверх него, но всё ещё под нижней панелью из build() выше.
+  Widget _buildShellHome() {
+    // У "Карты" и "Чатов" уже есть собственный AppBar с заголовком — не
+    // дублируем общий "CarSpot" поверх него, чтобы не было двух панелей
+    // подряд. На "Ленте"/"Профиле" общий AppBar остаётся как обычно.
+    final showSharedAppBar = _selectedIndex == 0 || _selectedIndex == 4;
+    return Scaffold(
+      appBar: showSharedAppBar
+          ? AppBar(
+              title: GestureDetector(
+                onLongPress: () {
+                  HapticFeedback.mediumImpact();
+                  SoundPlayer.play(context, AppSound.success);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(context.t('home.easter_egg_message'))),
+                  );
+                },
+                child: const Text('CarSpot'),
+              ),
+              elevation: 0,
+              backgroundColor: AppColors.black,
+              actions: [
+                // Быстрый доступ к настройкам прямо из AppBar вкладки "Профиль" —
+                // раньше настройки было видно только проскроллив весь список меню
+                // до конца, теперь так их видно сразу.
+                if (_selectedIndex == 4)
+                  IconButton(
+                    icon: const Icon(Icons.settings_outlined),
+                    tooltip: context.t('home.menu_settings'),
+                    onPressed: () => _shellNavKey.currentState!.push(
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                    ),
+                  ),
+                IconButton(
+                  icon: const Icon(Icons.card_giftcard_outlined),
+                  tooltip: context.t('daily_login.title'),
+                  onPressed: () => showDailyLoginDialog(context),
+                ),
+                Stack(
+                  key: _tourNotificationsKey,
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_outlined),
+                      tooltip: context.t('home.tooltip_notifications'),
+                      onPressed: _openNotifications,
+                    ),
+                    if (_unreadNotifications > 0)
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(10)),
+                          constraints: const BoxConstraints(minWidth: 16),
+                          child: Text(
+                            _unreadNotifications > 99 ? '99+' : '$_unreadNotifications',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            )
+          : null,
+      backgroundColor: AppColors.scaffoldBg(context),
+      body: Stack(
+        children: [
+          SectionBackground(
+            accent: _selectedIndex == 4 ? AppColors.blue : AppColors.red,
+            glowAlignment: _selectedIndex == 4 ? Alignment.topLeft : Alignment.topRight,
+            imageAsset: _selectedIndex == 4
+                ? 'assets/backgrounds/profile.jpg'
+                : 'assets/backgrounds/events.jpg',
+          ),
+          PageView(
+            controller: _pageController,
+            onPageChanged: (pageIndex) => setState(() => _selectedIndex = _pageIndexToNavPos[pageIndex]),
+            children: [
+              _buildEventsTab(),
+              const EventsMapScreen(),
+              const ChatsListScreen(),
+              _buildProfileTab(),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   void _showCreateSheet() {
@@ -626,8 +654,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text(context.t('home.create_event_option')),
                 onTap: () async {
                   Navigator.pop(context);
-                  final result = await Navigator.push(
-                    context,
+                  final result = await _shellNavKey.currentState!.push(
                     MaterialPageRoute(builder: (_) => const CreateEventScreen()),
                   );
                   if (result == true) _loadEvents();
@@ -638,8 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text(context.t('home.create_business_option')),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(
-                    context,
+                  _shellNavKey.currentState!.push(
                     MaterialPageRoute(builder: (_) => const BusinessFormScreen()),
                   );
                 },
@@ -788,8 +814,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(18),
                             onTap: () {
-                              Navigator.push(
-                                context,
+                              _shellNavKey.currentState!.push(
                                 MaterialPageRoute(
                                   builder: (_) => EventDetailsScreen(event: event),
                                 ),
@@ -1154,8 +1179,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 10),
           TextButton.icon(
             onPressed: () async {
-              final result = await Navigator.push(
-                context,
+              final result = await _shellNavKey.currentState!.push(
                 MaterialPageRoute(builder: (_) => const EditProfileScreen()),
               );
               if (result == true) setState(() {});
@@ -1247,8 +1271,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
+                onTap: () => _shellNavKey.currentState!.push(
                   MaterialPageRoute(builder: (_) => const GarageScreen()),
                 ).then((_) => _loadMyCars()),
                 child: Column(children: [
@@ -1306,8 +1329,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: context.t('home.section_my_car'),
                 subtitle: context.t('home.section_my_car_subtitle'),
                 color: Colors.cyan,
-                onTap: () => Navigator.push(
-                  context,
+                onTap: () => _shellNavKey.currentState!.push(
                   MaterialPageRoute(
                     builder: (_) => CarHubScreen(
                       myCars: _myCars,
@@ -1323,8 +1345,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: context.t('home.section_community'),
                 subtitle: context.t('home.section_community_subtitle'),
                 color: AppColors.blue,
-                onTap: () => Navigator.push(
-                  context,
+                onTap: () => _shellNavKey.currentState!.push(
                   MaterialPageRoute(
                     builder: (_) => CommunityHubScreen(
                       myClubs: _myClubs,
@@ -1339,8 +1360,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: context.t('home.section_my_activity'),
                 subtitle: context.t('home.section_my_activity_subtitle'),
                 color: Colors.amber,
-                onTap: () => Navigator.push(
-                  context,
+                onTap: () => _shellNavKey.currentState!.push(
                   MaterialPageRoute(
                     builder: (_) => ActivityHubScreen(
                       achievements: achievements,
@@ -1356,8 +1376,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: context.t('home.section_safety'),
                 subtitle: context.t('home.section_safety_subtitle'),
                 color: AppColors.red,
-                onTap: () => Navigator.push(
-                  context,
+                onTap: () => _shellNavKey.currentState!.push(
                   MaterialPageRoute(builder: (_) => const SafetyHubScreen()),
                 ),
               ),
@@ -1367,8 +1386,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: context.t('home.section_other'),
                 subtitle: context.t('home.section_other_subtitle'),
                 color: Colors.blueGrey,
-                onTap: () => Navigator.push(
-                  context,
+                onTap: () => _shellNavKey.currentState!.push(
                   MaterialPageRoute(
                     builder: (_) => MoreHubScreen(
                       isAdmin: user['is_admin'] == true,
@@ -1419,8 +1437,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Text(context.t('home.referral_program_title'), style: TextStyle(fontWeight: FontWeight.bold, color: cardText)),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.push(
-                        context,
+                      onPressed: () => _shellNavKey.currentState!.push(
                         MaterialPageRoute(builder: (_) => const PremiumScreen()),
                       ),
                       child: Text(context.t('home.premium_link')),
