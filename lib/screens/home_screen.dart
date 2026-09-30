@@ -44,6 +44,11 @@ import 'vin_decoder_screen.dart';
 import 'ai_diagnosis_screen.dart';
 import 'car_report_screen.dart';
 import 'maintenance_forecast_screen.dart';
+import 'car_hub_screen.dart';
+import 'community_hub_screen.dart';
+import 'activity_hub_screen.dart';
+import 'safety_hub_screen.dart';
+import 'more_hub_screen.dart';
 import 'daily_login_dialog.dart';
 import '../widgets/challenges_banner.dart';
 import 'hazards_screen.dart';
@@ -221,6 +226,73 @@ class _HomeScreenState extends State<HomeScreen> {
         bodyKey: 'onboarding_tour.step_final_body',
       ),
     ];
+  }
+
+  /// Крупная карточка-категория на главном экране (редизайн меню: раньше
+  /// было ~19 мелких иконок плоским списком, теперь 5 смысловых разделов,
+  /// каждый открывает отдельный экран со своим функционалом — см.
+  /// car_hub_screen.dart и соседние *_hub_screen.dart).
+  Widget _categoryCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final isDark = AppColors.isDark(context);
+    final cardSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final cardText = isDark ? AppColors.textOnDark : AppColors.textOnLight;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: cardSurface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.border(context)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: color, size: 28),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12.5, color: cardText.withOpacity(0.65)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right, color: cardText.withOpacity(0.4)),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   /// Сравнивает текущий уровень/достижения с тем, что видели в прошлый раз
@@ -1358,447 +1430,98 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 12),
           const ChallengesBanner(),
 
-          // Меню разложено по смысловым разделам (раньше все ~19 пунктов
-          // лежали одним плоским списком, и "Настройки" было тяжело найти).
-          // Быстрый доступ к настройкам также вынесен в AppBar этой вкладки
-          // (иконка-шестерёнка рядом с колокольчиком уведомлений).
+          // Меню сгруппировано в 5 крупных категорий (раньше было ~19
+          // мелких иконок плоским списком). Тап по категории открывает
+          // отдельный экран с её функционалом — см. car_hub_screen.dart и
+          // соседние *_hub_screen.dart. Быстрый доступ к настройкам также
+          // остаётся в AppBar этой вкладки (иконка-шестерёнка рядом с
+          // колокольчиком уведомлений).
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(context.t('home.menu_title'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
           ),
           const SizedBox(height: 14),
-
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(context.t('home.section_my_car'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+          _categoryCard(
+            context,
+            icon: Icons.directions_car,
+            title: context.t('home.section_my_car'),
+            subtitle: context.t('home.section_my_car_subtitle'),
+            color: Colors.cyan,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CarHubScreen(
+                  myCars: _myCars,
+                  isMaxTier: isMaxTier,
+                  onCarsChanged: _loadMyCars,
+                ),
+              ),
+            ),
           ),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.directions_car,
-                  label: context.t('home.menu_garage'),
-                  color: Colors.cyan,
-                  badge: _myCars.isNotEmpty ? '${_myCars.length}' : null,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const GarageScreen()),
-                  ).then((_) => _loadMyCars()),
+          const SizedBox(height: 12),
+          _categoryCard(
+            context,
+            icon: Icons.groups,
+            title: context.t('home.section_community'),
+            subtitle: context.t('home.section_community_subtitle'),
+            color: AppColors.blue,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CommunityHubScreen(
+                  myClubs: _myClubs,
+                  onClubsChanged: _loadMyClubs,
                 ),
               ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.local_parking,
-                  label: context.t('home.menu_parking'),
-                  color: Colors.indigo,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ParkingScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.build,
-                  label: context.t('home.menu_service_log'),
-                  color: Colors.brown,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MaintenanceScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.description,
-                  label: context.t('home.menu_documents'),
-                  color: Colors.blueGrey,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CarDocumentsScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.attach_money,
-                  label: context.t('home.menu_expenses'),
-                  color: Colors.green,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CarExpensesScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.local_gas_station,
-                  label: context.t('home.menu_fuel_tracker'),
-                  color: Colors.teal,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FuelTrackerScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.qr_code_scanner,
-                  label: context.t('home.menu_vin_check'),
-                  color: Colors.purple,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const VinDecoderScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.psychology_alt,
-                  label: context.t('home.menu_ai_diagnosis'),
-                  color: Colors.deepOrange,
-                  locked: !isMaxTier,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => isMaxTier
-                          ? AiDiagnosisScreen(carId: _myCars.isNotEmpty ? _myCars.first['id'] as String? : null)
-                          : const PremiumScreen(),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.picture_as_pdf,
-                  label: context.t('home.menu_car_report'),
-                  color: Colors.redAccent,
-                  locked: !isMaxTier,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => isMaxTier ? const CarReportScreen() : const PremiumScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.event_available,
-                  label: context.t('home.menu_maintenance_forecast'),
-                  color: Colors.teal,
-                  locked: !isMaxTier,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => isMaxTier ? const MaintenanceForecastScreen() : const PremiumScreen()),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-
-          const SizedBox(height: 18),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(context.t('home.section_community'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
+          const SizedBox(height: 12),
+          _categoryCard(
+            context,
+            icon: Icons.emoji_events,
+            title: context.t('home.section_my_activity'),
+            subtitle: context.t('home.section_my_activity_subtitle'),
+            color: Colors.amber,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ActivityHubScreen(
+                  achievements: achievements,
+                  level: stats.level,
+                  levelTitle: context.t(stats.levelTitleKey),
+                ),
+              ),
+            ),
           ),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.people,
-                  label: context.t('home.menu_friends'),
-                  color: AppColors.blue,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FriendsListScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.groups,
-                  label: context.t('home.menu_clubs'),
-                  color: AppColors.blue,
-                  badge: _myClubs.isNotEmpty ? '${_myClubs.length}' : null,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ClubsListScreen()),
-                  ).then((_) => _loadMyClubs()),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.forum,
-                  label: context.t('home.menu_forum'),
-                  color: Colors.deepOrange,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ForumCategoriesScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.storefront,
-                  label: context.t('home.menu_marketplace'),
-                  color: Colors.deepPurple,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PartListingsScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.sell_outlined,
-                  label: context.t('home.menu_car_listings'),
-                  color: Colors.deepPurple,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CarListingsScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.how_to_vote,
-                  label: context.t('home.menu_car_of_week'),
-                  color: Colors.orangeAccent,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CarOfWeekScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.route,
-                  label: context.t('home.menu_convoy'),
-                  color: AppColors.blue,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ConvoyScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.emoji_events,
-                  label: context.t('home.menu_leaders'),
-                  color: Colors.amber,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
-                  ),
-                ),
-              ),
-            ],
+          const SizedBox(height: 12),
+          _categoryCard(
+            context,
+            icon: Icons.shield,
+            title: context.t('home.section_safety'),
+            subtitle: context.t('home.section_safety_subtitle'),
+            color: AppColors.red,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SafetyHubScreen()),
+            ),
           ),
-
-          const SizedBox(height: 18),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(context.t('home.section_my_activity'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
-          ),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.event_available,
-                  label: context.t('home.menu_my_bookings'),
-                  color: Colors.tealAccent,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
-                  ),
+          const SizedBox(height: 12),
+          _categoryCard(
+            context,
+            icon: Icons.more_horiz,
+            title: context.t('home.section_other'),
+            subtitle: context.t('home.section_other_subtitle'),
+            color: Colors.blueGrey,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MoreHubScreen(
+                  isAdmin: user['is_admin'] == true,
+                  onStartTour: () => showOnboardingTour(context, _tourSteps()),
                 ),
               ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.bookmark,
-                  label: context.t('home.menu_favorites'),
-                  color: AppColors.red,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FavoritesScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.military_tech,
-                  label: context.t('home.menu_achievements'),
-                  color: Colors.amber,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AchievementsScreen(
-                        achievements: achievements,
-                        level: stats.level,
-                        levelTitle: context.t(stats.levelTitleKey),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.flag,
-                  label: context.t('home.menu_challenges'),
-                  color: Colors.deepOrange,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ChallengesScreen()),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(context.t('home.section_safety'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
-          ),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.sos,
-                  label: 'SOS',
-                  color: Colors.red,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SosScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.warning_amber_rounded,
-                  label: context.t('home.menu_road_hazards'),
-                  color: Colors.orange,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const HazardsScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.car_repair,
-                  label: context.t('home.menu_services'),
-                  color: AppColors.red,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const BusinessesListScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.pin_drop,
-                  label: context.t('home.menu_my_points'),
-                  color: Colors.teal,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MyPointsScreen()),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(context.t('home.section_other'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: cardText.withOpacity(0.65), letterSpacing: 0.3)),
-          ),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.settings,
-                  label: context.t('home.menu_settings'),
-                  color: Colors.grey,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.help_outline,
-                  label: context.t('home.menu_help'),
-                  color: Colors.blueGrey,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const FaqScreen()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 78,
-                child: AnimatedMenuTile(
-                  icon: Icons.explore_outlined,
-                  label: context.t('home.menu_tour'),
-                  color: Colors.deepOrange,
-                  onTap: () => showOnboardingTour(context, _tourSteps()),
-                ),
-              ),
-              if (user['is_admin'] == true)
-                SizedBox(
-                  width: 78,
-                  child: AnimatedMenuTile(
-                    icon: Icons.admin_panel_settings,
-                    label: context.t('home.menu_admin'),
-                    color: AppColors.red,
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AdminPanelScreen()),
-                    ),
-                  ),
-                ),
-            ],
+            ),
           ),
 
           const SizedBox(height: 20),

@@ -21,4 +21,12 @@ const Map<String, Map<String, String>> kFeatureHomeMenuGridTranslations = {
   'home.menu_road_hazards': {'ru': 'Опасности на дороге', 'en': 'Road hazards', 'ka': 'საგზაო საფრთხეები'},
   'home.section_other': {'ru': 'Прочее', 'en': 'Other', 'ka': 'სხვა'},
   'home.menu_help': {'ru': 'Помощь', 'en': 'Help', 'ka': 'დახმარება'},
+
+  // Подзаголовки для крупных карточек-категорий на главном экране
+  // (редизайн меню: 5 категорий вместо ~19 плоских иконок).
+  'home.section_my_car_subtitle': {'ru': 'Гараж, сервис, документы, топливо и ИИ-диагностика', 'en': 'Garage, service, documents, fuel and AI diagnosis', 'ka': 'გარაჟი, სერვისი, დოკუმენტები, საწვავი და AI დიაგნოსტიკა'},
+  'home.section_community_subtitle': {'ru': 'Друзья, клубы, форум, маркетплейс и лидеры', 'en': 'Friends, clubs, forum, marketplace and leaders', 'ka': 'მეგობრები, კლუბები, ფორუმი, ბაზარი და ლიდერები'},
+  'home.section_my_activity_subtitle': {'ru': 'Записи, избранное, достижения и челленджи', 'en': 'Bookings, favorites, achievements and challenges', 'ka': 'ჩანაწერები, ფავორიტები, მიღწევები და გამოწვევები'},
+  'home.section_safety_subtitle': {'ru': 'SOS, дорожные опасности, автосервисы и ваши точки', 'en': 'SOS, road hazards, auto services and your points', 'ka': 'SOS, საგზაო საფრთხეები, ავტოსერვისები და თქვენი წერტილები'},
+  'home.section_other_subtitle': {'ru': 'Настройки, помощь и интерактивный тур по приложению', 'en': 'Settings, help and the interactive app tour', 'ka': 'პარამეტრები, დახმარება და აპლიკაციის ტური'},
 };
