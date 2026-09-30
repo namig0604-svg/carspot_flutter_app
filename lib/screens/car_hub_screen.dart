@@ -54,7 +54,7 @@ class CarHubScreen extends StatelessWidget {
                 runSpacing: 10,
                 children: [
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.directions_car,
                       label: context.t('home.menu_garage'),
@@ -67,7 +67,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.local_parking,
                       label: context.t('home.menu_parking'),
@@ -79,7 +79,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.build,
                       label: context.t('home.menu_service_log'),
@@ -91,7 +91,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.description,
                       label: context.t('home.menu_documents'),
@@ -103,7 +103,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.attach_money,
                       label: context.t('home.menu_expenses'),
@@ -115,7 +115,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.local_gas_station,
                       label: context.t('home.menu_fuel_tracker'),
@@ -127,7 +127,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.route,
                       label: context.t('home.menu_trips'),
@@ -139,7 +139,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.qr_code_scanner,
                       label: context.t('home.menu_vin_check'),
@@ -151,7 +151,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.psychology_alt,
                       label: context.t('home.menu_ai_diagnosis'),
@@ -168,7 +168,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.picture_as_pdf,
                       label: context.t('home.menu_car_report'),
@@ -181,7 +181,7 @@ class CarHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.event_available,
                       label: context.t('home.menu_maintenance_forecast'),

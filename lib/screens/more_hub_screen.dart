@@ -41,7 +41,7 @@ class MoreHubScreen extends StatelessWidget {
                 runSpacing: 10,
                 children: [
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.settings,
                       label: context.t('home.menu_settings'),
@@ -53,7 +53,7 @@ class MoreHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.help_outline,
                       label: context.t('home.menu_help'),
@@ -65,7 +65,7 @@ class MoreHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.explore_outlined,
                       label: context.t('home.menu_tour'),
@@ -75,7 +75,7 @@ class MoreHubScreen extends StatelessWidget {
                   ),
                   if (isAdmin)
                     SizedBox(
-                      width: 78,
+                      width: 96,
                       child: AnimatedMenuTile(
                         icon: Icons.admin_panel_settings,
                         label: context.t('home.menu_admin'),

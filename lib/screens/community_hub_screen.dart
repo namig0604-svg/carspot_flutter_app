@@ -46,7 +46,7 @@ class CommunityHubScreen extends StatelessWidget {
                 runSpacing: 10,
                 children: [
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.people,
                       label: context.t('home.menu_friends'),
@@ -58,7 +58,7 @@ class CommunityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.groups,
                       label: context.t('home.menu_clubs'),
@@ -71,7 +71,7 @@ class CommunityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.forum,
                       label: context.t('home.menu_forum'),
@@ -83,7 +83,7 @@ class CommunityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.storefront,
                       label: context.t('home.menu_marketplace'),
@@ -95,7 +95,7 @@ class CommunityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.sell_outlined,
                       label: context.t('home.menu_car_listings'),
@@ -107,7 +107,7 @@ class CommunityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.how_to_vote,
                       label: context.t('home.menu_car_of_week'),
@@ -119,7 +119,7 @@ class CommunityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.route,
                       label: context.t('home.menu_convoy'),
@@ -131,7 +131,7 @@ class CommunityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.emoji_events,
                       label: context.t('home.menu_leaders'),

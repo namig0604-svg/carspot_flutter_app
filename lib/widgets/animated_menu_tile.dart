@@ -59,10 +59,10 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
         duration: const Duration(milliseconds: 110),
         curve: Curves.easeOut,
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: widget.dense ? 10 : 14, horizontal: 6),
+          padding: EdgeInsets.symmetric(vertical: widget.dense ? 12 : 18, horizontal: 8),
           decoration: BoxDecoration(
             color: AppColors.surfaceDark,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(color: effectiveColor.withOpacity(widget.locked ? 0.18 : 0.25)),
           ),
           child: Column(
@@ -72,8 +72,8 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
                 clipBehavior: Clip.none,
                 children: [
                   Container(
-                    width: widget.dense ? 38 : 44,
-                    height: widget.dense ? 38 : 44,
+                    width: widget.dense ? 48 : 58,
+                    height: widget.dense ? 48 : 58,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: effectiveColor.withOpacity(widget.locked ? 0.10 : 0.15),
@@ -82,7 +82,7 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
                     child: Icon(
                       widget.icon,
                       color: widget.locked ? effectiveColor.withOpacity(0.5) : effectiveColor,
-                      size: widget.dense ? 19 : 21,
+                      size: widget.dense ? 24 : 28,
                     ),
                   ),
                   if (widget.locked)
@@ -92,7 +92,7 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
                       child: Container(
                         padding: const EdgeInsets.all(3),
                         decoration: const BoxDecoration(color: Colors.black87, shape: BoxShape.circle),
-                        child: const Icon(Icons.lock, size: 10, color: Colors.amber),
+                        child: const Icon(Icons.lock, size: 12, color: Colors.amber),
                       ),
                     )
                   else if (widget.badge != null)
@@ -112,7 +112,7 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
                     ),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 widget.label,
                 textAlign: TextAlign.center,
@@ -120,7 +120,7 @@ class _AnimatedMenuTileState extends State<AnimatedMenuTile> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: AppColors.textOnDark.withOpacity(widget.locked ? 0.5 : 1.0),
-                  fontSize: widget.dense ? 10.5 : 11.5,
+                  fontSize: widget.dense ? 12 : 13.5,
                   fontWeight: FontWeight.w600,
                 ),
               ),

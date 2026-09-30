@@ -34,7 +34,7 @@ class SafetyHubScreen extends StatelessWidget {
                 runSpacing: 10,
                 children: [
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.sos,
                       label: 'SOS',
@@ -46,7 +46,7 @@ class SafetyHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.warning_amber_rounded,
                       label: context.t('home.menu_road_hazards'),
@@ -58,7 +58,7 @@ class SafetyHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.car_repair,
                       label: context.t('home.menu_services'),
@@ -70,7 +70,7 @@ class SafetyHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.pin_drop,
                       label: context.t('home.menu_my_points'),

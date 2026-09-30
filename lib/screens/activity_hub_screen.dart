@@ -44,7 +44,7 @@ class ActivityHubScreen extends StatelessWidget {
                 runSpacing: 10,
                 children: [
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.event_available,
                       label: context.t('home.menu_my_bookings'),
@@ -56,7 +56,7 @@ class ActivityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.bookmark,
                       label: context.t('home.menu_favorites'),
@@ -68,7 +68,7 @@ class ActivityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.military_tech,
                       label: context.t('home.menu_achievements'),
@@ -86,7 +86,7 @@ class ActivityHubScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 78,
+                    width: 96,
                     child: AnimatedMenuTile(
                       icon: Icons.flag,
                       label: context.t('home.menu_challenges'),
