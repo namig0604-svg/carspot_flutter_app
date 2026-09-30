@@ -1,10 +1,11 @@
-/// Настройка нижней панели (BottomNavSettingsScreen) + новые id разделов
-/// в самой панели ("Поездки", "Гараж" — home.nav_trips/home.nav_garage).
+/// Настройка нижней панели (BottomNavSettingsScreen) + новый id раздела
+/// в самой панели ("Поездки" — home.nav_trips). home.nav_garage сюда не
+/// входит — он уже определён в batch1_tr.dart, повторное определение
+/// ломает сборку (конфликт ключей в const Map).
 /// Только ru/en/ka — остальные языки (az/hy/kk/uk) откатываются на русский.
 /// Подключается централизованно в lib/l10n/app_translations.dart.
 const Map<String, Map<String, String>> kFeatureBottomNavSettingsTranslations = {
   'home.nav_trips': {'ru': 'Поездки', 'en': 'Trips', 'ka': 'მოგზაურობები'},
-  'home.nav_garage': {'ru': 'Гараж', 'en': 'Garage', 'ka': 'გარაჟი'},
 
   'bottom_nav_settings.section_title': {'ru': 'Нижняя панель', 'en': 'Bottom bar', 'ka': 'ქვედა პანელი'},
   'bottom_nav_settings.entry_title': {'ru': 'Настроить разделы', 'en': 'Customize sections', 'ka': 'განყოფილებების მორგება'},
