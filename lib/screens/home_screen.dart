@@ -228,11 +228,12 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
-  /// Крупная карточка-категория на главном экране (редизайн меню: раньше
-  /// было ~19 мелких иконок плоским списком, теперь 5 смысловых разделов,
-  /// каждый открывает отдельный экран со своим функционалом — см.
-  /// car_hub_screen.dart и соседние *_hub_screen.dart).
-  Widget _categoryCard(
+  /// Квадратная плитка-категория на главном экране (редизайн меню: раньше
+  /// было ~19 мелких иконок плоским списком, потом — 5 крупных карточек в
+  /// один столбец; теперь квадратные плитки по 2 в ряд — компактнее и
+  /// аккуратнее на глаз). Тап открывает отдельный экран со своим
+  /// функционалом — см. car_hub_screen.dart и соседние *_hub_screen.dart.
+  Widget _categoryTile(
     BuildContext context, {
     required IconData icon,
     required String title,
@@ -243,52 +244,52 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = AppColors.isDark(context);
     final cardSurface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final cardText = isDark ? AppColors.textOnDark : AppColors.textOnLight;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: onTap,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: cardSurface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.border(context)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.16),
-                  borderRadius: BorderRadius.circular(14),
+    final side = (MediaQuery.of(context).size.width - 40 - 12) / 2;
+    return SizedBox(
+      width: side,
+      height: side,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: cardSurface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.border(context)),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.16),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(icon, color: color, size: 28),
                 ),
-                child: Icon(icon, color: color, size: 28),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12.5, color: cardText.withOpacity(0.65)),
-                    ),
-                  ],
+                const SizedBox(height: 12),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: cardText),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: cardText.withOpacity(0.4)),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 11, color: cardText.withOpacity(0.6)),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1295,86 +1296,88 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(context.t('home.menu_title'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
           ),
           const SizedBox(height: 14),
-          _categoryCard(
-            context,
-            icon: Icons.directions_car,
-            title: context.t('home.section_my_car'),
-            subtitle: context.t('home.section_my_car_subtitle'),
-            color: Colors.cyan,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CarHubScreen(
-                  myCars: _myCars,
-                  isMaxTier: isMaxTier,
-                  onCarsChanged: _loadMyCars,
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _categoryTile(
+                context,
+                icon: Icons.directions_car,
+                title: context.t('home.section_my_car'),
+                subtitle: context.t('home.section_my_car_subtitle'),
+                color: Colors.cyan,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CarHubScreen(
+                      myCars: _myCars,
+                      isMaxTier: isMaxTier,
+                      onCarsChanged: _loadMyCars,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _categoryCard(
-            context,
-            icon: Icons.groups,
-            title: context.t('home.section_community'),
-            subtitle: context.t('home.section_community_subtitle'),
-            color: AppColors.blue,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => CommunityHubScreen(
-                  myClubs: _myClubs,
-                  onClubsChanged: _loadMyClubs,
+              _categoryTile(
+                context,
+                icon: Icons.groups,
+                title: context.t('home.section_community'),
+                subtitle: context.t('home.section_community_subtitle'),
+                color: AppColors.blue,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CommunityHubScreen(
+                      myClubs: _myClubs,
+                      onClubsChanged: _loadMyClubs,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _categoryCard(
-            context,
-            icon: Icons.emoji_events,
-            title: context.t('home.section_my_activity'),
-            subtitle: context.t('home.section_my_activity_subtitle'),
-            color: Colors.amber,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ActivityHubScreen(
-                  achievements: achievements,
-                  level: stats.level,
-                  levelTitle: context.t(stats.levelTitleKey),
+              _categoryTile(
+                context,
+                icon: Icons.emoji_events,
+                title: context.t('home.section_my_activity'),
+                subtitle: context.t('home.section_my_activity_subtitle'),
+                color: Colors.amber,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ActivityHubScreen(
+                      achievements: achievements,
+                      level: stats.level,
+                      levelTitle: context.t(stats.levelTitleKey),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _categoryCard(
-            context,
-            icon: Icons.shield,
-            title: context.t('home.section_safety'),
-            subtitle: context.t('home.section_safety_subtitle'),
-            color: AppColors.red,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SafetyHubScreen()),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _categoryCard(
-            context,
-            icon: Icons.more_horiz,
-            title: context.t('home.section_other'),
-            subtitle: context.t('home.section_other_subtitle'),
-            color: Colors.blueGrey,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MoreHubScreen(
-                  isAdmin: user['is_admin'] == true,
-                  onStartTour: () => showOnboardingTour(context, _tourSteps()),
+              _categoryTile(
+                context,
+                icon: Icons.shield,
+                title: context.t('home.section_safety'),
+                subtitle: context.t('home.section_safety_subtitle'),
+                color: AppColors.red,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SafetyHubScreen()),
                 ),
               ),
-            ),
+              _categoryTile(
+                context,
+                icon: Icons.more_horiz,
+                title: context.t('home.section_other'),
+                subtitle: context.t('home.section_other_subtitle'),
+                color: Colors.blueGrey,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MoreHubScreen(
+                      isAdmin: user['is_admin'] == true,
+                      onStartTour: () => showOnboardingTour(context, _tourSteps()),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 20),
