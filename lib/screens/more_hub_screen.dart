@@ -33,10 +33,10 @@ class MoreHubScreen extends StatelessWidget {
       body: Stack(
         children: [
           const SectionBackground(accent: Colors.blueGrey, glowAlignment: Alignment.topRight, imageAsset: 'assets/backgrounds/settings.jpg'),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Wrap(
+          ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Wrap(
                 spacing: 10,
                 runSpacing: 10,
                 children: [
@@ -88,7 +88,7 @@ class MoreHubScreen extends StatelessWidget {
                     ),
                 ],
               ),
-            ),
+            ],
           ),
         ],
       ),
