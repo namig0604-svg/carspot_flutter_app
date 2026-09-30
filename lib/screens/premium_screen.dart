@@ -14,6 +14,7 @@ import '../widgets/app_loader.dart';
 import '../widgets/car_loaders.dart';
 import 'subscription_management_screen.dart';
 import '../theme/app_colors.dart';
+import '../widgets/tier_swipe_stack.dart';
 import '../utils/sound_player.dart';
 import '../l10n/l10n_extensions.dart';
 
@@ -355,82 +356,68 @@ class _PremiumScreenState extends State<PremiumScreen> {
     );
   }
 
-  Widget _buildPlansByTier(Color cardText) {
+  /// Группирует загруженные тарифные планы в карточки для свайп-стека
+  /// [TierSwipeStack] (Basic → Pro → Max, от дешёвого к дорогому — порядок,
+  /// в котором свайп влево идёт "дороже"). Привилегии подобраны по уровням
+  /// из той же информации, что и таблица сравнения ниже — каждый следующий
+  /// уровень показывает только то, что добавляется сверх предыдущего, чтобы
+  /// карточка не дублировала целиком уже показанные пункты.
+  List<TierCardData> _buildTierCards() {
     final byTier = <String, List<Map<String, dynamic>>>{};
     for (final p in _plans) {
       final plan = p as Map<String, dynamic>;
       final tier = (plan['tier'] as String?) ?? 'pro';
       byTier.putIfAbsent(tier, () => []).add(plan);
     }
-    // Max сверху — самый жирный план, Pro — золотая середина.
-    final order = ['max', 'pro', 'basic'];
-    final tierTitles = {'max': 'CarSpot Max', 'pro': 'CarSpot Pro', 'basic': 'CarSpot Basic'};
-    final tierBadgeColors = {'max': Colors.purple.shade700, 'pro': Colors.amber.shade700};
-    final tierBadgeKeys = {'max': 'premium.top_tier_badge', 'pro': 'premium.best_value_badge'};
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (final tier in order)
-          if (byTier.containsKey(tier)) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6, top: 4),
-              child: Row(
-                children: [
-                  Text(
-                    tierTitles[tier] ?? tier,
-                    style: TextStyle(fontWeight: FontWeight.bold, color: cardText, fontSize: 14),
-                  ),
-                  if (tierBadgeKeys.containsKey(tier)) ...[
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: tierBadgeColors[tier],
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        context.t(tierBadgeKeys[tier]!),
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            for (final plan in byTier[tier]!)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: _isCheckingOut ? null : () => _startCheckout(plan['id'] as String),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: BorderSide(color: Colors.amber.shade700),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(plan['title'] as String,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                            overflow: TextOverflow.ellipsis),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '\$${plan['amount_usd']}',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber.shade800),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            const SizedBox(height: 8),
-          ],
+    const order = ['basic', 'pro', 'max'];
+    final titles = {'basic': 'CarSpot Basic', 'pro': 'CarSpot Pro', 'max': 'CarSpot Max'};
+    final colors = {'basic': AppColors.blue, 'pro': Colors.amber.shade700, 'max': Colors.purple.shade700};
+    final badgeKeys = {'pro': 'premium.best_value_badge', 'max': 'premium.top_tier_badge'};
+    final leadInKeys = {'pro': 'premium.includes_basic_plus', 'max': 'premium.includes_pro_plus'};
+
+    final perksByTier = <String, List<TierPerk>>{
+      'basic': [
+        TierPerk(Icons.monetization_on, context.t('premium.compare_bonus_coins'), '+50'),
+        TierPerk(Icons.bolt, context.t('premium.compare_bonus_xp'), '+50'),
+        TierPerk(Icons.badge, context.t('premium.compare_status_name')),
+        TierPerk(Icons.arrow_upward, context.t('premium.compare_priority')),
+        TierPerk(Icons.directions_car, context.t('premium.compare_garage'), '12'),
+        TierPerk(Icons.storefront, context.t('premium.compare_business'), '1'),
       ],
-    );
+      'pro': [
+        TierPerk(Icons.monetization_on, context.t('premium.compare_bonus_coins'), '+150'),
+        TierPerk(Icons.bolt, context.t('premium.compare_bonus_xp'), '+100'),
+        TierPerk(Icons.rocket_launch, context.t('premium.compare_free_boost'), '24h'),
+        TierPerk(Icons.push_pin, context.t('premium.compare_pinned_photos')),
+        TierPerk(Icons.directions_car, context.t('premium.compare_garage'), '18'),
+        TierPerk(Icons.storefront, context.t('premium.compare_business'), '2'),
+      ],
+      'max': [
+        TierPerk(Icons.monetization_on, context.t('premium.compare_bonus_coins'), '+400'),
+        TierPerk(Icons.rocket_launch, context.t('premium.compare_free_boost'), '48h'),
+        TierPerk(Icons.psychology_alt, context.t('premium.compare_ai_diagnosis')),
+        TierPerk(Icons.picture_as_pdf, context.t('premium.compare_car_report')),
+        TierPerk(Icons.event_available, context.t('premium.compare_maintenance_forecast')),
+        TierPerk(Icons.directions_car, context.t('premium.compare_garage'), '25'),
+      ],
+    };
+
+    final cards = <TierCardData>[];
+    for (final tier in order) {
+      final plans = byTier[tier];
+      if (plans == null || plans.isEmpty) continue;
+      cards.add(TierCardData(
+        tier: tier,
+        title: titles[tier]!,
+        color: colors[tier]!,
+        badgeLabel: badgeKeys.containsKey(tier) ? context.t(badgeKeys[tier]!) : null,
+        leadInLabel: leadInKeys.containsKey(tier) ? context.t(leadInKeys[tier]!) : null,
+        plans: plans,
+        perks: perksByTier[tier] ?? const [],
+      ));
+    }
+    return cards;
   }
 
   Widget _tierCompareRow(
@@ -663,7 +650,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 ),
               )
             else if (kIsWeb)
-              _buildPlansByTier(cardText)
+              TierSwipeStack(
+                cards: _buildTierCards(),
+                isCheckingOut: _isCheckingOut,
+                onBuy: _startCheckout,
+              )
             else if (!BillingService.instance.isAvailable || BillingService.instance.products.isEmpty)
               Container(
                 width: double.infinity,
@@ -795,12 +786,14 @@ class _PremiumScreenState extends State<PremiumScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            Text(context.t('premium.compare_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 4),
-            Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Column(
-                children: [
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: Text(context.t('premium.detailed_compare_title'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: Column(
+                    children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                     child: Row(
@@ -832,13 +825,17 @@ class _PremiumScreenState extends State<PremiumScreen> {
                 ],
               ),
             ),
+              ],
+            ),
             const SizedBox(height: 24),
-            Text(context.t('premium.perks_title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 4),
-            Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: Column(
-                children: [
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: Text(context.t('premium.detailed_perks_title'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: cardText)),
+              children: [
+                Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: Column(
+                    children: [
                   // Практичные/статусные/монетные плюшки — то, что реально
                   // хотят иметь, а не голые цифры лимитов (машины/автосервисы
                   // и так остаются в сравнительной таблице выше).
@@ -875,6 +872,8 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       context.t('premium.perk_maintenance_forecast_subtitle')),
                 ],
               ),
+            ),
+              ],
             ),
             const SizedBox(height: 24),
           ],

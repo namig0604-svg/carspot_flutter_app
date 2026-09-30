@@ -86,6 +86,34 @@ const Map<String, Map<String, String>> kFeaturePremiumTiersTranslations = {
     'en': 'Pinned photos',
     'ka': 'დამაგრებული ფოტოები',
   },
+
+  // Свайп-стек выбора тарифа на экране Premium (редизайн в стиле Tinder:
+  // свайп влево — тариф дороже, вправо — дешевле).
+  'premium.swipe_hint': {
+    'ru': 'Смахните карточку: влево — тариф дороже, вправо — дешевле',
+    'en': 'Swipe the card: left for a pricier tier, right for a cheaper one',
+    'ka': 'გადაფურცლეთ ბარათი: მარცხნივ — უფრო ძვირი, მარჯვნივ — იაფი',
+  },
+  'premium.includes_basic_plus': {
+    'ru': 'Всё из Basic, плюс:',
+    'en': 'Everything in Basic, plus:',
+    'ka': 'ყველაფერი Basic-დან, პლუს:',
+  },
+  'premium.includes_pro_plus': {
+    'ru': 'Всё из Pro, плюс:',
+    'en': 'Everything in Pro, plus:',
+    'ka': 'ყველაფერი Pro-დან, პლუს:',
+  },
+  'premium.detailed_compare_title': {
+    'ru': 'Подробное сравнение тарифов',
+    'en': 'Detailed tier comparison',
+    'ka': 'დონეების დეტალური შედარება',
+  },
+  'premium.detailed_perks_title': {
+    'ru': 'Все привилегии по отдельности',
+    'en': 'All perks in detail',
+    'ka': 'ყველა პრივილეგია დეტალურად',
+  },
   'subscription_mgmt.title': {
     'ru': 'Управление подпиской',
     'en': 'Manage subscription',
